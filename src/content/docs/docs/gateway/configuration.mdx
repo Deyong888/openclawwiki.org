@@ -1,0 +1,125 @@
+---
+title: Configuration
+description: All configuration options for ~/.openclaw/openclaw.json with examples.
+sidebar:
+  label: Configuration
+  order: 1
+---
+
+---
+title: Configuration
+description: Complete configuration guide for OpenClaw (openclaw.json).
+sidebar:
+  label: Configuration
+  order: 1
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Configuration 🔧
+
+OpenClaw is configured via a JSON5 file at `~/.openclaw/openclaw.json`.
+
+<Aside type="note">
+**JSON5** allows comments (`//`) and trailing commas, making it much friendlier than standard JSON.
+</Aside>
+
+## Minimal config (recommended starting point)
+
+```json5
+{
+  // "agents" defines defaults for all agents
+  agents: {
+    defaults: {
+      // Where the agent keeps its memory and skills
+      workspace: "~/.openclaw/workspace"
+    }
+  },
+  // "channels" defines how the world talks to the gateway
+  channels: {
+    // Example: enable Telegram
+    telegram: {
+      enabled: true,
+      botToken: "123:abc...",
+      dmPolicy: "pairing"
+    }
+  }
+}
+```
+
+## Examples
+
+<Tabs>
+  <TabItem label="Minimal">
+    A simple setup enabling Telegram and a custom workspace.
+
+    ```json5
+    {
+      // Global settings
+      agents: {
+        defaults: {
+          workspace: "~/.openclaw/workspace"
+        }
+      },
+      // Channel config
+      channels: {
+        telegram: {
+          enabled: true,
+          botToken: "YOUR_TOKEN",
+          dmPolicy: "pairing"
+        }
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Full">
+    A more complete configuration with multiple channels and web tools.
+
+    ```json5
+    {
+      gateway: {
+        port: 18789
+      },
+      agents: {
+        defaults: {
+          workspace: "~/.openclaw/workspace",
+          model: { primary: "anthropic/claude-3-5-sonnet" }
+        }
+      },
+      channels: {
+        whatsapp: {
+          enabled: true,
+          dmPolicy: "allowlist",
+          allowFrom: ["+15551234567"]
+        },
+        telegram: {
+          enabled: true,
+          botToken: "YOUR_TOKEN",
+          groups: { "*": { requireMention: true } }
+        }
+      },
+      tools: {
+        web: {
+          search: { enabled: true, provider: "brave" }
+        }
+      }
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+## Management Commands
+
+You don't always need to edit the file manually.
+
+- **Check Config**: `openclaw doctor`
+- **Apply Changes**: `openclaw config apply` (restarts gateway)
+- **Get Value**: `openclaw config get channels.telegram.enabled`
+- **Set Value**: `openclaw config set channels.telegram.enabled true`
+
+## Strict Validation
+
+The Gateway enforces a strict schema. If your config is invalid:
+1. The Gateway will **refuse to start**.
+2. Run `openclaw doctor` to see errors.
+3. Fix errors manually or use `openclaw doctor --fix`.

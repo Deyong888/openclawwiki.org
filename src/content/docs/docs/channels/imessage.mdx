@@ -1,0 +1,99 @@
+---
+title: iMessage (Legacy)
+description: Connect OpenClaw to iMessage via the legacy imsg CLI tool.
+sidebar:
+  label: iMessage (Legacy)
+  order: 23
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+<Aside type="caution" title="Legacy Integration">
+This integration uses `imsg` and local macOS database access. For a more robust, modern experience (including Windows/Linux support via a bridge), we recommend using **[BlueBubbles](/docs/channels/bluebubbles)** instead.
+</Aside>
+
+The legacy iMessage integration runs directly on a macOS machine, accessing the local Messages `chat.db` to read and send messages.
+
+## Prerequisites
+
+- A **macOS** machine (Mac Mini, MacBook, etc.).
+- **Messages app** signed in with an Apple ID.
+- **Full Disk Access** granted to OpenClaw (to read `chat.db`).
+
+## Setup Guide
+
+<Steps>
+
+1.  ### Install the CLI Tool
+    We use `imsg` to bridge OpenClaw to the Messages private API.
+    
+    ```bash
+    brew install steipete/tap/imsg
+    ```
+
+2.  ### Configure OpenClaw
+    Tell OpenClaw where `imsg` and your chat database are located.
+
+    ```json5
+    {
+      channels: {
+        imessage: {
+          enabled: true,
+          // Path to the installed binary
+          cliPath: "/opt/homebrew/bin/imsg", 
+          // Your Messages DB
+          dbPath: "/Users/yourname/Library/Messages/chat.db" 
+        }
+      }
+    }
+    ```
+
+3.  ### Grant Permissions
+    When you first run OpenClaw:
+    *   macOS will prompt you to grant **Full Disk Access** to your terminal or the OpenClaw binary. This is required to read `chat.db`.
+    *   macOS may prompt for **Automation** permissions to allow sending messages.
+
+4.  ### Pairing
+    Send an iMessage to yourself (or the account running the bot).
+    *   The bot will reply with a **Pairing Code**.
+    *   Run `openclaw pairing approve imessage <code>` to authorize.
+
+</Steps>
+
+## Remote Setup (Tailscale)
+
+If you run OpenClaw on Linux but have a Mac for iMessage, you can bridge them via SSH and Tailscale.
+
+1.  **Mac**: Enable **Remote Login** (SSH).
+2.  **Linux**: Create a wrapper script to run `imsg` remotely.
+
+    ```bash
+    #!/bin/bash
+    # /usr/local/bin/imsg-ssh
+    ssh user@my-mac-mini.tailscale.net "/opt/homebrew/bin/imsg $@"
+    ```
+
+3.  **Config**:
+    ```json5
+    {
+      channels: {
+        imessage: {
+          cliPath: "/usr/local/bin/imsg-ssh",
+          remoteHost: "user@my-mac-mini.tailscale.net", // For fetching attachments
+          includeAttachments: true
+        }
+      }
+    }
+    ```
+
+## Comparison: Legacy vs. BlueBubbles
+
+| Feature | Legacy (`imsg`) | BlueBubbles |
+| :--- | :--- | :--- |
+| **OS Support** | macOS Only | Linux, Windows, Docker (via Android/Mac bridge) |
+| **Reliability** | Medium (depends on AppleScript/DB) | High (API based) |
+| **Attachments** | Basic | Full Support |
+| **Reactions** | Read-only | Read/Write |
+| **Typing Indicators** | No | Yes |
+
+We strongly recommend migrating to [BlueBubbles](/docs/channels/bluebubbles) for new deployments.

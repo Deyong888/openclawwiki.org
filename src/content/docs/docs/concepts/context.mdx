@@ -1,0 +1,63 @@
+---
+title: Context
+description: How OpenClaw constructs the prompt context for the LLM.
+sidebar:
+  order: 5
+---
+
+**Context** is the complete set of information sent to the LLM for a single inference turn. It is the "world" the AI sees at that moment.
+
+## Components of Context
+
+A typical context is built from layers, ordered from general to specific:
+
+### 1. System Prompt (The Persona)
+*   **Role**: Defines who the agent is.
+*   **Content**: "You are OpenClaw, a helpful AI assistant. You answer concisely..."
+*   **Priority**: High. This sets the behavioral baseline.
+
+### 2. World State / Environment
+*   **Time**: "Current date: 2023-10-27".
+*   **User Info**: "User name: Alice. Location: New York."
+*   **OS/Platform**: "Running on Linux. Channel: Telegram."
+
+### 3. Skill Definitions (Tools)
+*   **Schema**: JSON descriptions of available functions (e.g., `web_search`, `read_file`).
+*   **Instruction**: "Use `web_search` if the user asks for current events."
+
+### 4. Long-Term Memory (RAG)
+*   **Retrieval**: Relevant snippets fetched from the vector database based on the user's latest query.
+*   **Content**: "Alice mentioned she likes sushi in a previous chat."
+
+### 5. Conversation History (Short-Term Memory)
+*   **The Chat**: The actual back-and-forth messages.
+*   `[User]: Hi!`
+*   `[Agent]: Hello! How can I help?`
+*   `[User]: What's the weather?`
+*   **Compaction**: Older history may be replaced by a summary here.
+
+### 6. Scratchpad / Thoughts
+*   **Chain-of-Thought**: If the agent is "thinking", previous reasoning steps are included here to guide the final answer.
+
+## Context Window Management
+
+The **Context Window** is the maximum size of this combined text (measured in tokens).
+*   GPT-4: 8k or 32k or 128k.
+*   Claude 3: 200k.
+*   Llama 3: 8k/128k.
+
+OpenClaw dynamically manages this budget:
+1.  **Reserve** space for the System Prompt and Tools (must always fit).
+2.  **Fill** with History (most recent first).
+3.  **Inject** RAG memories if space permits.
+4.  **Truncate** or **Compact** the oldest history if the limit is reached.
+
+## Debugging Context
+
+To see exactly what the agent sees, you can often run with verbose logging:
+
+```bash
+openclaw run --verbose
+```
+
+This will print the full prompt sent to the LLM, allowing you to inspect if memories are being retrieved or if the history is being truncated correctly.

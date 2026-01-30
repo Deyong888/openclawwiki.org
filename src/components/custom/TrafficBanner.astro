@@ -1,0 +1,57 @@
+---
+import { Icon } from 'astro-icon/components';
+---
+
+<div
+  class="fixed bottom-0 left-0 z-50 w-full bg-brand-secondary text-brand-text border-t border-brand-primary/20 shadow-lg transform transition-transform duration-300 translate-y-0"
+  id="traffic-banner"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <span class="bg-brand-primary/20 text-brand-primary p-1.5 rounded-full">
+        <Icon name="tabler:shield-check" class="w-5 h-5" />
+      </span>
+      <p class="text-sm font-medium">
+        Looking for the most secure AI assistant? <span class="font-bold text-white">Openclaw</span> is the answer.
+      </p>
+    </div>
+    <div class="flex items-center gap-3 w-full sm:w-auto">
+      <a
+        href="/docs/install/mac-mini/"
+        class="flex-1 sm:flex-none text-center text-sm bg-brand-primary hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition-colors duration-200"
+      >
+        Get Started
+      </a>
+      <button
+        id="close-traffic-banner"
+        class="text-brand-text-muted hover:text-white transition-colors p-1"
+        aria-label="Close banner"
+      >
+        <Icon name="tabler:x" class="w-5 h-5" />
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const banner = document.getElementById('traffic-banner');
+  const closeBtn = document.getElementById('close-traffic-banner');
+  const STORAGE_KEY = 'openclaw-traffic-banner-closed';
+
+  if (banner && closeBtn) {
+    // Check if user previously closed the banner
+    const isClosed = localStorage.getItem(STORAGE_KEY);
+    if (isClosed) {
+      banner.style.display = 'none';
+    }
+
+    closeBtn.addEventListener('click', () => {
+      banner.style.transform = 'translateY(100%)';
+      localStorage.setItem(STORAGE_KEY, 'true');
+      // Remove from DOM after animation
+      setTimeout(() => {
+        banner.style.display = 'none';
+      }, 300);
+    });
+  }
+</script>

@@ -1,0 +1,121 @@
+---
+title: CLI backends (fallback runtime)
+description: CLI backends text-only fallback via local AI CLIs.
+sidebar:
+  label: CLI Backends
+  order: 18
+---
+
+# CLI backends (fallback runtime)
+
+OpenClaw can run **local AI CLIs** as a **text-only fallback** when API providers are down,
+rate-limited, or temporarily misbehaving. This is intentionally conservative:
+
+- **Tools are disabled** (no tool calls).
+- **Text in → text out** (reliable).
+- **Sessions are supported** (so follow-up turns stay coherent).
+- **Images can be passed through** if the CLI accepts image paths.
+
+This is designed as a **safety net** rather than a primary path. Use it when you
+want “always works” text responses without relying on external APIs.
+
+## Beginner-friendly quick start
+
+You can use Claude Code CLI **without any config** (OpenClaw ships a built-in default):
+
+```bash
+openclaw agent --message "hi" --model claude-cli/opus-4.5
+```
+
+Codex CLI also works out of the box:
+
+```bash
+openclaw agent --message "hi" --model codex-cli/gpt-5.2-codex
+```
+
+If your gateway runs under launchd/systemd and PATH is minimal, add just the
+command path:
+
+```json5
+{
+  agents: {
+    defaults: {
+      cliBackends: {
+        "claude-cli": {
+          command: "/opt/homebrew/bin/claude"
+        }
+      }
+    }
+  }
+}
+```
+
+That’s it. No keys, no extra auth config needed beyond the CLI itself.
+
+## Using it as a fallback
+
+Add a CLI backend to your fallback list so it only runs when primary models fail:
+
+```json5
+{
+  agents: {
+    defaults: {
+      model: {
+        primary: "anthropic/claude-opus-4-5",
+        fallbacks: [
+          "claude-cli/opus-4.5"
+        ]
+      },
+      models: {
+        "anthropic/claude-opus-4-5": { alias: "Opus" },
+        "claude-cli/opus-4.5": {}
+      }
+    }
+  }
+}
+```
+
+Notes:
+- If you use `agents.defaults.models` (allowlist), you must include `claude-cli/...`.
+- If the primary provider fails (auth, rate limits, timeouts), OpenClaw will
+  try the CLI backend next.
+
+## Configuration overview
+
+All CLI backends live under:
+
+```
+agents.defaults.cliBackends
+```
+
+Each entry is keyed by a **provider id** (e.g. `claude-cli`, `my-cli`).
+The provider id becomes the left side of your model ref:
+
+```
+<provider>/<model>
+```
+
+### Example configuration
+
+```json5
+{
+  agents: {
+    defaults: {
+      cliBackends: {
+        "claude-cli": {
+          // Absolute path to binary (optional if on PATH)
+          command: "/opt/homebrew/bin/claude",
+          
+          // Environment variables for the child process
+          env: {
+            "ANTHROPIC_API_KEY": "sk-..."
+          },
+          
+          // Timeout for the CLI process
+          timeoutMs: 60000
+        }
+      }
+    }
+  }
+}
+```

@@ -1,0 +1,70 @@
+---
+title: What is OpenClaw?
+description: Introduction to OpenClaw, the self-hosted AI assistant.
+sidebar:
+  label: What is OpenClaw?
+  order: 1
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+# Building a Personal Assistant with OpenClaw
+
+**OpenClaw** (formerly **Moltbot**, and **Clawdbot**) is a self-hosted gateway that turns your messaging apps (WhatsApp, Telegram, Discord, iMessage, Slack) into a powerful AI assistant. It runs on your own hardware, ensuring privacy and control.
+
+<Aside type="note" title="Naming Confusion?">
+You might see "Moltbot" or "Clawdbot" in older tutorials. **OpenClaw** is the current and permanent name. They are the same project.
+</Aside>
+
+## 🔍 Brand History & FAQ
+
+Why so many names? Here is the breakdown:
+
+### 1. Clawdbot (The Original)
+- **Origin**: Inspired by Anthropic's "Claude" models, but designed as a "bot" wrapper.
+- **Why it changed**: To avoid trademark confusion with Anthropic's official products. "Clawdbot" sounded too much like an official Claude bot.
+- **Relationship to Claude**: OpenClaw is **not** affiliated with Anthropic, though it supports using Claude models (via API) as the brain of your assistant.
+
+### 2. Moltbot (The Transition)
+- **Meaning**: "Molt" refers to shedding skin and growing (like a crab or lobster). It symbolized the project's evolution from a simple wrapper to a complex agent system.
+- **Why it changed**: Users found the name confusing or hard to remember.
+
+### 3. OpenClaw (The Future)
+- **Meaning**: Emphasizes "Open" source and retains the "Claw" from the original crab/lobster theme (a nod to the Rust/Ferris ecosystem and the original name).
+
+## 🚀 Key Features
+
+- **Self-Hosted**: You own your data. No middleman reading your chats.
+- **Multi-LLM Support**: Connect to OpenAI, Anthropic, Gemini, DeepSeek, or local models (Ollama/LM Studio).
+- **Universal Gateway**: One agent, available everywhere (WhatsApp, Telegram, Discord, Signal, iMessage, Slack, Matrix).
+- **Tool-Use**: The agent can browse the web, write files, run code, and use custom "Skills".
+
+## 🆚 Comparisons
+
+### OpenClaw vs. Claude Code / Cursor
+- **Claude Code/Cursor**: Focused on *coding assistance* within an IDE.
+- **OpenClaw**: Focused on *life assistance* and *automation* via messaging apps. It lives in your phone's chat app, not your code editor.
+
+### OpenClaw vs. ChatGPT / Gemini App
+- **ChatGPT/Gemini**: Cloud-based, closed ecosystem. You can't add custom tools easily, and they own the data.
+- **OpenClaw**: Runs on your machine. You can give it access to your local files, your calendar, your smart home, and it can execute real shell commands.
+
+### OpenClaw vs. AutoGPT / BabyAGI
+- **AutoGPT**: Often autonomous "agents" that run in a loop to solve a task.
+- **OpenClaw**: A "conversational" agent. It waits for you to talk to it, but can also run background tasks (cron jobs). It's designed to be a long-term companion, not just a task solver.
+
+## ⚠️ Safety First
+
+You’re putting an agent in a position to:
+- Run commands on your machine (`exec` tool).
+- Read/write files in your workspace.
+- Send messages back out via messaging apps.
+
+**Start Conservative**:
+1.  **Allowlist**: Always set `channels.<channel>.allowFrom` to your personal user ID. Never run it open-to-the-world.
+2.  **Sandbox**: Use Docker sandboxing for tools if you are unsure.
+3.  **Human in the Loop**: Use `exec.approvals` to require confirmation before the agent runs dangerous commands.
+
+## Why OpenClaw?
+
+Unlike cloud-based assistants, OpenClaw runs on your hardware (like a Mac Mini M4 or a Raspberry Pi), ensuring your conversations remain private and your tools have local access.

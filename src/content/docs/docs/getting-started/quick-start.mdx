@@ -1,0 +1,70 @@
+---
+title: Quick Start Guide
+description: Go from zero to first working chat with Openclaw.
+sidebar:
+  label: Quick Start Guide
+  order: 2
+---
+
+# Getting Started
+
+Goal: go from **zero** → **first working chat** (with sane defaults) as quickly as possible.
+
+Fastest chat: open the Control UI (no channel setup needed). Run `openclaw dashboard`
+and chat in the browser, or open `http://127.0.0.1:18789/` on the gateway host.
+
+Recommended path: use the **CLI onboarding wizard** (`openclaw onboard`). It sets up:
+- model/auth (OAuth recommended)
+- gateway settings
+- channels (WhatsApp/Telegram/Discord/Mattermost (plugin)/...)
+- pairing defaults (secure DMs)
+- workspace bootstrap + skills
+- optional background service
+
+## 0) Prerequisites
+
+- Node `>=22`
+- `pnpm` (optional; recommended if you build from source)
+- **Recommended:** Brave Search API key for web search. Easiest path:
+  `openclaw configure --section web` (stores `tools.web.search.apiKey`).
+
+**macOS**: if you plan to build the apps, install Xcode / CLT. For the CLI + gateway only, Node is enough.
+**Windows**: use **WSL2** (Ubuntu recommended). WSL2 is strongly recommended; native Windows is untested, more problematic, and has poorer tool compatibility. Install WSL2 first, then run the Linux steps inside WSL.
+
+## 1) Install the CLI (recommended)
+
+```bash
+curl -fsSL https://openclaw.bot/install.sh | bash
+```
+
+Windows (PowerShell):
+
+```powershell
+iwr -useb https://openclaw.ai/install.ps1 | iex
+```
+
+Alternative (global install):
+
+```bash
+npm install -g openclaw@latest
+```
+
+## 2) Run the onboarding wizard
+
+```bash
+openclaw onboard --install-daemon
+```
+
+What you’ll choose:
+- **Local vs Remote** gateway
+- **Auth**: OpenAI Code (Codex) subscription (OAuth) or API keys. For Anthropic we recommend an API key; `claude setup-token` is also supported.
+- **Providers**: WhatsApp QR login, Telegram/Discord bot tokens, Mattermost plugin tokens, etc.
+- **Daemon**: background install (launchd/systemd; WSL2 uses systemd)
+  - **Runtime**: Node (recommended; required for WhatsApp/Telegram). Bun is **not recommended**.
+- **Gateway token**: the wizard generates one by default (even on loopback) and stores it in `gateway.auth.token`.
+
+### Auth: where it lives (important)
+
+- **Recommended Anthropic path:** set an API key (wizard can store it for service use). `claude setup-token` is also supported if you want to reuse Claude Code credentials.
+- OAuth credentials (legacy import): `~/.openclaw/credentials/oauth.json`
+- Auth profiles (OAuth + API keys): `~/.openclaw/agents/<agentId>/agent/auth-profiles.json`

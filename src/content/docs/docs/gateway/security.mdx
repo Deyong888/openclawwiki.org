@@ -1,0 +1,95 @@
+---
+title: Gateway Security
+description: Security considerations and threat model for running an AI gateway.
+sidebar:
+  label: Security
+  order: 3
+---
+
+---
+title: Gateway Security
+description: Security considerations, audit tools, and best practices for running an AI gateway.
+sidebar:
+  label: Security
+  order: 3
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+# Security 🔒
+
+Running an AI agent with shell access and network capabilities is powerful but requires vigilance. OpenClaw provides built-in tools to help you secure your instance.
+
+## Security Audit
+
+The fastest way to check your security posture is the built-in audit tool.
+
+<Steps>
+
+1.  **Run Basic Audit**
+    Checks for common misconfigurations (open ports, weak policies).
+    ```bash
+    openclaw security audit
+    ```
+
+2.  **Deep Scan**
+    Probes the live gateway to verify reachability and auth.
+    ```bash
+    openclaw security audit --deep
+    ```
+
+3.  **Auto-Fix**
+    Applies recommended guardrails automatically.
+    ```bash
+    openclaw security audit --fix
+    ```
+    This will:
+    - Restrict `groupPolicy` to `allowlist`.
+    - Redact sensitive logs.
+    - Tighten file permissions (`chmod 700` on `~/.openclaw`).
+
+</Steps>
+
+## Threat Model & Philosophy
+
+OpenClaw is designed with a "Defense in Depth" approach:
+
+- **Identity**: Every connection is authenticated (Device Auth or Token).
+- **Policy**: You explicitly define *who* can talk to the bot (`dmPolicy`, `allowFrom`).
+- **Capabilities**: You explicitly define *what* the bot can do (Tools, Sandbox).
+
+<Aside type="danger" title="Critical Warning">
+**Never expose the Gateway directly to the public internet** without proper authentication and TLS. Use Tailscale or a reverse proxy with `trustedProxies` configured.
+</Aside>
+
+## Credential Storage
+
+Sensitive data is stored in `~/.openclaw/`:
+
+| Credential Type | Path |
+| :--- | :--- |
+| **WhatsApp Sessions** | `~/.openclaw/credentials/whatsapp/` |
+| **Pairing Allowlists** | `~/.openclaw/credentials/*-allowFrom.json` |
+| **Model Auth** | `~/.openclaw/agents/*/agent/auth-profiles.json` |
+
+Ensure these files are readable only by the user running the Gateway.
+
+## Reverse Proxy Configuration
+
+If running behind Nginx, Caddy, or Traefik:
+
+1.  **Configure Trusted Proxies**: Tell OpenClaw to trust headers from your proxy.
+2.  **Pass Real IP**: Ensure your proxy sends `X-Forwarded-For`.
+
+```yaml
+gateway:
+  trustedProxies:
+    - "127.0.0.1"  # If proxy is local
+  auth:
+    mode: password
+    password: ${OPENCLAW_GATEWAY_PASSWORD}
+```
+
+<Aside type="caution">
+If `trustedProxies` is not set, the Gateway will reject connections from the proxy if they don't have authentication, even if they originate from localhost.
+</Aside>

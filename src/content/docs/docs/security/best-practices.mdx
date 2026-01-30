@@ -1,0 +1,67 @@
+---
+title: Security Best Practices
+description: Security considerations for running Openclaw.
+sidebar:
+  label: Best Practices
+  order: 2
+---
+
+# Security 🔒
+
+## Quick check: `openclaw security audit`
+
+Run this regularly (especially after changing config or exposing network surfaces):
+
+```bash
+openclaw security audit
+openclaw security audit --deep
+openclaw security audit --fix
+```
+
+It flags common footguns (Gateway auth exposure, browser control exposure, elevated allowlists, filesystem permissions).
+
+`--fix` applies safe guardrails:
+- Tighten `groupPolicy="open"` to `groupPolicy="allowlist"` (and per-account variants) for common channels.
+- Turn `logging.redactSensitive="off"` back to `"tools"`.
+- Tighten local perms (`~/.openclaw` → `700`, config file → `600`, plus common state files).
+
+## Core Principles
+
+Running an AI agent with shell access on your machine is... *spicy*. Here’s how to not get pwned.
+
+OpenClaw is both a product and an experiment: you’re wiring frontier-model behavior into real messaging surfaces and real tools. **There is no “perfectly secure” setup.** The goal is to be deliberate about:
+- who can talk to your bot
+- where the bot is allowed to act
+- what the bot can touch
+
+Start with the smallest access that still works, then widen it as you gain confidence.
+
+## What the audit checks (high level)
+
+- **Inbound access** (DM policies, group policies, allowlists): can strangers trigger the bot?
+- **Tool blast radius** (elevated tools + open rooms): could prompt injection turn into shell/file/network actions?
+- **Network exposure** (Gateway bind/auth, Tailscale Serve/Funnel).
+- **Browser control exposure** (remote nodes, relay ports, remote CDP endpoints).
+- **Local disk hygiene** (permissions, symlinks, config includes, “synced folder” paths).
+- **Plugins** (extensions exist without an explicit allowlist).
+- **Model hygiene** (warn when configured models look legacy; not a hard block).
+
+## Credential storage map
+
+Use this when auditing access or deciding what to back up:
+
+- **WhatsApp**: `~/.openclaw/credentials/whatsapp/<accountId>/creds.json`
+- **Telegram bot token**: config/env or `channels.telegram.tokenFile`
+- **Pairing allowlists**: `~/.openclaw/credentials/<channel>-allowFrom.json`
+- **Model auth profiles**: `~/.openclaw/agents/<agentId>/agent/auth-profiles.json`
+
+## Security Audit Checklist
+
+When the audit prints findings, treat this as a priority order:
+
+1. **Anything “open” + tools enabled**: lock down DMs/groups first (pairing/allowlists), then tighten tool policy/sandboxing.
+2. **Public network exposure** (LAN bind, Funnel, missing auth): fix immediately.
+3. **Browser control remote exposure**: treat it like operator access (tailnet-only, pair nodes deliberately, avoid public exposure).
+4. **Permissions**: make sure state/config/credentials/auth are not group/world-readable.
+5. **Plugins/extensions**: only load what you explicitly trust.
+6. **Model choice**: prefer modern, instruction-hardened models for any bot with tools.

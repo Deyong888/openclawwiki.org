@@ -1,0 +1,174 @@
+---
+title: Web Tools
+description: Web search + fetch tools (Brave Search API, Perplexity direct/OpenRouter).
+sidebar:
+  label: Web Tools
+  order: 5
+---
+
+---
+title: Web Tools
+description: Configure web search (Brave/Perplexity) and fetching for OpenClaw agents.
+sidebar:
+  label: Web Tools
+  order: 5
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Web Tools
+
+OpenClaw includes two powerful tools for internet access:
+
+1.  **`web_search`**: Find information using search engines (Brave or Perplexity).
+2.  **`web_fetch`**: Retrieve and read the content of specific web pages (HTML to Markdown).
+
+<Aside type="note">
+These tools are lightweight and API-based. For complex interactions (like logging in, clicking buttons, or handling heavy JavaScript), use the [Browser Tool](/docs/tools/browser).
+</Aside>
+
+## Web Search
+
+OpenClaw supports two providers for web search:
+
+| Provider | Description | Best For |
+| :--- | :--- | :--- |
+| **Brave Search** | Standard search results (links + snippets). | General queries, finding URLs. |
+| **Perplexity** | AI-synthesized answers with citations. | Complex questions, research. |
+
+### Configuration
+
+You can configure the search provider in `~/.openclaw/openclaw.json`.
+
+<Tabs>
+  <TabItem label="Brave Search (Default)">
+    1.  Get an API key from [Brave Search API](https://brave.com/search/api/).
+    2.  Set `BRAVE_API_KEY` in your environment OR config:
+
+    ```json5
+    {
+      tools: {
+        web: {
+          search: {
+            provider: "brave",
+            apiKey: "BSA-..." // Optional if env var set
+          }
+        }
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Perplexity (via OpenRouter)">
+    1.  Get an API key from [OpenRouter](https://openrouter.ai/).
+    2.  Set `OPENROUTER_API_KEY` in your environment OR config:
+
+    ```json5
+    {
+      tools: {
+        web: {
+          search: {
+            provider: "perplexity",
+            perplexity: {
+              apiKey: "sk-or-...", // Optional if env var set
+              model: "perplexity/sonar-pro"
+            }
+          }
+        }
+      }
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+## Web Fetch
+
+The `web_fetch` tool downloads a webpage and converts it to readable text (Markdown) for the agent.
+
+- **Auto-Fallback**: If a direct fetch fails (e.g., due to anti-bot protection), it can automatically try [Firecrawl](/docs/tools/firecrawl) if configured.
+- **Privacy**: Fetches are done from the Gateway server IP.
+
+### Usage Example
+
+The agent decides when to use these tools. You might see logs like:
+
+```text
+[agent] invoking tool: web_search({ query: "latest SpaceX launch" })
+[agent] invoking tool: web_fetch({ url: "https://www.spacex.com/launches/" })
+```
+
+## Advanced Settings
+
+```json5
+{
+  tools: {
+    web: {
+      search: {
+        enabled: true,
+        maxResults: 5,
+        cacheTtlMinutes: 15 // Cache results to save API credits
+      },
+      fetch: {
+        timeoutSeconds: 30,
+        userAgent: "OpenClaw/1.0" // Custom User-Agent
+      }
+    }
+  }
+}
+```
+  freshness: "pw"
+});
+```
+
+## web_fetch
+
+Fetch a URL and extract readable content.
+
+### Requirements
+
+- `tools.web.fetch.enabled` must not be `false` (default: enabled)
+- Optional Firecrawl fallback: set `tools.web.fetch.firecrawl.apiKey` or `FIRECRAWL_API_KEY`.
+
+### Config
+
+```json5
+{
+  tools: {
+    web: {
+      fetch: {
+        enabled: true,
+        maxChars: 50000,
+        timeoutSeconds: 30,
+        cacheTtlMinutes: 15,
+        maxRedirects: 3,
+        userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_7_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        readability: true,
+        firecrawl: {
+          enabled: true,
+          apiKey: "FIRECRAWL_API_KEY_HERE", // optional if FIRECRAWL_API_KEY is set
+          baseUrl: "https://api.firecrawl.dev",
+          onlyMainContent: true,
+          maxAgeMs: 86400000, // ms (1 day)
+          timeoutSeconds: 60
+        }
+      }
+    }
+  }
+}
+```
+
+### Tool parameters
+
+- `url` (required, http/https only)
+- `extractMode` (`markdown` | `text`)
+- `maxChars` (truncate long pages)
+
+Notes:
+- `web_fetch` uses Readability (main-content extraction) first, then Firecrawl (if configured). If both fail, the tool returns an error.
+- Firecrawl requests use bot-circumvention mode and cache results by default.
+- `web_fetch` sends a Chrome-like User-Agent and `Accept-Language` by default; override `userAgent` if needed.
+- `web_fetch` blocks private/internal hostnames and re-checks redirects (limit with `maxRedirects`).
+- `web_fetch` is best-effort extraction; some sites will need the browser tool.
+- See [Firecrawl](/docs/tools/firecrawl) for key setup and service details.
+- Responses are cached (default 15 minutes) to reduce repeated fetches.
+- If you use tool profiles/allowlists, add `web_search`/`web_fetch` or `group:web`.
+- If the Brave key is missing, `web_search` returns a short setup hint with a docs link.

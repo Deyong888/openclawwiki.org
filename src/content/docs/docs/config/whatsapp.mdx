@@ -1,0 +1,106 @@
+---
+title: WhatsApp Configuration
+description: Connect OpenClaw to WhatsApp for a 24/7 personal assistant on your phone.
+sidebar:
+  label: WhatsApp
+  order: 1
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+# WhatsApp (web channel)
+
+Status: **Stable** (WhatsApp Web via Baileys). The Gateway owns the session(s).
+
+<Aside type="note">
+For architectural details and multi-account setups, see the [WhatsApp Channel Guide](/docs/channels/whatsapp/).
+</Aside>
+
+OpenClaw connects to WhatsApp using the **Baileys** library, simulating a WhatsApp Web client. This allows your agent to reply to messages, manage groups, and act as a personal assistant directly within WhatsApp.
+
+## Quick Setup
+
+<Steps>
+
+1.  **Prepare a Phone Number**
+    Use a separate phone number if possible (recommended) or your personal number.
+
+2.  **Configure OpenClaw**
+    Add the WhatsApp configuration to `~/.openclaw/openclaw.json`.
+
+    ```json5
+    {
+      channels: {
+        whatsapp: {
+          enabled: true,
+          dmPolicy: "allowlist",
+          allowFrom: ["+15551234567"] // Your personal number
+        }
+      }
+    }
+    ```
+
+3.  **Start the Gateway**
+    Run the gateway to initialize the connection.
+    ```bash
+    openclaw gateway run
+    ```
+
+4.  **Scan QR Code**
+    The gateway will print a QR code to the terminal (or logs).
+    - Open WhatsApp on your phone.
+    - Go to **Settings** > **Linked Devices** > **Link a Device**.
+    - Scan the QR code.
+
+</Steps>
+
+## Configuration Strategy
+
+<Aside type="tip" title="Best Practice">
+For the best experience, use a **dedicated phone number** for your bot.
+</Aside>
+
+### Option A: Dedicated Number (Recommended)
+Use a spare Android phone or an eSIM on your main device.
+- **Pros**: Clean routing, no "self-chat" quirks, distinct identity.
+- **Setup**: Install WhatsApp (or WhatsApp Business) on the spare device/profile. Link OpenClaw to this account.
+
+### Option B: Personal Number (Fallback)
+Run OpenClaw on your own main number.
+- **Pros**: No extra hardware/SIM needed.
+- **Cons**: You have to message *yourself* (Note to Self) to talk to the bot.
+- **Quirks**: You will see the bot's replies as if you sent them.
+
+## Advanced Configuration
+
+```json5
+{
+  channels: {
+    whatsapp: {
+      enabled: true,
+      // Who can talk to the bot?
+      dmPolicy: "allowlist", // "allowlist" (strict) or "pairing" (open)
+      allowFrom: ["+15551234567"],
+      
+      // Admin users (can run privileged commands)
+      adminUsers: ["+15551234567"],
+      
+      // Session storage (defaults to ~/.openclaw/workspace/sessions/whatsapp)
+      sessionDir: "/path/to/custom/session" 
+    }
+  }
+}
+```
+
+## Troubleshooting
+
+<Tabs>
+  <TabItem label="Connection Issues">
+    - **QR Code Loop**: If the QR code keeps regenerating, ensure your phone has a stable internet connection.
+    - **Disconnects**: WhatsApp Web sessions can time out. Restart the gateway to refresh the session.
+  </TabItem>
+  <TabItem label="Message Routing">
+    - **No Reply**: Check `dmPolicy`. If set to `allowlist`, ensure your number is in `allowFrom` (include country code, e.g., `+1...`).
+    - **Group Chats**: By default, the bot may not reply in groups unless mentioned or configured otherwise.
+  </TabItem>
+</Tabs>

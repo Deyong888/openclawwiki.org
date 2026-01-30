@@ -1,0 +1,36 @@
+---
+title: Openclaw Documentation
+description: Get started with Openclaw.
+template: splash
+hero:
+  tagline: Your self-hosted AI assistant journey starts here.
+  image:
+    file: ../../../assets/images/openclaw-logo.svg
+  actions:
+    - text: Get Started
+      link: /docs/getting-started/quick-start/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/openclaw/openclaw
+      icon: external
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Next steps
+
+<CardGrid stagger>
+	<Card title="Install Openclaw" icon="pencil">
+		Follow the [installation guide](/docs/install/mac-mini/) to get set up.
+	</Card>
+	<Card title="Migrate" icon="add-document">
+		Coming from Moltbot? Check the [migration guide](/docs/migration/from-moltbot/).
+	</Card>
+	<Card title="Configure" icon="setting">
+		Connect [Telegram](/docs/config/telegram/), [WhatsApp](/docs/config/whatsapp/), and [Gmail](/docs/config/gmail/).
+	</Card>
+	<Card title="Explore Tools" icon="rocket">
+		Discover [Browser Automation](/docs/tools/browser/) and [Skills](/docs/tools/skills/).
+	</Card>
+</CardGrid>

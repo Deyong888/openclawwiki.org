@@ -1,0 +1,150 @@
+---
+title: Connect Slack
+description: Integrate OpenClaw with Slack workspaces using Socket Mode or HTTP Webhooks.
+sidebar:
+  label: Slack
+  order: 21
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+OpenClaw integrates with Slack to provide an intelligent assistant for your team. It supports **Socket Mode** (easiest, works behind firewalls) and **HTTP Mode** (for public servers).
+
+## Prerequisites
+
+- A **Slack Workspace** where you have permission to install apps.
+- **OpenClaw** installed.
+
+## Setup Guide (Socket Mode)
+
+Socket Mode is recommended for most users as it doesn't require exposing a public IP address.
+
+<Steps>
+
+1.  ### Create a Slack App
+    Go to [api.slack.com/apps](https://api.slack.com/apps) and click **Create New App**. Choose **From scratch**, name it (e.g., "OpenClaw"), and pick your workspace.
+
+2.  ### Enable Socket Mode
+    *   Navigate to **Socket Mode** in the sidebar.
+    *   Toggle **Enable Socket Mode**.
+    *   Give the token a name (e.g., "Socket Token") and click **Generate**.
+    *   **Copy the `xapp-...` token**. This is your **App Token**.
+
+3.  ### Configure Scopes
+    Go to **OAuth & Permissions**. Scroll down to **Bot Token Scopes** and add:
+    *   `app_mentions:read` (to hear @mentions)
+    *   `chat:write` (to reply)
+    *   `channels:history` (to read public channels)
+    *   `groups:history` (to read private channels)
+    *   `im:history` (to read DMs)
+    *   `im:write` (to send DMs)
+    *   `users:read` (to know who is talking)
+    *   `files:write` (to upload images/files)
+
+4.  ### Install App
+    Scroll up to the top of **OAuth & Permissions** and click **Install to Workspace**.
+    *   **Copy the `xoxb-...` token**. This is your **Bot Token**.
+
+5.  ### Subscribe to Events
+    Go to **Event Subscriptions**.
+    *   Toggle **Enable Events**.
+    *   Expand **Subscribe to bot events** and add:
+        *   `message.channels`
+        *   `message.groups`
+        *   `message.im`
+        *   `app_mention`
+        *   `member_joined_channel`
+
+6.  ### Enable DMs
+    Go to **App Home**.
+    *   Check **Allow users to send Slash commands and messages from the messages tab**.
+
+7.  ### Configure OpenClaw
+    Add the tokens to your `config.json`.
+
+    ```json5
+    {
+      channels: {
+        slack: {
+          enabled: true,
+          // App Token (Socket Mode)
+          appToken: "xapp-...",
+          // Bot Token (OAuth)
+          botToken: "xoxb-..."
+        }
+      }
+    }
+    ```
+
+</Steps>
+
+## Threading Behavior
+
+Slack conversations often happen in threads. You can control how OpenClaw replies.
+
+| Mode | Behavior | Config |
+| :--- | :--- | :--- |
+| **Off** (Default) | Replies in the main channel (unless the user is already in a thread). | `replyToMode: "off"` |
+| **First** | The *first* reply starts a thread; subsequent replies stay in that thread. Keeps channels clean. | `replyToMode: "first"` |
+| **All** | Every reply is threaded. | `replyToMode: "all"` |
+
+**Example:**
+```json5
+{
+  channels: {
+    slack: {
+      // Thread DMs always, but keep group chats flat
+      replyToModeByChatType: {
+        direct: "all",
+        group: "off"
+      }
+    }
+  }
+}
+```
+
+## Access Control
+
+### Direct Messages
+By default, OpenClaw uses **Pairing Mode** for DMs.
+*   **Approve a user:** `openclaw pairing approve slack <code>`
+*   **Open to everyone:**
+    ```json5
+    {
+      channels: {
+        slack: {
+          dm: { policy: "open", allowFrom: ["*"] }
+        }
+      }
+    }
+    ```
+
+### Channel Access
+You can restrict which channels the bot responds to.
+
+```json5
+{
+  channels: {
+    slack: {
+      groupPolicy: "allowlist",
+      channels: {
+        "C12345678": { allow: true }, // Allow specific channel ID
+        "#general": { allow: true }   // Allow by name
+      }
+    }
+  }
+}
+```
+
+## Troubleshooting
+
+**Bot doesn't respond to DMs:**
+*   Did you enable the **Messages Tab** in the **App Home** section on api.slack.com?
+*   Did you subscribe to `message.im` events?
+
+**Bot doesn't respond in channels:**
+*   Did you **invite the bot** to the channel? (`/invite @OpenClaw`)
+*   Did you subscribe to `message.channels`?
+
+**"missing_scope" error:**
+*   Check the logs to see which scope is missing, then add it in **OAuth & Permissions** and **Reinstall the App** (you must reinstall for scope changes to take effect).

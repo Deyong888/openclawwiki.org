@@ -1,0 +1,84 @@
+---
+title: Troubleshooting
+description: Quick troubleshooting guide for common OpenClaw failures.
+sidebar:
+  label: Troubleshooting
+  order: 99
+---
+
+---
+title: Troubleshooting
+description: Quick troubleshooting guide for common OpenClaw failures.
+sidebar:
+  label: Troubleshooting
+  order: 99
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Troubleshooting 🔧
+
+Having trouble? Here's how to diagnose and fix common issues.
+
+## Quick Diagnostics
+
+<Steps>
+
+1.  **Check Status**
+    ```bash
+    openclaw status
+    ```
+    Gives a high-level overview of the gateway, channels, and sessions.
+
+2.  **View Logs**
+    ```bash
+    openclaw logs --follow
+    ```
+    Watch real-time logs to see what's happening when you interact with the bot.
+
+3.  **Deep Health Check**
+    ```bash
+    openclaw doctor
+    ```
+    Scans for configuration errors and missing dependencies.
+
+</Steps>
+
+## Common Issues
+
+<Tabs>
+  <TabItem label="Auth / Models">
+    **Error**: `No API key found for provider "anthropic"`
+    
+    The agent is missing credentials.
+    - **Fix**: Run `openclaw models auth setup-token --provider anthropic` on the gateway host.
+    - **Verify**: Run `openclaw models status`.
+
+    **Error**: `OAuth token refresh failed`
+    - **Fix**: Your OAuth token expired. Regenerate it or switch to an API key.
+  </TabItem>
+
+  <TabItem label="Connection">
+    **Error**: `Control UI fails on HTTP`
+    
+    Browsers block cryptographic features on insecure HTTP.
+    - **Fix**: Use `http://127.0.0.1:18789` (localhost) or set up HTTPS (Tailscale).
+    - **Workaround**: Enable `gateway.controlUi.allowInsecureAuth: true` (Not recommended).
+  </TabItem>
+
+  <TabItem label="Service">
+    **Symptom**: Service installed but not running.
+    
+    - **Check**: `openclaw gateway status`
+    - **Fix**: Check logs (`/tmp/openclaw/openclaw-gateway.log` on macOS) for crash reasons.
+  </TabItem>
+</Tabs>
+
+## Diagnostic Commands Reference
+
+| Command | Usage |
+| :--- | :--- |
+| `openclaw status` | General overview. |
+| `openclaw status --all` | Full report (redacted) for sharing. |
+| `openclaw gateway probe` | Test network reachability. |
+| `openclaw channels status --probe` | Check if channels (WhatsApp/Telegram) are connected. |

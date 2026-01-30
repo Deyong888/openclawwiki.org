@@ -1,0 +1,60 @@
+---
+title: Docker Setup
+description: Optional Docker-based setup for Openclaw.
+sidebar:
+  label: Docker Setup
+  order: 2
+---
+
+# Docker (optional)
+
+Docker is **optional**. Use it only if you want a containerized gateway or to validate the Docker flow.
+
+## Is Docker right for me?
+
+- **Yes**: you want an isolated, throwaway gateway environment or to run OpenClaw on a host without local installs.
+- **No**: you’re running on your own machine and just want the fastest dev loop. Use the normal install flow instead.
+- **Sandboxing note**: agent sandboxing uses Docker too, but it does **not** require the full gateway to run in Docker.
+
+## Requirements
+
+- Docker Desktop (or Docker Engine) + Docker Compose v2
+- Enough disk for images + logs
+
+## Containerized Gateway (Docker Compose)
+
+### Quick start (recommended)
+
+From repo root:
+
+```bash
+./docker-setup.sh
+```
+
+This script:
+- builds the gateway image
+- runs the onboarding wizard
+- prints optional provider setup hints
+- starts the gateway via Docker Compose
+- generates a gateway token and writes it to `.env`
+
+Optional env vars:
+- `OPENCLAW_DOCKER_APT_PACKAGES` — install extra apt packages during build
+- `OPENCLAW_EXTRA_MOUNTS` — add extra host bind mounts
+- `OPENCLAW_HOME_VOLUME` — persist `/home/node` in a named volume
+
+After it finishes:
+- Open `http://127.0.0.1:18789/` in your browser.
+- Paste the token into the Control UI (Settings → token).
+
+It writes config/workspace on the host:
+- `~/.openclaw/`
+- `~/.openclaw/workspace`
+
+### Manual flow (compose)
+
+```bash
+docker build -t openclaw:local -f Dockerfile .
+docker compose run --rm openclaw-cli onboard
+docker compose up -d openclaw-gateway
+```

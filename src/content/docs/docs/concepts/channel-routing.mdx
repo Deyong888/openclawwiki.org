@@ -1,0 +1,78 @@
+---
+title: Channel Routing
+description: How OpenClaw routes messages between channels and agent sessions.
+sidebar:
+  order: 3
+---
+
+**Channel Routing** determines how an incoming message from a platform (like Telegram or Discord) is mapped to a specific Agent Session, and how the Agent's reply is routed back to the correct user or thread.
+
+## Key Concepts
+
+*   **Channel**: An integration point (e.g., `telegram`, `discord`, `http`).
+*   **Session Key**: A unique string identifying a conversation context.
+*   **Routing Rule**: Logic that maps `(Channel, User, Chat)` -> `Session Key`.
+
+## Session Key Shapes
+
+The `sessionKey` is the fundamental ID for a conversation. Its format varies by context:
+
+### 1. Direct Messages (1:1)
+Usually `channel:userId`.
+*   Example: `telegram:123456789`
+*   The agent treats this as a private conversation with that user.
+
+### 2. Group Chats
+Usually `channel:groupId`.
+*   Example: `discord:987654321098765432`
+*   The agent treats this as a shared room. All users in the group contribute to the *same* session history.
+
+### 3. Threads / Topics
+Some platforms support threads.
+*   Example: `slack:C12345:thread:167890.123`
+*   The agent sees the thread as a distinct session, separate from the main channel.
+
+## Routing Logic
+
+When a message arrives:
+1.  **Ingest**: The Channel Plugin receives the webhook/event.
+2.  **Normalize**: Extracts `userId`, `chatId`, `threadId`, `content`.
+3.  **Resolve Key**: Constructs the `sessionKey`.
+    *   *If DM*: Use `userId`.
+    *   *If Group*: Use `chatId`.
+4.  **Lookup Session**: Checks if a session exists for this key.
+    *   *New*: Create a new session.
+    *   *Existing*: Load history.
+5.  **Dispatch**: Sends to the Agent Loop.
+
+## Broadcast Groups
+
+You can configure **Broadcast Groups** to route messages from one source to multiple sessions, or to alias a group.
+
+```json5
+// config.json
+{
+  broadcast: {
+    strategy: "parallel", // Send to all targets
+    // Map a WhatsApp group to two specific agent personas
+    "120363403215116621@g.us": ["alfred", "baerbel"],
+    // Map a phone number to support agents
+    "+15555550123": ["support", "logger"]
+  }
+}
+```
+
+In this mode, one incoming message triggers multiple agent runs (one for "alfred", one for "baerbel"), effectively allowing multiple bots to exist in the same group chat independently.
+
+## WebChat Behavior
+
+The built-in WebChat (OpenClaw UI) uses a generated UUID for the session key, stored in the browser's `localStorage`.
+*   Clearing browser data resets the session (unless logged in).
+
+## Reply Context
+
+When the Agent replies, the loop preserves the **Routing Context**:
+*   `replyToId`: Which message is being answered (for threaded replies).
+*   `channelId`: Where to send the text.
+
+The Channel Plugin uses this to format the outgoing message correctly (e.g., calling the Discord API to reply to a specific message ID).

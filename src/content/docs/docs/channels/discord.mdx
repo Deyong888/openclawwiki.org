@@ -1,0 +1,188 @@
+---
+title: Connect Discord
+description: Set up a Discord bot for OpenClaw with DMs, server channels, and slash commands.
+sidebar:
+  label: Discord
+  order: 20
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Connect OpenClaw to Discord to interact with your agent via Direct Messages (DMs) or within Guild (Server) channels. This integration supports text, images, file uploads, and slash commands.
+
+## Prerequisites
+
+- A **Discord Account** with developer mode enabled.
+- **OpenClaw** installed and running.
+- Permissions to add bots to a server (or create your own test server).
+
+## Setup Guide
+
+Follow these steps to create your bot and connect it to OpenClaw.
+
+<Steps>
+
+1.  ### Create a Discord Application
+    Go to the [Discord Developer Portal](https://discord.com/developers/applications) and click **New Application**. Give it a name (e.g., "ClawBot").
+
+2.  ### Create the Bot User
+    Navigate to the **Bot** tab in the sidebar and click **Add Bot**.
+    
+    <Aside type="caution">
+    **Critical Step:** Under the **Privileged Gateway Intents** section, you **must** enable:
+    *   **Message Content Intent**: Required to read messages.
+    *   **Server Members Intent**: Required for allowlists and user lookups.
+    </Aside>
+
+    Click **Save Changes**. Then, click **Reset Token** to generate your **Bot Token**. Copy this token; you will need it later.
+
+3.  ### Invite the Bot to Your Server
+    Go to the **OAuth2** -> **URL Generator** tab.
+    
+    **Scopes:**
+    *   `bot`
+    *   `applications.commands` (for slash commands)
+
+    **Bot Permissions:**
+    *   Read Messages/View Channels
+    *   Send Messages
+    *   Embed Links
+    *   Attach Files
+    *   Read Message History
+    *   Add Reactions
+
+    Copy the generated URL, open it in your browser, and select the server you want to invite the bot to.
+
+4.  ### Configure OpenClaw
+    Add the configuration to your `config.json` or use environment variables.
+
+    <Tabs>
+      <TabItem label="config.json">
+      ```json5
+      {
+        channels: {
+          discord: {
+            enabled: true,
+            // Replace with your actual token
+            token: "OTk...<your_bot_token>"
+          }
+        }
+      }
+      ```
+      </TabItem>
+      <TabItem label="Environment Variable">
+      ```bash
+      export DISCORD_BOT_TOKEN="OTk...<your_bot_token>"
+      ```
+      </TabItem>
+    </Tabs>
+
+5.  ### Start OpenClaw
+    Run your agent. You should see a log message indicating the Discord gateway has connected.
+    
+    ```bash
+    openclaw run
+    ```
+
+6.  ### Verify Connection
+    Send a DM to your bot or mention it in a channel: `@ClawBot hello`.
+    
+    *   **First Run (DMs):** By default, OpenClaw uses **Pairing Mode** for security. The bot will reply with a pairing code (e.g., `123-456`).
+    *   Run `openclaw pairing approve discord <code >` to authorize yourself.
+
+</Steps>
+
+## Configuration Options
+
+### Access Control
+
+Control who can talk to your agent.
+
+#### Direct Messages (DM)
+| Policy | Description | Config |
+| :--- | :--- | :--- |
+| **Pairing** (Default) | Unknown users get a code. Admin must approve via CLI. | `dm: { policy: "pairing" }` |
+| **Allowlist** | Only specific user IDs can chat. | `dm: { policy: "allowlist", allowFrom: ["123456..."] }` |
+| **Open** | Anyone can chat (use with caution). | `dm: { policy: "open", allowFrom: ["*"] }` |
+| **Disabled** | Ignore all DMs. | `dm: { enabled: false }` |
+
+#### Server Channels (Guilds)
+By default, the bot listens to channels where it is a member, but may require mentions.
+
+```json5
+{
+  channels: {
+    discord: {
+      guilds: {
+        // "Your Guild ID" (Right-click server -> Copy ID)
+        "9876543210": {
+          // Require users to @mention the bot to get a reply?
+          requireMention: true,
+          // Only allow specific channels
+          channels: {
+            "general": { allow: true },
+            "secret-lab": { allow: false }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Slash Commands
+
+OpenClaw automatically registers its commands (like `/help`, `/reset`) as native Discord Slash Commands if `commands.native` is `"auto"` (default).
+
+To disable this:
+```json5
+{
+  channels: {
+    discord: {
+      commands: { native: false }
+    }
+  }
+}
+```
+
+## Troubleshooting
+
+<Aside type="tip">
+Use the built-in doctor command to check for common issues:
+`openclaw doctor`
+</Aside>
+
+**Bot comes online but doesn't reply:**
+*   **Check Intents:** Did you enable "Message Content Intent" in the Discord Developer Portal? This is the #1 cause of silence.
+*   **Check Permissions:** Does the bot have "Send Messages" in that specific channel?
+*   **Check Logs:** Run with `openclaw run --verbose` to see if the message is being received but filtered (e.g., due to allowlists).
+
+**"Used disallowed intents" error:**
+*   You enabled an intent in `config.json` (or defaults) that is *not* enabled in the Developer Portal. Toggle them on in the portal.
+
+**Replies are split into multiple messages:**
+*   Discord has a 2000-character limit. OpenClaw automatically chunks long responses. You can adjust `channels.discord.textChunkLimit` if needed.
+
+## Advanced Usage
+
+### Multi-Account Support
+You can run multiple bots from one OpenClaw instance.
+
+```json5
+{
+  channels: {
+    discord: {
+      accounts: {
+        "personal": { token: "..." },
+        "work": { token: "..." }
+      }
+    }
+  }
+}
+```
+
+### Getting IDs
+To find User, Server (Guild), or Channel IDs:
+1.  Open Discord User Settings -> **Advanced**.
+2.  Enable **Developer Mode**.
+3.  Right-click any user, server, or channel and select **Copy ID**.

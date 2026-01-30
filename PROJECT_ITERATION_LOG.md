@@ -1,0 +1,31 @@
+- [x] 迁移常用工具与技能文档 (`docs/tools/` -> `src/content/docs/docs/tools/`)。
+- [x] 修复因迁移导致的 404 链接 (Tools 部分已修复)。
+- [x] 补充 Gmail 配置文档 (`docs/config/gmail.mdx`)。
+- [x] 完善 Telegram/WhatsApp 配置文档。
+
+### 迭代总结
+完成了核心文档的迁移工作，重点优化了文档结构和内容质量：
+1. **SEO & EEAT**:
+   - 增加了 `Mac Mini`, `Docker`, `Security` 等高搜索意图的文档。
+   - 使用 Starlight 组件 (`Steps`, `Tabs`, `Aside`) 提升阅读体验。
+   - 修复了大量内部链接，确保导航流畅。
+2. **内容增量**:
+   - 补充了 `Gmail`, `Telegram`, `WhatsApp` 的详细配置指南。
+   - 增加了 `Gateway` 安全与故障排查的深度内容。
+3. **架构优化**:
+   - 统一了 YAML Frontmatter 格式。
+   - 建立了清晰的目录结构 (`gateway`, `channels`, `config`, `tools`)。
+
+## 迭代 7: 文档审查与发布准备 (已完成)
+
+### 目标
+- [x] **全站链接检查**: 运行 `astro build` 成功，修复了 MDX 语法错误 (`local-models.mdx`)。
+- [x] **内容审查**: 
+    - 优化了 `docs/index.mdx` 导览页，增加 Config 和 Tools 入口。
+    - 完善了 `config/` 下的 Telegram/WhatsApp 文档，增加了指向 `channels/` 的交叉链接。
+- [x] **最终构建**: `dist/` 目录已生成，静态资源压缩完成。
+
+## 迭代 8: 紧急修复与优化 (进行中)
+
+### 目标
+- [x] **修复 404 错误**: 解决 `trailingSlash` 配置冲突问题，统一设置为 `always` (在 `astro.config.ts` 和 `src/config.yaml` 中)，确保 URL 结构一致且符合目录索引生成的行为。

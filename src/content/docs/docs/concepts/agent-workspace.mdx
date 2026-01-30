@@ -1,0 +1,95 @@
+---
+title: Agent Workspace
+description: Managing the file system workspace for OpenClaw agents.
+sidebar:
+  order: 2
+---
+
+The **Agent Workspace** is the directory where the agent runs, stores files, and manages its "home". It serves as the persistent filesystem for the agent across restarts.
+
+## Default Location
+
+By default, the workspace is located at:
+
+*   **Linux/macOS**: `~/.openclaw/workspace`
+*   **Windows**: `%USERPROFILE%\.openclaw\workspace`
+
+You can verify the location by running:
+
+```bash
+openclaw config get agent.workspace
+```
+
+## Configuration
+
+You can override the workspace location in your `config.json` (or via environment variables).
+
+```json5
+// config.json
+{
+  agent: {
+    // Custom workspace path
+    workspace: "/var/lib/openclaw/workspace"
+  }
+}
+```
+
+### Environment Variables
+
+*   `OPENCLAW_WORKSPACE`: Overrides the workspace path.
+
+## Structure
+
+A typical workspace contains:
+
+```text
+workspace/
+├── .git/               # (Optional) Git history for backup
+├── memories/           # Vector store or memory files
+├── sessions/           # Session-specific data
+├── skills/             # Local skills/tools
+├── storage/            # General file storage for agents
+└── temp/               # Temporary scratch space
+```
+
+## File Map & Access
+
+Agents usually have read/write access to this directory.
+*   **Read**: The agent can read any file in the workspace.
+*   **Write**: The agent can create or modify files here.
+
+### Security Note
+The agent is **sandboxed** to this directory (logically). While the underlying process might have OS-level permissions, the OpenClaw runtime restricts high-level file operations to the workspace to prevent accidental modification of system files.
+
+## Backup Strategy
+
+Since the workspace contains all your agent's state (memories, custom skills, session logs), it is crucial to back it up.
+
+### Git Backup
+OpenClaw has built-in support for using Git to version the workspace.
+
+1.  Initialize a git repo in the workspace:
+    ```bash
+    cd ~/.openclaw/workspace
+    git init
+    ```
+2.  Configure a remote (e.g., private GitHub repo):
+    ```bash
+    git remote add origin git@github.com:username/my-agent-workspace.git
+    ```
+3.  OpenClaw can be configured to auto-commit changes (feature availability depends on version).
+
+### Manual Backup
+Simply archive the directory:
+```bash
+tar -czvf openclaw-backup.tar.gz ~/.openclaw/workspace
+```
+
+## Moving to a New Machine
+
+To migrate your agent:
+1.  **Stop** the OpenClaw service.
+2.  **Copy** the entire `workspace` directory to the new machine.
+3.  **Install** OpenClaw on the new machine.
+4.  **Point** the config to the copied workspace.
+5.  **Start** the service.

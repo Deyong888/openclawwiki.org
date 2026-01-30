@@ -1,0 +1,172 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Hero from '~/components/widgets/Hero.astro';
+import Note from '~/components/widgets/Note.astro';
+import Features from '~/components/widgets/Features.astro';
+import Steps from '~/components/widgets/Steps.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import CallToAction from '~/components/widgets/CallToAction.astro';
+import TrafficBanner from '~/components/custom/TrafficBanner.astro';
+
+const metadata = {
+  title: 'Openclaw Wiki — The Ultimate Self-Hosted AI Assistant Guide',
+  ignoreTitleTemplate: true,
+};
+---
+
+<Layout metadata={metadata}>
+  <!-- Hero Widget ******************* -->
+
+  <Hero
+    actions={[
+      {
+        variant: 'primary',
+        text: 'Get Started',
+        href: '/docs/getting-started/quick-start/',
+        icon: 'tabler:rocket',
+      },
+      { text: 'Migration Guide', href: '/moltbot-to-openclaw/' },
+    ]}
+    image={{ src: '~/assets/images/openclaw-logo.svg', alt: 'Openclaw Hero Image' }}
+  >
+    <Fragment slot="title">
+      Unlock the Power of <span class="text-accent dark:text-white highlight">Openclaw</span>
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="hidden sm:inline">
+        Formerly known as <b>Moltbot</b> and <b>Clawdbot</b>.
+      </span>
+      <span class="block mb-1 font-bold text-blue-600">Your Private AI Assistant.</span>
+      Build your own self-hosted AI on Mac Mini M4. Secure, fast, and completely yours.
+    </Fragment>
+  </Hero>
+
+  <!-- Note Widget ******************* -->
+
+  <Note title="Rebrand Notice:" description="Clawdbot → Moltbot → Openclaw. One mission, new name." />
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="features"
+    tagline="Why Openclaw?"
+    title="Control Your AI Destiny"
+    subtitle="Stop relying on cloud providers that spy on your data. Switch to local AI."
+    items={[
+      {
+        title: 'Total Privacy',
+        description:
+          'Your data never leaves your device. Perfect for sensitive work and personal privacy.',
+        icon: 'tabler:lock',
+      },
+      {
+        title: 'Multi-Model Support',
+        description:
+          'Connect to Anthropic Claude, OpenAI GPT-4, or run local models like Llama 3.',
+        icon: 'tabler:brain',
+      },
+      {
+        title: 'Cost Effective',
+        description:
+          'Stop paying monthly subscriptions per user. Buy hardware once, run forever.',
+        icon: 'tabler:coin',
+      },
+      {
+        title: 'Extensible Plugins',
+        description:
+          'Add capabilities like web search, file management, and home automation.',
+        icon: 'tabler:plug',
+      },
+    ]}
+  />
+
+  <!-- Steps Widget ****************** -->
+
+  <Steps
+    title="Start your journey in 3 simple steps"
+    items={[
+      {
+        title: 'Step 1: Prepare Hardware',
+        description:
+          "We recommend a Mac Mini M4 for the best balance of performance and efficiency. Linux/Docker is also supported.",
+        icon: 'tabler:server',
+      },
+      {
+        title: 'Step 2: Install Openclaw',
+        description:
+          "Run a single command to deploy the entire stack. <br/> <code>curl -sL https://openclaw.wiki/install | bash</code>",
+        icon: 'tabler:terminal',
+      },
+      {
+        title: 'Step 3: Connect & Configure',
+        description:
+          'Link your preferred LLM providers or download local models. Configure your assistants.',
+        icon: 'tabler:settings',
+      },
+    ]}
+    image={{
+      src: 'https://images.unsplash.com/photo-1616469829941-c7200edec809?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+      alt: 'Steps image',
+    }}
+  />
+
+  <!-- FAQs Widget ******************* -->
+
+  <FAQs
+    title="Frequently Asked Questions"
+    subtitle="Got questions? We've got answers."
+    tagline="FAQs"
+    classes={{ container: 'max-w-6xl' }}
+    items={[
+      {
+        title: 'What happened to Moltbot?',
+        description:
+          "Moltbot was a transitional name. We decided to rebrand to Openclaw to better reflect our open-source values and avoid confusion.",
+      },
+      {
+        title: 'Is Openclaw free?',
+        description:
+          'Yes, the core software is 100% open source and free. You only pay for your hardware and any cloud API usage (optional).',
+      },
+      {
+        title: 'Can I run it on Windows?',
+        description:
+          "Yes, via WSL2 (Windows Subsystem for Linux) or Docker Desktop. However, macOS or Linux is recommended for production.",
+      },
+      {
+        title: 'How do I migrate from Clawdbot?',
+        description:
+          "We have a dedicated migration guide. It's mostly a matter of renaming configuration files and updating the docker image.",
+      },
+    ]}
+  />
+
+  <!-- CallToAction Widget *********** -->
+
+  <CallToAction
+    actions={[
+      {
+        variant: 'primary',
+        text: 'Get Started Now',
+        href: '/docs/getting-started/quick-start/',
+        icon: 'tabler:rocket',
+      },
+    ]}
+  >
+    <Fragment slot="title">
+      Ready to take control?
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      Join thousands of developers building the future of private AI.
+    </Fragment>
+  </CallToAction>
+
+  <!-- Traffic Banner (Custom) ******* -->
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4">
+    <TrafficBanner variant="footer" site="all" />
+  </div>
+
+</Layout>

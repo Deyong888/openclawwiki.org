@@ -1,0 +1,102 @@
+---
+title: Heartbeat (Gateway)
+description: Heartbeat polling messages and notification rules.
+sidebar:
+  label: Heartbeat
+  order: 6
+---
+
+# Heartbeat (Gateway)
+
+> **Heartbeat vs Cron?** See [Cron vs Heartbeat](/docs/automation/cron-vs-heartbeat) for guidance on when to use each.
+
+Heartbeat runs **periodic agent turns** in the main session so the model can
+surface anything that needs attention without spamming you.
+
+## Quick start (beginner)
+
+1. Leave heartbeats enabled (default is `30m`, or `1h` for Anthropic OAuth/setup-token) or set your own cadence.
+2. Create a tiny `HEARTBEAT.md` checklist in the agent workspace (optional but recommended).
+3. Decide where heartbeat messages should go (`target: "last"` is the default).
+4. Optional: enable heartbeat reasoning delivery for transparency.
+5. Optional: restrict heartbeats to active hours (local time).
+
+Example config:
+
+```json5
+{
+  agents: {
+    defaults: {
+      heartbeat: {
+        every: "30m",
+        target: "last",
+        // activeHours: { start: "08:00", end: "24:00" },
+        // includeReasoning: true, // optional: send separate `Reasoning:` message too
+      }
+    }
+  }
+}
+```
+
+## Defaults
+
+- Interval: `30m` (or `1h` when Anthropic OAuth/setup-token is the detected auth mode). Set `agents.defaults.heartbeat.every` or per-agent `agents.list[].heartbeat.every`; use `0m` to disable.
+- Prompt body (configurable via `agents.defaults.heartbeat.prompt`):
+  `Read HEARTBEAT.md if it exists (workspace context). Follow it strictly. Do not infer or repeat old tasks from prior chats. If nothing needs attention, reply HEARTBEAT_OK.`
+- The heartbeat prompt is sent **verbatim** as the user message. The system
+  prompt includes a “Heartbeat” section and the run is flagged internally.
+- Active hours (`heartbeat.activeHours`) are checked in the configured timezone.
+  Outside the window, heartbeats are skipped until the next tick inside the window.
+
+## What the heartbeat prompt is for
+
+The default prompt is intentionally broad:
+- **Background tasks**: “Consider outstanding tasks” nudges the agent to review
+  follow-ups (inbox, calendar, reminders, queued work) and surface anything urgent.
+- **Human check-in**: “Checkup sometimes on your human during day time” nudges an
+  occasional lightweight “anything you need?” message, but avoids night-time spam
+  by using your configured local timezone (see [/docs/concepts/timezone](/docs/concepts/timezone)).
+
+If you want a heartbeat to do something very specific (e.g. “check Gmail PubSub
+stats” or “verify gateway health”), set `agents.defaults.heartbeat.prompt` (or
+`agents.list[].heartbeat.prompt`) to a custom body (sent verbatim).
+
+## Response contract
+
+- If nothing needs attention, reply with **`HEARTBEAT_OK`**.
+- During heartbeat runs, OpenClaw treats `HEARTBEAT_OK` as an ack when it appears
+  at the **start or end** of the reply. The token is stripped and the reply is
+  dropped if the remaining content is **≤ `ackMaxChars`** (default: 300).
+- If `HEARTBEAT_OK` appears in the **middle** of a reply, it is not treated
+  specially.
+- For alerts, **do not** include `HEARTBEAT_OK`; return only the alert text.
+
+Outside heartbeats, stray `HEARTBEAT_OK` at the start/end of a message is stripped
+and logged; a message that is only `HEARTBEAT_OK` is dropped.
+
+## Config
+
+```json5
+{
+  agents: {
+    defaults: {
+      heartbeat: {
+        every: "30m",           // default: 30m (0m disables)
+        model: "anthropic/claude-opus-4-5",
+        includeReasoning: false, // default: false (deliver separate Reasoning: message when available)
+        target: "last",         // last | none | <channel id> (core or plugin, e.g. "bluebubbles")
+        to: "+15551234567",     // optional channel-specific override
+        prompt: "Read HEARTBEAT.md if it exists (workspace context). Follow it strictly. Do not infer or repeat old tasks from prior chats. If nothing needs attention, reply HEARTBEAT_OK.",
+        ackMaxChars: 300         // max chars allowed after HEARTBEAT_OK
+      }
+    }
+  }
+}
+```
+
+### Scope and precedence
+
+- `agents.defaults.heartbeat` sets global heartbeat behavior.
+- `agents.list[].heartbeat` merges on top; if any agent has a `heartbeat` block, **only those agents** run heartbeats.
+- `channels.defaults.heartbeat` sets visibility defaults for all channels.
+- `channels.<channel>.heartbeat` overrides channel defaults.

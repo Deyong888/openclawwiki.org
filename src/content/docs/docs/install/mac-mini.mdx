@@ -1,0 +1,70 @@
+---
+title: Mac Mini M4 Setup
+description: Guide for running Openclaw on Mac Mini M4.
+sidebar:
+  label: Mac Mini M4
+  order: 1
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+# Gateway on macOS (Mac Mini M4)
+
+OpenClaw is optimized for Apple Silicon (M1/M2/M3/M4). Running on a dedicated Mac Mini is the recommended setup for a 24/7 personal assistant.
+
+## Hardware Requirements
+
+<Aside type="tip" title="Recommended Specs">
+For a smooth experience running local LLMs and 24/7 automation:
+
+- **Model**: Mac Mini M4 (or M2/M1)
+- **RAM**: 16GB minimum (32GB+ recommended for larger local models)
+- **Storage**: 256GB SSD (512GB+ if storing many model weights)
+- **Network**: Wired Ethernet preferred for stability
+</Aside>
+
+## Install the CLI (required)
+
+You need Node 22+ on the Mac, then install `openclaw` globally:
+
+<Steps>
+
+1.  **Install Node.js**
+    Ensure you have Node.js 22 or higher installed.
+
+2.  **Install OpenClaw CLI**
+    ```bash
+    npm install -g openclaw@latest
+    ```
+
+</Steps>
+
+## Launchd (Gateway as LaunchAgent)
+
+The best way to keep OpenClaw running is using `launchd`. The CLI can set this up for you automatically during onboarding.
+
+```bash
+openclaw onboard --install-daemon
+```
+
+This will:
+1. Create a `bot.molt.gateway.plist` in `~/Library/LaunchAgents/`.
+2. Load the service immediately.
+3. Ensure it restarts automatically on reboot.
+
+## Logging
+
+If you need to check logs:
+
+- launchd stdout/err: `/tmp/openclaw/openclaw-gateway.log`
+
+## Smoke check
+
+Verify your installation:
+
+```bash
+openclaw --version
+
+# Test gateway health (if running)
+openclaw gateway call health --url ws://127.0.0.1:18789 --timeout 3000
+```

@@ -1,0 +1,23 @@
+:root {
+  /* 核心品牌色 - 更新为更开放的蓝色调 */
+  --brand-primary: #3b82f6;        /* 开放蓝 blue-500 */
+  --brand-secondary: #0f172a;      /* 深 slate-900 */
+  --brand-text: #f8fafc;           /* slate-50 */
+  --brand-text-muted: #94a3b8;     /* slate-400 */
+  --brand-accent: #ea580c;         /* 保留龙虾橙作为历史色 */
+
+  /* Starlight Overrides */
+  --sl-color-accent: var(--brand-primary);
+  --sl-color-text-accent: var(--brand-primary);
+  --sl-color-bg-nav: var(--brand-secondary);
+  --sl-color-bg-sidebar: var(--brand-secondary);
+  --sl-color-bg: var(--brand-secondary);
+}
+
+[data-theme='light'] {
+  --brand-secondary: #ffffff;
+  --brand-text: #0f172a;
+  --sl-color-bg: #ffffff;
+  --sl-color-bg-nav: #f8fafc;
+  --sl-color-bg-sidebar: #f8fafc;
+}

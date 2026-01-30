@@ -1,0 +1,107 @@
+---
+title: Developing Custom Skills
+description: Learn how to build, test, and share custom skills for Moltbot/OpenClaw.
+sidebar:
+  label: Creating Skills
+  order: 51
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Developing Custom Skills 🛠️
+
+**Skills** are the primary way to extend OpenClaw's capabilities. Whether you want to integrate a private API, automate a specific workflow, or add a new tool, Skills provide a standardized way to package instructions and functionality.
+
+## What is a Skill?
+
+A Skill is simply a directory containing a `SKILL.md` file.
+- **Metadata**: YAML frontmatter defines the skill's name and description.
+- **Instructions**: The Markdown body tells the LLM *when* and *how* to use the skill.
+- **Tools**: Skills can define their own tools (via scripts) or use existing system tools.
+
+## Prerequisites
+
+- **OpenClaw/Moltbot Installed**: You need a running Gateway.
+- **Workspace Access**: You must have access to the `~/.openclaw/workspace/skills/` directory.
+
+## Step-by-Step Guide
+
+<Steps>
+
+1.  **Create the Skill Directory**
+    Skills typically live in your workspace. Create a new folder for your skill.
+    ```bash
+    mkdir -p ~/.openclaw/workspace/skills/hello-world
+    ```
+
+2.  **Create `SKILL.md`**
+    Create a `SKILL.md` file in that directory. This is the brain of your skill.
+
+    ```markdown
+    ---
+    name: hello_world
+    description: A simple skill that says hello.
+    ---
+
+    # Hello World Skill
+
+    When the user asks for a greeting or says "hello", use the `echo` tool (or just respond directly) to say:
+    "Hello from your custom skill! 🚀"
+    ```
+
+3.  **Add Functionality (Optional)**
+    You can instruct the agent to use existing tools like `bash`, `browser`, or `web_fetch`.
+    *Example: A skill that checks Hacker News.*
+
+    ```markdown
+    # Hacker News Checker
+    To check Hacker News:
+    1. Use `web_fetch` to get `https://news.ycombinator.com`.
+    2. Summarize the top 3 stories.
+    ```
+
+4.  **Refresh Skills**
+    Tell your agent to "refresh skills" or simply restart the Gateway. OpenClaw watches the skills directory and will auto-discover the new addition.
+
+5.  **Test It**
+    Send a message to your agent.
+    > "Say hello using your new skill."
+
+</Steps>
+
+## Best Practices
+
+<Aside type="tip">
+**Be Concise**: Instruct the model on *what* to do, not *how to be an AI*. The model already knows how to think; it just needs to know your specific business logic.
+</Aside>
+
+- **Clear Triggers**: Define exactly when the skill should be used (e.g., "Use this skill when the user asks about X").
+- **Safety**: If your skill uses `bash`, be extremely careful. Do not allow the model to execute arbitrary code from user input unless necessary.
+- **Modularity**: Keep skills focused on a single domain (e.g., "Calendar Skill", "Deployment Skill").
+
+## Advanced: Adding Custom Scripts
+
+You can include scripts (Node.js, Python, Bash) in your skill directory and instruct the agent to run them.
+
+*Example structure:*
+```
+hello-world/
+├── SKILL.md
+└── greet.js
+```
+
+*SKILL.md:*
+```markdown
+To greet the user, run `node {{skillPath}}/greet.js`.
+```
+(Note: `{{skillPath}}` is a placeholder you can manually resolve or instruct the agent to find relative to the skill file).
+
+## Sharing Skills
+
+Once you've built a useful skill, you can share it with the community or your team.
+- **ClawdHub**: [ClawdHub](https://clawdhub.com) is the official registry for shared skills.
+- **Git**: Commit your `skills/` directory to a private repo for team synchronization.
+
+## Configuration
+
+To manage where OpenClaw looks for skills, see [Skills Config](/docs/tools/skills-config).

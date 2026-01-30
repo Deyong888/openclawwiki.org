@@ -1,0 +1,84 @@
+---
+title: Agent Loop
+description: Understand the lifecycle of an OpenClaw agent run, from intake to streaming replies.
+sidebar:
+  order: 1
+---
+
+The **Agent Loop** is the core runtime lifecycle that turns an incoming message (or event) into a set of actions and a final reply. It manages context assembly, model inference, tool execution, and streaming responses.
+
+## Overview
+
+At a high level, the loop:
+1.  **Receives Input**: A message from a channel (e.g., Telegram, Discord) or an API call.
+2.  **Assembles Context**: Gathers recent history, relevant memories, and system instructions.
+3.  **Inference**: Sends the context to the LLM (Large Language Model).
+4.  **Tool Execution**: If the model requests tool calls (e.g., "search web", "query database"), the loop executes them and feeds the results back.
+5.  **Streaming**: Emits partial text deltas to the user in real-time.
+6.  **Persistence**: Saves the interaction to the session history.
+
+## How it works (high-level)
+
+1.  **`agent` RPC**: Validates params, resolves session (`sessionKey`/`sessionId`), persists session metadata, and returns `{ runId, acceptedAt }` immediately.
+2.  **`agentCommand`**: Runs the agent:
+    *   Resolves model + thinking/verbose defaults.
+    *   Loads skills snapshot.
+    *   Calls `runEmbeddedPiAgent` (pi-agent-core runtime).
+    *   Emits **lifecycle end/error** if the embedded loop does not emit one.
+3.  **`runEmbeddedPiAgent`**:
+    *   Serializes runs via per-session + global queues.
+    *   Resolves model + auth profile and builds the pi session.
+    *   Subscribes to pi events and streams assistant/tool deltas.
+    *   Enforces timeout -> aborts run if exceeded.
+    *   Returns payloads + usage metadata.
+
+## Detailed Flow
+
+### 1. Intake & Queueing
+Every request is assigned a `runId`. To prevent race conditions (e.g., user sends two messages quickly), runs for the same `sessionKey` are often serialized (queued) so the agent processes them in order.
+
+### 2. Session Preparation
+The loop loads the **Session** state, which includes:
+*   **History**: Recent chat messages.
+*   **Memory**: Long-term recollections (if enabled).
+*   **Scratchpad**: Temporary notes for the current task.
+
+### 3. Prompt Assembly
+OpenClaw constructs the prompt for the LLM. This includes:
+*   **System Prompt**: Defines the persona (e.g., "You are a helpful assistant...").
+*   **Skill Definitions**: Descriptions of available tools (functions).
+*   **Context**: The relevant history and memory.
+
+### 4. Model Inference & Tool Use
+The prompt is sent to the LLM. The model may generate:
+*   **Text**: A conversational response.
+*   **Tool Calls**: Requests to execute code or external APIs.
+
+If tools are called, the loop:
+*   Executes the tool (e.g., runs a Python script, calls a weather API).
+*   Captures the output (stdout/stderr/return value).
+*   Appends the result to the conversation history.
+*   **Loops back** to step 3 to let the model see the tool output and continue.
+
+### 5. Streaming & Reply
+As the model generates text, OpenClaw streams it to the client via Server-Sent Events (SSE) or directly to the chat channel (via the specific Channel integration).
+
+### 6. Compaction & Finalization
+Once the run is complete:
+*   The new messages are committed to the database.
+*   **Compaction** may trigger if the history exceeds the context window limit (summarizing older messages).
+*   **Memories** may be extracted and saved.
+
+## Events & Streams
+
+The agent loop emits various events during execution:
+*   `run.start`: The loop has begun.
+*   `text.delta`: A chunk of generated text.
+*   `tool.call`: A tool is being executed.
+*   `tool.result`: A tool has finished.
+*   `run.complete`: The loop finished successfully.
+*   `run.error`: An error occurred.
+
+## Timeouts
+
+To prevent "stuck" agents, the loop enforces a strict timeout (configurable, e.g., 60 seconds). If the model doesn't complete within this time, the run is aborted to free up resources.

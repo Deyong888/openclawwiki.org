@@ -1,0 +1,95 @@
+---
+title: Local models
+description: Run OpenClaw on local LLMs (LM Studio, vLLM, LiteLLM, custom OpenAI endpoints).
+sidebar:
+  label: Local Models
+  order: 21
+---
+
+---
+title: Local Models
+description: Run OpenClaw completely offline using local LLMs (LM Studio, Ollama).
+sidebar:
+  label: Local Models
+  order: 21
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Local Models
+
+OpenClaw supports running with local Large Language Models (LLMs), allowing for:
+- **Privacy**: Data never leaves your machine.
+- **Offline Use**: Run without internet.
+- **Cost**: No API fees.
+
+<Aside type="caution">
+**Hardware Warning**: Running capable agents requires significant hardware.
+- **Minimum**: 16GB RAM (M1/M2/M3).
+- **Recommended**: 32GB+ RAM, dedicated GPU (Mac Studio, RTX 4090).
+</Aside>
+
+## Recommended Setup: LM Studio
+
+[LM Studio](https://lmstudio.ai) is the easiest way to serve OpenAI-compatible local models.
+
+<Steps>
+
+1.  **Install LM Studio**
+    Download from [lmstudio.ai](https://lmstudio.ai).
+
+2.  **Load a Model**
+    Search for and download a model.
+    - **Recommendation**: `MiniMax-Text-01` or `Llama-3-70B` (if hardware permits).
+    - *Avoid small (&lt;7B) quantized models for complex agent tasks.*
+
+3.  **Start Server**
+    In LM Studio, go to the **Local Server** tab and click **Start Server**.
+    - Ensure it's running on `http://127.0.0.1:1234`.
+
+4.  **Configure OpenClaw**
+    Add the local provider to `~/.openclaw/openclaw.json`.
+
+    ```json5
+    {
+      models: {
+        providers: {
+          lmstudio: {
+            baseUrl: "http://127.0.0.1:1234/v1",
+            apiKey: "lm-studio", // Value doesn't matter
+            models: [
+              {
+                id: "local-model", // Match the ID in LM Studio
+                name: "My Local Model",
+                contextWindow: 32000
+              }
+            ]
+          }
+        }
+      },
+      agents: {
+        defaults: {
+          model: { primary: "lmstudio/local-model" }
+        }
+      }
+    }
+    ```
+
+</Steps>
+
+## Hybrid Mode (Best of Both Worlds)
+
+You can use a local model for "easy" tasks (chat) and a hosted model (Claude/GPT-4) for complex reasoning or fallbacks.
+
+```json5
+{
+  agents: {
+    defaults: {
+      model: {
+        primary: "anthropic/claude-3-5-sonnet", // Smart cloud model
+        fallbacks: ["lmstudio/local-model"]      // Local fallback
+      }
+    }
+  }
+}
+```

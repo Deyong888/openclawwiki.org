@@ -1,0 +1,74 @@
+---
+title: Compaction
+description: Managing context window limits through history summarization.
+sidebar:
+  order: 4
+---
+
+**Compaction** is the process of managing the Agent's "Context Window" (the limit on how much text the LLM can read at once). As conversations grow, they eventually exceed this limit. OpenClaw uses compaction to compress old history while retaining key information.
+
+## The Problem
+
+LLMs have a fixed token limit (e.g., 8k, 32k, 128k tokens).
+*   **Too much history** -> API errors or high costs.
+*   **Truncating history** -> Agent forgets what was just said.
+
+## The Solution: Auto-Compaction
+
+OpenClaw automatically triggers compaction when the session history reaches a configured threshold.
+
+### Mechanism
+
+1.  **Trigger**: `history_tokens > max_context_tokens * 0.8` (example).
+2.  **Select**: Identify the oldest N messages in the history.
+3.  **Summarize**:
+    *   A secondary LLM call runs a "Summarizer" prompt.
+    *   Input: The old messages.
+    *   Output: A concise narrative summary (e.g., "User asked about Python. Agent provided a code snippet.").
+4.  **Replace**:
+    *   The N old messages are removed from the active context.
+    *   A single `SystemMessage` or `Memory` entry containing the summary is inserted at the beginning of the history.
+
+### Configuration
+
+You can tune compaction in `config.json`:
+
+```json5
+{
+  llm: {
+    // Max tokens for the model
+    max_context: 16000,
+    // When to trigger compaction
+    compaction_threshold: 0.75 // 75% of max_context
+  }
+}
+```
+
+## Pruning vs. Summarizing
+
+*   **Pruning**: Simply dropping the oldest messages.
+    *   *Pros*: Free, fast.
+    *   *Cons*: Complete data loss of older context.
+*   **Summarizing** (Compaction): Rewriting old messages.
+    *   *Pros*: Retains semantic meaning and important facts.
+    *   *Cons*: Costs tokens/time to generate the summary.
+
+OpenClaw defaults to **Summarizing** for a continuous conversational experience.
+
+## Manual Compaction
+
+You can force a compaction (or "summarize now") via commands if the agent feels "cluttered":
+
+```bash
+# (Conceptual command, depends on specific agent implementation)
+/summarize
+```
+
+## Impact on RAG
+
+Compaction interacts with RAG (Retrieval Augmented Generation).
+*   **Active History**: The immediate conversation (last ~20 messages).
+*   **Summary**: The compressed past.
+*   **Long-term Memory (Vector DB)**: Specific facts extracted and stored permanently.
+
+Compaction bridges the gap between Active History and Long-term Memory. Ideally, vital facts from the summary are eventually moved to Long-term Memory.

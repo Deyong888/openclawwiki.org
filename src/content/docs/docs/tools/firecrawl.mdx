@@ -1,0 +1,74 @@
+---
+title: "Firecrawl: Anti-Bot Web Scraping"
+description: Use Firecrawl for reliable web extraction, bypassing bot detection and caching content.
+sidebar:
+  label: Firecrawl
+  order: 42
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+# Firecrawl
+
+OpenClaw integrates with **Firecrawl**, a powerful content extraction service designed to bypass bot detection and handle complex, JavaScript-heavy websites.
+
+## Why use Firecrawl?
+
+- **Anti-Bot Circumvention**: Successfully scrapes sites that block standard HTTP requests (e.g., Cloudflare challenges).
+- **JavaScript Rendering**: Handles single-page applications (SPAs) that require JS to load content.
+- **Smart Caching**: Reduces API costs and latency by caching results for up to 2 days (configurable).
+- **Fallback Mechanism**: Automatically used by the `web_fetch` tool when local extraction fails.
+
+## Setup
+
+<Steps>
+
+1.  **Get an API Key**
+    Create an account at [Firecrawl.dev](https://firecrawl.dev) and generate an API key.
+
+2.  **Configure OpenClaw**
+    Add the key to your configuration file (`~/.openclaw/openclaw.json`) or environment variables.
+
+</Steps>
+
+### Configuration
+
+```json5
+{
+  tools: {
+    web: {
+      fetch: {
+        firecrawl: {
+          apiKey: "FIRECRAWL_API_KEY_HERE",
+          baseUrl: "https://api.firecrawl.dev",
+          onlyMainContent: true,     // Extract only the article body
+          maxAgeMs: 172800000,       // Cache duration (default: 2 days)
+          timeoutSeconds: 60
+        }
+      }
+    }
+  }
+}
+```
+
+<Aside type="tip">
+You can also set the `FIRECRAWL_API_KEY` environment variable in the Gateway's environment instead of putting it in the config file.
+</Aside>
+
+## How it works
+
+The `web_fetch` tool uses a smart waterfall strategy to retrieve content:
+
+1.  **Local Readability**: Attempts to fetch and parse the page locally (fastest, free).
+2.  **Firecrawl**: If local fetch fails (e.g., 403 Forbidden, 401 Unauthorized, or empty content), it seamlessly retries using Firecrawl.
+3.  **Basic HTML**: Final fallback to raw HTML extraction if all else fails.
+
+### Stealth Mode
+
+Firecrawl uses an intelligent proxy system:
+- OpenClaw requests `proxy: "auto"`.
+- Firecrawl attempts a standard request first.
+- If blocked, it automatically retries with **stealth proxies** (residential IPs) to bypass defenses.
+
+See [Web Tools](/docs/tools/web) for more details on the complete web scraping toolkit.
+

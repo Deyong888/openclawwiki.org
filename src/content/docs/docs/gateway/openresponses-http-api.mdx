@@ -1,0 +1,102 @@
+---
+title: OpenResponses API (HTTP)
+description: Expose an OpenResponses-compatible /v1/responses HTTP endpoint from the Gateway.
+sidebar:
+  label: OpenResponses API
+  order: 23
+---
+
+# OpenResponses API (HTTP)
+
+OpenClaw’s Gateway can serve an OpenResponses-compatible `POST /v1/responses` endpoint.
+
+This endpoint is **disabled by default**. Enable it in config first.
+
+- `POST /v1/responses`
+- Same port as the Gateway (WS + HTTP multiplex): `http://<gateway-host>:<port>/v1/responses`
+
+Under the hood, requests are executed as a normal Gateway agent run (same codepath as
+`openclaw agent`), so routing/permissions/config match your Gateway.
+
+## Authentication
+
+Uses the Gateway auth configuration. Send a bearer token:
+
+- `Authorization: Bearer <token>`
+
+Notes:
+- When `gateway.auth.mode="token"`, use `gateway.auth.token` (or `OPENCLAW_GATEWAY_TOKEN`).
+- When `gateway.auth.mode="password"`, use `gateway.auth.password` (or `OPENCLAW_GATEWAY_PASSWORD`).
+
+## Choosing an agent
+
+No custom headers required: encode the agent id in the OpenResponses `model` field:
+
+- `model: "openclaw:<agentId>"` (example: `"openclaw:main"`, `"openclaw:beta"`)
+- `model: "agent:<agentId>"` (alias)
+
+Or target a specific OpenClaw agent by header:
+
+- `x-openclaw-agent-id: <agentId>` (default: `main`)
+
+Advanced:
+- `x-openclaw-session-key: <sessionKey>` to fully control session routing.
+
+## Enabling the endpoint
+
+Set `gateway.http.endpoints.responses.enabled` to `true`:
+
+```json5
+{
+  gateway: {
+    http: {
+      endpoints: {
+        responses: { enabled: true }
+      }
+    }
+  }
+}
+```
+
+## Disabling the endpoint
+
+Set `gateway.http.endpoints.responses.enabled` to `false`:
+
+```json5
+{
+  gateway: {
+    http: {
+      endpoints: {
+        responses: { enabled: false }
+      }
+    }
+  }
+}
+```
+
+## Session behavior
+
+By default the endpoint is **stateless per request** (a new session key is generated each call).
+
+If the request includes an OpenResponses `user` string, the Gateway derives a stable session key
+from it, so repeated calls can share an agent session.
+
+## Request shape (supported)
+
+The request follows the OpenResponses API with item-based input. Current support:
+
+- `input`: string or array of item objects.
+- `instructions`: merged into the system prompt.
+- `tools`: client tool definitions (function tools).
+- `tool_choice`: filter or require client tools.
+- `stream`: enables SSE streaming.
+- `max_output_tokens`: best-effort output limit (provider dependent).
+- `user`: stable session routing.
+
+Accepted but **currently ignored**:
+
+- `max_tool_calls`
+- `reasoning`
+- `metadata`
+- `store`
+- `previous_response_id`

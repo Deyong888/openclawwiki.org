@@ -1,0 +1,111 @@
+---
+title: Telegram Configuration
+description: Configure a Telegram Bot for OpenClaw.
+sidebar:
+  label: Telegram
+  order: 2
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Telegram (Bot API)
+
+Status: **Production-Ready** (Bot API via grammY).
+
+<Aside type="note">
+For architectural details and advanced usage, see the [Telegram Channel Guide](/docs/channels/telegram/).
+</Aside>
+
+OpenClaw integrates seamlessly with Telegram bots, allowing you to interact with your agent via DMs or add it to group chats.
+
+## Quick Setup
+
+<Steps>
+
+1.  **Create a Bot**
+    - Open Telegram and search for **@BotFather**.
+    - Send `/newbot` and follow the prompts.
+    - Copy the **HTTP API Token** provided (e.g., `123456789:ABCdefGHIjklMNOpqrstUVwxyz`).
+
+2.  **Configure OpenClaw**
+    Add the token to `~/.openclaw/openclaw.json`:
+
+    ```json5
+    {
+      channels: {
+        telegram: {
+          enabled: true,
+          botToken: "YOUR_BOT_TOKEN_HERE",
+          dmPolicy: "pairing" // Requires pairing code on first contact
+        }
+      }
+    }
+    ```
+    
+    <Aside type="tip">
+    Alternatively, set the `TELEGRAM_BOT_TOKEN` environment variable.
+    </Aside>
+
+3.  **Start the Gateway**
+    ```bash
+    openclaw gateway run
+    ```
+
+4.  **Pairing**
+    - Send a message to your new bot on Telegram (e.g., "Hello").
+    - The bot will reply asking for a **pairing code**.
+    - Check the gateway logs for the code and send it to the bot.
+
+</Steps>
+
+## Configuration Options
+
+### DM Policy
+Control who can talk to your bot in Direct Messages.
+
+| Policy | Description |
+| :--- | :--- |
+| **`pairing`** (Default) | New users must enter a one-time code printed in the gateway logs. |
+| **`allowlist`** | Only users in `allowFrom` (list of user IDs) can interact. |
+| **`open`** | Anyone can talk to the bot (Not recommended for public bots). |
+
+### Group Chats
+To use the bot in groups:
+
+1.  **Privacy Mode**: By default, bots only see messages mentioning them or replies.
+    - To see *all* messages: Talk to @BotFather, use `/setprivacy` -> `Disable`.
+    - *Note: OpenClaw usually works best when it can see context.*
+
+2.  **Group Config**:
+    ```json5
+    {
+      channels: {
+        telegram: {
+          // ...
+          groups: {
+            "*": { requireMention: true } // Only reply when @mentioned
+          }
+        }
+      }
+    }
+    ```
+
+## Admin Permissions
+
+You can designate certain Telegram users as **Admins**. Admins can:
+- Run sensitive tools (if configured).
+- Bypass certain policy checks.
+
+```json5
+{
+  channels: {
+    telegram: {
+      adminUsers: [123456789] // Your numeric Telegram User ID
+    }
+  }
+}
+```
+
+<Aside type="note">
+You can find your Telegram User ID by messaging `@userinfobot`.
+</Aside>

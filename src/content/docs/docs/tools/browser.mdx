@@ -1,0 +1,228 @@
+---
+title: Browser Automation & Scraping
+description: Control a dedicated Chrome/Brave profile for safe, isolated agent automation and web scraping.
+sidebar:
+  label: Browser
+  order: 3
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Browser (openclaw-managed)
+
+OpenClaw allows your agent to control a **dedicated Chrome/Brave/Edge/Chromium profile**. This provides a safe, isolated environment for **browser automation** and **web scraping**, distinct from your personal browsing session.
+
+<Aside type="tip" title="Beginner View">
+- Think of this as a **robot-only browser**.
+- The `openclaw` profile does **not** touch your personal history, cookies, or logins.
+- The agent can **open tabs, read pages, click buttons, and type forms** in this safe lane.
+- By default, it uses a local loopback service to control the browser.
+</Aside>
+
+## Why use the Managed Browser?
+
+- **Isolation**: Keeps agent activity separate from your personal work.
+- **Safety**: Prevents the agent from accidentally closing your tabs or leaking your session data.
+- **Capabilities**: Enables full automation (snapshots, PDF generation, screenshots, complex interactions).
+- **Multi-Profile**: Support for multiple isolated profiles (e.g., `work`, `research`, `testing`).
+
+## Quick Start
+
+<Steps>
+
+1.  **Check Status**
+    Verify if the browser service is ready.
+    ```bash
+    openclaw browser --browser-profile openclaw status
+    ```
+
+2.  **Start the Browser**
+    Launch the managed browser instance.
+    ```bash
+    openclaw browser --browser-profile openclaw start
+    ```
+
+3.  **Open a Page**
+    Direct the agent to a URL.
+    ```bash
+    openclaw browser --browser-profile openclaw open https://example.com
+    ```
+
+4.  **Take a Snapshot**
+    See what the agent sees.
+    ```bash
+    openclaw browser --browser-profile openclaw snapshot
+    ```
+
+</Steps>
+
+<Aside type="caution">
+If you receive a "Browser disabled" error, you need to enable it in your configuration file (see below) and restart the Gateway.
+</Aside>
+
+## Profiles: `openclaw` vs `chrome`
+
+| Profile | Description | Use Case |
+| :--- | :--- | :--- |
+| **`openclaw`** | Managed, isolated browser instance. | **Recommended.** Best for automation, scraping, and testing. |
+| **`chrome`** | Extension relay to your *system* browser. | Use when the agent needs access to your logged-in sessions (requires [Chrome Extension](/docs/tools/chrome-extension)). |
+
+To use the managed browser by default, set `browser.defaultProfile: "openclaw"` in your config.
+
+## Configuration
+
+Browser settings are located in `~/.openclaw/openclaw.json`.
+
+```json5
+{
+  browser: {
+    enabled: true,                    // Master switch
+    // cdpUrl: "http://127.0.0.1:18792", // Legacy override
+    remoteCdpTimeoutMs: 1500,         // Timeout for remote CDP checks
+    remoteCdpHandshakeTimeoutMs: 3000,
+    defaultProfile: "chrome",         // Change to "openclaw" for isolation
+    color: "#FF4500",                 // UI tint color
+    headless: false,                  // Set true for background operation
+    noSandbox: false,
+    attachOnly: false,                // "true" = never launch, only attach
+    executablePath: "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
+    profiles: {
+      openclaw: { cdpPort: 18800, color: "#FF4500" },
+      work: { cdpPort: 18801, color: "#0066CC" },
+      remote: { cdpUrl: "http://10.0.0.42:9222", color: "#00AA00" }
+    }
+  }
+}
+```
+
+<Aside type="note">
+- **Ports**: The browser control service uses a port derived from `gateway.port` (default `18791`).
+- **Auto-Detect**: OpenClaw automatically finds installed Chromium browsers (Chrome, Brave, Edge).
+- **Headless**: Set `headless: true` if you are running on a server (like a Mac Mini or Docker container) without a display.
+</Aside>
+
+## Browser Selection & Overrides
+
+If your **system default** browser is Chromium-based, OpenClaw uses it automatically. You can force a specific browser executable if needed.
+
+<Tabs>
+  <TabItem label="CLI">
+  ```bash
+  openclaw config set browser.executablePath "/usr/bin/google-chrome"
+  ```
+  </TabItem>
+  <TabItem label="macOS Config">
+  ```json5
+  {
+    browser: {
+      executablePath: "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
+    }
+  }
+  ```
+  </TabItem>
+  <TabItem label="Windows Config">
+  ```json5
+  {
+    browser: {
+      executablePath: "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
+    }
+  }
+  ```
+  </TabItem>
+  <TabItem label="Linux Config">
+  ```json5
+  {
+    browser: {
+      executablePath: "/usr/bin/brave-browser"
+    }
+  }
+  ```
+  </TabItem>
+</Tabs>
+
+## Local vs Remote Control
+
+OpenClaw supports flexible deployment models:
+
+1.  **Local Control (Default)**: Gateway runs locally, launches browser locally.
+2.  **Remote Control (Node Host)**: Gateway runs elsewhere, but uses a "Node Host" on your machine to control the browser.
+3.  **Remote CDP**: Gateway connects directly to a remote debugger (e.g., a browser in a Docker container or another server).
+
+### Remote CDP with Auth
+
+You can connect to a remote browser instance using a CDP URL.
+
+- **Query Token**: `https://provider.example?token=<token>`
+- **Basic Auth**: `https://user:pass@provider.example`
+
+<Aside type="danger">
+Avoid committing sensitive tokens to your `openclaw.json`. Use environment variables or a secrets manager where possible.
+</Aside>
+
+## Browserless (Hosted Remote CDP)
+
+[Browserless](https://browserless.io) provides a hosted Chromium service, perfect for serverless deployments or when you don't want to manage local browser resources.
+
+```json5
+{
+  browser: {
+    enabled: true,
+    defaultProfile: "browserless",
+    profiles: {
+      browserless: {
+        cdpUrl: "https://production-sfo.browserless.io?token=<BROWSERLESS_API_KEY>",
+        color: "#00AA00"
+      }
+    }
+  }
+}
+```
+
+## Chrome Extension Relay
+
+Drive your **existing Chrome tabs** (with your login sessions) using the Chrome Extension.
+
+<Steps>
+
+1.  **Install Extension**
+    Load the extension in "Developer Mode".
+    ```bash
+    openclaw browser extension install
+    ```
+    Navigate to `chrome://extensions`, enable Developer Mode, and "Load Unpacked" from the path provided.
+
+2.  **Attach to Tab**
+    Click the OpenClaw icon on the tab you want to control. The badge will show `ON`.
+
+3.  **Control via Agent**
+    The agent can now use the `chrome` profile to interact with that tab.
+    ```bash
+    openclaw browser --browser-profile chrome tabs
+    ```
+
+</Steps>
+
+For a full guide, see [Chrome Extension](/docs/tools/chrome-extension).
+
+## Troubleshooting & Debugging
+
+Common issues and how to solve them.
+
+<Tabs>
+  <TabItem label="Debugging Steps">
+    1.  **Take a Snapshot**: `openclaw browser snapshot --interactive` to see what the agent sees.
+    2.  **Check Console**: `openclaw browser console --level error` for page errors.
+    3.  **Highlight**: `openclaw browser highlight <ref>` to verify element targeting.
+    4.  **Trace**: `openclaw browser trace start` / `stop` to record a Playwright trace for deep analysis.
+  </TabItem>
+  <TabItem label="Common Errors">
+    - **"Browser disabled"**: Check `browser.enabled: true` in config.
+    - **"Playwright not available"**: Install full Playwright package or reinstall OpenClaw with browser support.
+    - **"Not visible"**: The element might be behind another element or not yet rendered. Use `wait` commands.
+  </TabItem>
+</Tabs>
+
+## CLI Reference
+
+See [Browser CLI Reference](/docs/tools/browser#cli-quick-reference) for a complete list of commands.
+

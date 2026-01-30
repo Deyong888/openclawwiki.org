@@ -1,0 +1,116 @@
+---
+title: Configuration Examples
+description: Schema-accurate configuration examples for common OpenClaw setups.
+sidebar:
+  label: Configuration Examples
+  order: 10
+---
+
+# Configuration Examples
+
+Examples below are aligned with the current config schema. For the exhaustive reference and per-field notes, see [Configuration](/docs/gateway/configuration).
+
+## Quick start
+
+### Absolute minimum
+```json5
+{
+  agent: { workspace: "~/.openclaw/workspace" },
+  channels: { whatsapp: { allowFrom: ["+15555550123"] } }
+}
+```
+
+Save to `~/.openclaw/openclaw.json` and you can DM the bot from that number.
+
+### Recommended starter
+```json5
+{
+  identity: {
+    name: "Clawd",
+    theme: "helpful assistant",
+    emoji: "🦞"
+  },
+  agent: {
+    workspace: "~/.openclaw/workspace",
+    model: { primary: "anthropic/claude-sonnet-4-5" }
+  },
+  channels: {
+    whatsapp: {
+      allowFrom: ["+15555550123"],
+      groups: { "*": { requireMention: true } }
+    }
+  }
+}
+```
+
+## Expanded example (major options)
+
+> JSON5 lets you use comments and trailing commas. Regular JSON works too.
+
+```json5
+{
+  // Environment + shell
+  env: {
+    OPENROUTER_API_KEY: "sk-or-...",
+    vars: {
+      GROQ_API_KEY: "gsk-..."
+    },
+    shellEnv: {
+      enabled: true,
+      timeoutMs: 15000
+    }
+  },
+
+  // Auth profile metadata (secrets live in auth-profiles.json)
+  auth: {
+    profiles: {
+      "anthropic:me@example.com": { provider: "anthropic", mode: "oauth", email: "me@example.com" },
+      "anthropic:work": { provider: "anthropic", mode: "api_key" },
+      "openai:default": { provider: "openai", mode: "api_key" },
+      "openai-codex:default": { provider: "openai-codex", mode: "oauth" }
+    },
+    order: {
+      anthropic: ["anthropic:me@example.com", "anthropic:work"],
+      openai: ["openai:default"],
+      "openai-codex": ["openai-codex:default"]
+    }
+  },
+
+  // Identity
+  identity: {
+    name: "Samantha",
+    theme: "helpful sloth",
+    emoji: "🦥"
+  },
+
+  // Logging
+  logging: {
+    level: "info",
+    file: "/tmp/openclaw/openclaw.log",
+    consoleLevel: "info",
+    consoleStyle: "pretty",
+    redactSensitive: "tools"
+  },
+
+  // Message formatting
+  messages: {
+    messagePrefix: "[openclaw]",
+    responsePrefix: ">",
+    ackReaction: "👀",
+    ackReactionScope: "group-mentions"
+  },
+
+  // Gateway
+  gateway: {
+    port: 18789,
+    auth: {
+      mode: "password",
+      password: "correct-horse-battery-staple"
+    },
+    bind: "loopback",
+    cors: {
+      origin: ["https://dashboard.example.com"]
+    }
+  }
+}
+```

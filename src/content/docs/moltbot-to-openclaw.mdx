@@ -1,0 +1,29 @@
+---
+title: 'Migration Guide: Moltbot to Openclaw'
+description: How to migrate your existing Moltbot setup to Openclaw.
+---
+
+If you are currently running Moltbot, upgrading to Openclaw is straightforward.
+
+## Why Migrate?
+
+- **Improved Security**: Enhanced privacy controls.
+- **Better Performance**: Optimized for M4 chips.
+- **New Features**: Latest model support.
+
+## Migration Steps
+
+1. **Backup your data**:
+   ```bash
+   moltbot backup --all
+   ```
+
+2. **Update your instance**:
+   ```bash
+   curl -sL https://openclaw.wiki/update.sh | bash
+   ```
+
+3. **Verify installation**:
+   ```bash
+   openclaw --version
+   ```

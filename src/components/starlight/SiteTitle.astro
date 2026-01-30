@@ -1,0 +1,21 @@
+---
+import type { Props } from '@astrojs/starlight/props';
+import DefaultSiteTitle from '@astrojs/starlight/components/SiteTitle.astro';
+---
+
+<div class="flex items-center gap-2">
+  <DefaultSiteTitle {...Astro.props} />
+  <span class="hidden sm:inline-block text-xs font-medium px-2 py-0.5 rounded-full bg-brand-primary/10 text-brand-primary border border-brand-primary/20">
+    Wiki
+  </span>
+</div>
+
+<style>
+  /* Ensure the logo doesn't get too big if using replacesTitle */
+  :global(a.site-title) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+  }
+</style>
