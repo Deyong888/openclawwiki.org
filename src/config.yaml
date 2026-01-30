@@ -1,6 +1,6 @@
 site:
   name: Openclaw Wiki
-  site: 'https://openclaw.wiki'
+  site: 'https://openclawwiki.org'
   base: '/'
   trailingSlash: true
 

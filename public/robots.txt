@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://openclaw.wiki/sitemap-index.xml
+Sitemap: https://openclawwiki.org/sitemap-index.xml

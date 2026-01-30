@@ -244,7 +244,7 @@ See: [Clawdbot Legacy Upgrade Archaeology Guide](/docs/migration/from-clawdbot/)
 
 ### Primary Sources
 - [Openclaw GitHub Repository](https://github.com/openclaw/openclaw) — Source code analysis, commit history, release notes
-- [Openclaw Official Documentation](https://openclaw.wiki) — Installation procedures, API reference
+- [Openclaw Official Documentation](https://openclawwiki.org) — Installation procedures, API reference
 - Moltbot Archived Repository — Historical comparison (now redirects)
 - Clawdbot Original Repository — Initial release archaeology (now redirects)
 

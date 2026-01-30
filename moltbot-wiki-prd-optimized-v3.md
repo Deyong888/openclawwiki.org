@@ -1435,7 +1435,7 @@ sidebar:
 User-agent: *
 Allow: /
 
-Sitemap: https://openclaw.wiki/sitemap-index.xml
+Sitemap: https://openclawwiki.org/sitemap-index.xml
 
 # 禁止爬取开发环境
 Disallow: /_astro/
