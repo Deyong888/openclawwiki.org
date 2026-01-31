@@ -1,0 +1,70 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import HeroText from '~/components/widgets/HeroText.astro';
+
+const metadata = {
+  title: 'OpenClaw Skills & Integrations - ClawHub Marketplace',
+  description: 'Explore the official OpenClaw Skills marketplace. Discover powerful plugins, integrations, and tools to extend the capabilities of your OpenClaw AI agent.',
+  ignoreTitleTemplate: true,
+};
+---
+
+<Layout metadata={metadata}>
+  <!-- HeroText Widget ******************* -->
+
+  <HeroText
+    tagline="Marketplace"
+    title="OpenClaw Skills Library"
+    subtitle="Discover and install powerful skills to expand your AI agent's capabilities."
+  />
+
+  <!-- Iframe Section ******************* -->
+
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+    <div class="w-full aspect-[4/3] md:aspect-[16/9] lg:h-[800px] bg-white dark:bg-slate-900 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+      <iframe
+        src="https://www.clawhub.com/skills"
+        title="OpenClaw Skills Marketplace"
+        class="w-full h-full border-0"
+        loading="lazy"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </section>
+
+  <!-- SEO Content Block ******************* -->
+
+  <section class="py-12 bg-blue-50 dark:bg-slate-800">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl mb-6">
+        What are OpenClaw Skills?
+      </h2>
+      <div class="prose prose-lg dark:prose-invert max-w-none text-gray-600 dark:text-slate-300">
+        <p>
+          <strong>OpenClaw Skills</strong> are modular extensions that grant your AI agent new abilities. 
+          Formerly known as Moltbot or Clawdbot plugins, these skills allow your self-hosted AI to interact with external APIs, 
+          manage files, execute code, and perform complex automation tasks.
+        </p>
+        
+        <h3 class="text-2xl font-semibold mt-8 mb-4 text-gray-800 dark:text-gray-100">Why use ClawHub?</h3>
+        <p>
+          ClawHub is the premier repository for community-verified OpenClaw extensions. 
+          By browsing the <a href="https://www.clawhub.com/skills" class="text-blue-600 dark:text-blue-400 hover:underline">ClawHub Skills Marketplace</a>, 
+          you can find tools for:
+        </p>
+        <ul class="list-disc pl-6 space-y-2 mt-4">
+          <li><strong>Web Browsing:</strong> Enable your agent to search the internet and extract real-time data.</li>
+          <li><strong>Productivity:</strong> Connect with Google Workspace, Slack, Notion, and Linear.</li>
+          <li><strong>Development:</strong> Give your agent direct access to GitHub, Docker, and command-line interfaces.</li>
+          <li><strong>Data Analysis:</strong> Equip your agent with Python pandas, SQL capabilities, and visualization tools.</li>
+        </ul>
+
+        <h3 class="text-2xl font-semibold mt-8 mb-4 text-gray-800 dark:text-gray-100">How to Install Skills</h3>
+        <p>
+          Installing a skill is as simple as copying the skill definition or configuration from the marketplace and adding it to your OpenClaw configuration file. 
+          Always ensure you are using the latest version of OpenClaw for maximum compatibility with the newest skills in the ecosystem.
+        </p>
+      </div>
+    </div>
+  </section>
+</Layout>

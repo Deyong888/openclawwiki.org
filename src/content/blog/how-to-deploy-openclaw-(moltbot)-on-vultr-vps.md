@@ -26,7 +26,7 @@ schema:
     - name: 'Terminal'
 ---
 
-# How to Deploy OpenClaw (Moltbot) on Vultr VPS: The "Free" Way
+## How to Deploy OpenClaw (Moltbot) on Vultr VPS: The "Free" Way
 
 **Keywords:** Deploy OpenClaw, Install Clawdbot, Moltbot Vultr Setup
 

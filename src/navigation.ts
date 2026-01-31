@@ -14,6 +14,10 @@ export const headerData = {
       text: 'Migration',
       href: '/moltbot-to-openclaw/',
     },
+    {
+      text: 'Skills',
+      href: getPermalink('/skills'),
+    },
   ],
   actions: [{ text: 'Download', href: '/docs/install/mac-mini/', target: '_blank' }],
 };
@@ -39,6 +43,8 @@ export const footerData = {
     {
       title: 'Project',
       links: [
+        { text: 'About Us', href: getPermalink('/about') },
+        { text: 'Contact Us', href: getPermalink('/contact') },
         { text: 'GitHub', href: 'https://github.com/openclaw/openclaw' },
         { text: 'Rebrand Story', href: '/clawdbot-vs-moltbot-vs-openclaw/' },
       ],

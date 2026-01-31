@@ -20,7 +20,7 @@ schema:
       text: 'Click deploy and wait for the service to start.'
 ---
 
-# The "Lazy" Guide: Deploy Openclaw on Zeabur in 3 Minutes (No VPS Required)
+## The "Lazy" Guide: Deploy Openclaw on Zeabur in 3 Minutes (No VPS Required)
 
 Let's be honest: Not everyone wants to buy a VPS, SSH into a Linux terminal, and debug `docker-compose` errors just to run an AI agent.
 
