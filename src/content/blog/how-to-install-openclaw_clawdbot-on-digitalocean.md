@@ -1,24 +1,4 @@
 ---
-title: 'How to Deploy OpenClaw (Moltbot) on DigitalOcean (Coming Soon)'
-description: 'Complete guide to installing OpenClaw on DigitalOcean Droplets. Learn how to set up your AI agent on a scalable cloud infrastructure.'
-excerpt: 'We are currently writing the definitive guide for deploying OpenClaw on DigitalOcean. Stay tuned for the step-by-step tutorial covering Droplet creation, Docker setup, and security best practices.'
-publishDate: 2026-02-10
-draft: true
-author: 'OpenClaw Wiki Team'
-tags: ['digitalocean', 'openclaw deploy', 'vps hosting']
-category: 'Server Deployment'
----
-
-# Coming Soon: How to Deploy OpenClaw on DigitalOcean
-
-We are working hard to bring you this tutorial. In the meantime, please check out our [Vultr Deployment Guide](/blog/how-to-deploy-openclaw-moltbot-on-vultr-vps) which uses a very similar process (Docker).
-
-## What to Expect
-*   Setting up a $4/mo Droplet
-*   Installing Docker on Ubuntu 24.04
-*   Configuring Firewall for port 18789
-*   Running the OpenClaw container
----
 title: 'How to Deploy OpenClaw on DigitalOcean: The 1-Click Marketplace Guide (2026)'
 description: 'Skip the complex Docker commands. Learn how to deploy OpenClaw (formerly Moltbot) using the official DigitalOcean Marketplace image. A complete step-by-step guide to getting your AI agent online in 3 minutes.'
 excerpt: 'Installing self-hosted AI shouldn''t require a Computer Science degree. In this guide, we walk through the "Lazy Method" of deploying OpenClaw using DigitalOcean''s 1-Click App—including the critical initialization step most guides miss.'
@@ -131,7 +111,7 @@ Even with one-click apps, things can sometimes go wrong. Here are the common fix
 ## ❓ Frequently Asked Questions (FAQ)
 
 **Q: Is this method free?**
-A: The OpenClaw software is free, but you pay DigitalOcean for the server hosting (starting at ~$6-12/mo). However, using our [referral link](#) gives you 2 months free ($200 credit).
+A: The OpenClaw software is free, but you pay DigitalOcean for the server hosting (starting at ~$6-12/mo). However, using our [referral link](https://www.digitalocean.com/?refcode=fb86ec65bc39&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge) gives you 2 months free ($200 credit).
 
 **Q: Is it safe to leave this running?**
 A: Yes. The Marketplace image runs OpenClaw inside a Docker container, meaning it is sandboxed from the core operating system.
@@ -148,4 +128,4 @@ DigitalOcean's Marketplace offering transforms the complex task of hosting an AI
 By following the steps above—especially the initialization login—you ensure a stable, always-on environment for your digital workforce.
 
 **Ready to deploy?**
-👉 **[Click here to claim your $200 DigitalOcean credit and launch OpenClaw today.](YOUR_AFFILIATE_LINK_HERE)**
+👉 **[Click here to claim your $200 DigitalOcean credit and launch OpenClaw today.](https://marketplace.digitalocean.com/apps/moltbot?refcode=fb86ec65bc39)**

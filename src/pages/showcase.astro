@@ -1,0 +1,179 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import Hero from '~/components/widgets/Hero.astro';
+import Headline from '~/components/ui/Headline.astro';
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+
+const metadata = {
+  title: 'Showcase - What People Are Building with OpenClaw',
+  description: 'Discover real-world use cases and autonomous agents built by the OpenClaw community.',
+};
+
+const items = [
+  {
+    name: 'Peter Steinberger',
+    handle: '@steipete',
+    avatar: 'https://unavatar.io/twitter/steipete',
+    tweetUrl: 'https://twitter.com/steipete',
+    content: `What I'm currently doing with @openclaw:
+    • Check my incoming mail, and remove spam
+    • Order things for me
+    • Send my reminders to Tana
+    • Create issues on GitHub
+    • Sync my Google Places
+    • Reads my X bookmarks and discusses them with me
+    • Keep track of costs and split them after trips`,
+    date: 'Jan 30',
+  },
+  {
+    name: 'Dave Kiss',
+    handle: '@davekiss',
+    avatar: 'https://unavatar.io/twitter/davekiss',
+    tweetUrl: 'https://twitter.com/davekiss',
+    content: `Rebuilt my entire site via Telegram while watching Netflix in bed.
+    • Notion → Astro, 18 posts migrated
+    • DNS moved to Cloudflare
+    • Never opened my laptop`,
+    date: 'Jan 28',
+  },
+  {
+    name: 'OpenClaw Community',
+    handle: '@openclaw_ai',
+    avatar: 'https://unavatar.io/twitter/openclaw_ai',
+    tweetUrl: 'https://twitter.com/openclaw_ai',
+    content: `Things my @openclaw does for me:
+    • Timeblocks tasks in my calendar based on importance
+    • Scores tasks importance and urgency
+    • Leads me through a weekly review based on meeting transcriptions
+    • Gives a morning daily brief: weather, objectives, health stats
+    • Notifies my wife and I about our son's upcoming school tests`,
+    date: 'Jan 29',
+  },
+  {
+    name: 'DevOps Engineer',
+    handle: '@devops_agent',
+    avatar: 'https://unavatar.io/twitter/github', // Fallback/Generic
+    tweetUrl: 'https://twitter.com/openclaw_ai',
+    content: `Put "BigC" (my OpenClaw) on a Hetzner server:
+    • Checked deployment of a new railway project
+    • Identified build failures and root causes (incorrect build commands)
+    • Updated configs, redeployed, and confirmed success
+    • Identified a design issue, fixed it, and submitted a PR`,
+    date: 'Jan 27',
+  },
+  {
+    name: 'Startup Founder',
+    handle: '@startup_io',
+    avatar: 'https://unavatar.io/twitter/stripe', // Generic tech avatar
+    tweetUrl: 'https://twitter.com/openclaw_ai',
+    content: `Less than 24 hours in:
+    • Cleaned up Linear issues
+    • Wrote email follow-ups
+    • Opened 3 PRs
+    • Prospected new signups
+    • Sent thousands of messages in a loop to test systems`,
+    date: 'Jan 26',
+  },
+  {
+    name: 'Smart Home User',
+    handle: '@home_automator',
+    avatar: 'https://unavatar.io/twitter/homeassistant',
+    tweetUrl: 'https://twitter.com/openclaw_ai',
+    content: `Built a full weekly meal planning system in Notion:
+    • Master meal plan template for all of 2026
+    • Shopping lists sorted by store and aisle
+    • Weather forecast auto-updating on the meal plan list
+    • Go-to recipes catalogued by chef`,
+    date: 'Jan 25',
+  },
+];
+---
+
+<Layout metadata={metadata}>
+  <!-- Hero Widget ******************* -->
+
+  <Hero
+    tagline="Showcase"
+    title="What People Are Building with OpenClaw"
+    subtitle="From autonomous coding to managing entire businesses—see how the community is redefining what AI agents can do."
+  />
+
+  <!-- Showcase Grid ****************** -->
+
+  <WidgetWrapper containerClass="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <Headline
+      title="Community Stories"
+      subtitle="Real examples of OpenClaw in the wild."
+      classes={{ container: 'mb-12' }}
+    />
+
+    <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+      {items.map(({ name, handle, avatar, tweetUrl, content, date }) => (
+        <a 
+          href={tweetUrl} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="block break-inside-avoid"
+        >
+          <div class="flex flex-col p-6 bg-white dark:bg-slate-900 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700 h-full">
+            
+            <!-- Header: Avatar + Name + Handle + Logo -->
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center">
+                <img 
+                  src={avatar} 
+                  alt={name} 
+                  class="w-10 h-10 rounded-full mr-3 border border-gray-100 dark:border-gray-600"
+                  onerror="this.src='https://unavatar.io/twitter/openclaw_ai'"
+                />
+                <div>
+                  <div class="font-bold text-gray-900 dark:text-white leading-tight hover:underline">
+                    {name}
+                  </div>
+                  <div class="text-gray-500 dark:text-gray-400 text-sm">
+                    {handle}
+                  </div>
+                </div>
+              </div>
+              <iconify-icon icon="tabler:brand-x" class="text-gray-400 text-xl"></iconify-icon>
+            </div>
+
+            <!-- Content -->
+            <div class="text-gray-800 dark:text-gray-200 text-[15px] leading-relaxed whitespace-pre-line mb-4">
+              {content}
+            </div>
+
+            <!-- Footer: Date -->
+            <div class="mt-auto pt-2 text-gray-500 dark:text-gray-400 text-sm border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
+              <span>{date} · View on X</span>
+              <iconify-icon icon="tabler:external-link" class="text-gray-400"></iconify-icon>
+            </div>
+
+          </div>
+        </a>
+      ))}
+    </div>
+  </WidgetWrapper>
+
+  <!-- CTA Widget ******************* -->
+
+  <section class="py-12 bg-blue-50 dark:bg-slate-800 mt-12">
+    <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl mb-6">
+        Built something cool?
+      </h2>
+      <p class="text-xl text-gray-600 dark:text-gray-300 mb-8">
+        Share your OpenClaw agent with the community.
+      </p>
+      <a
+        href="https://twitter.com/openclaw_ai"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-primary"
+      >
+        Share on Twitter
+      </a>
+    </div>
+  </section>
+
+</Layout>

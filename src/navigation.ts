@@ -18,6 +18,31 @@ export const headerData = {
       text: 'Skills',
       href: getPermalink('/skills'),
     },
+    {
+      text: 'Showcase',
+      href: getPermalink('/showcase'),
+    },
+    {
+      text: 'Tools',
+      links: [
+        {
+          text: 'Tools Overview',
+          href: getPermalink('/tools'),
+        },
+        {
+          text: 'Docker Generator',
+          href: getPermalink('/tools/docker-compose-generator'),
+        },
+        {
+          text: 'Cost Estimator',
+          href: getPermalink('/tools/claude-cost-estimator'),
+        },
+        {
+          text: 'Security Policy',
+          href: getPermalink('/tools/security-policy-generator'),
+        },
+      ],
+    },
   ],
   actions: [{ text: 'Download', href: '/docs/install/mac-mini/', target: '_blank' }],
 };
@@ -38,6 +63,7 @@ export const footerData = {
         { text: 'Documentation', href: '/docs/getting-started/quick-start/' },
         { text: 'Blog', href: getBlogPermalink() },
         { text: 'Migration Guide', href: '/moltbot-to-openclaw/' },
+        { text: 'FAQ', href: getPermalink('/resources/faq') },
       ],
     },
     {

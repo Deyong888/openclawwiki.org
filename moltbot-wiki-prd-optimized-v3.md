@@ -1454,7 +1454,7 @@ Disallow: /api/
 export const affiliates = {
   // 云服务器
   digitalOcean: {
-    url: 'https://m.do.co/c/YOUR_CODE',
+    url: 'https://m.do.co/c/fb86ec65bc39',
     name: 'DigitalOcean',
     offer: '$200 Free Credit',
     category: 'cloud',

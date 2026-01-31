@@ -1,0 +1,45 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import CostEstimator from '~/components/tools/CostEstimator';
+import Headline from '~/components/ui/Headline.astro';
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+
+const metadata = {
+  title: 'Claude API Cost Estimator - OpenClaw Tools',
+  description: 'Estimate your monthly AI costs for OpenClaw using Claude Haiku, Sonnet, or Opus. Plan your budget for autonomous agent operations.',
+};
+---
+
+<Layout metadata={metadata}>
+  <WidgetWrapper containerClass="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <Headline
+      title="API Cost Estimator"
+      subtitle="Plan your AI budget effectively. Estimate costs based on model choice and usage intensity."
+      classes={{ container: 'mb-8' }}
+    />
+
+    <div class="mb-12">
+      <CostEstimator client:load />
+    </div>
+
+    {/* SEO Content Section */}
+    <div class="prose dark:prose-invert max-w-4xl mx-auto mt-20">
+      <h2>Understanding AI Agent Costs</h2>
+      <p>
+        Running an autonomous agent like OpenClaw involves continuous API calls to Large Language Models (LLMs). The cost depends on three main factors:
+      </p>
+      <ol>
+        <li><strong>Model Selection:</strong> Claude Haiku is extremely cheap ($1/M tokens) and great for simple tasks. Claude Opus is expensive ($25/M output) but necessary for complex reasoning. Claude Sonnet 4.5 offers the best balance.</li>
+        <li><strong>Context Window:</strong> As your agent "remembers" more of the conversation (Long Term Memory), it needs to re-read previous messages, increasing Input Token usage.</li>
+        <li><strong>Task Complexity:</strong> Coding and research tasks require the agent to think more and output longer responses, increasing Output Token usage.</li>
+      </ol>
+
+      <h3>How to Optimize Costs</h3>
+      <ul>
+        <li>Use <strong>Claude Haiku</strong> for routine monitoring and simple notifications.</li>
+        <li>Enable <strong>Session Compaction</strong> in OpenClaw settings to summarize old memories.</li>
+        <li>Use <strong>Claude Sonnet</strong> for the majority of coding and writing tasks.</li>
+      </ul>
+    </div>
+  </WidgetWrapper>
+</Layout>

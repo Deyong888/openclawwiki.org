@@ -1,0 +1,45 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import SecurityPolicyMaker from '~/components/tools/SecurityPolicyMaker';
+import Headline from '~/components/ui/Headline.astro';
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+
+const metadata = {
+  title: 'Security Policy Generator - OpenClaw Tools',
+  description: 'Generate secure whitelist configurations for OpenClaw. Define allowed commands and work directories to keep your agent safe.',
+};
+---
+
+<Layout metadata={metadata}>
+  <WidgetWrapper containerClass="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <Headline
+      title="Security Policy Generator"
+      subtitle="Define what your agent can and cannot do. Generate a secure config.json file."
+      classes={{ container: 'mb-8' }}
+    />
+
+    <div class="mb-12">
+      <SecurityPolicyMaker client:load />
+    </div>
+
+    {/* SEO Content Section */}
+    <div class="prose dark:prose-invert max-w-4xl mx-auto mt-20">
+      <h2>Why is a Security Policy Important?</h2>
+      <p>
+        OpenClaw is a powerful agent that can execute shell commands. To prevent accidents or potential misuse (if the LLM gets confused), strictly defining an <code>allowedCommands</code> whitelist is crucial.
+      </p>
+
+      <h3>Best Practices</h3>
+      <ul>
+        <li><strong>Principle of Least Privilege:</strong> Only enable the commands your agent absolutely needs. If it doesn't need <code>docker</code>, don't enable it.</li>
+        <li><strong>Sandboxing:</strong> Always run OpenClaw in a container (Docker) or a restricted user environment.</li>
+        <li><strong>Work Directory:</strong> Restrict the agent's file operations to a specific <code>workspace</code> folder to protect your system files.</li>
+      </ul>
+
+      <h3>How to use this config</h3>
+      <p>
+        Copy the generated JSON content and save it to your <code>config.json</code> file in the OpenClaw configuration directory. Restart the agent for changes to take effect.
+      </p>
+    </div>
+  </WidgetWrapper>
+</Layout>

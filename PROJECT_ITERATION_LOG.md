@@ -25,7 +25,17 @@
     - 完善了 `config/` 下的 Telegram/WhatsApp 文档，增加了指向 `channels/` 的交叉链接。
 - [x] **最终构建**: `dist/` 目录已生成，静态资源压缩完成。
 
-## 迭代 8: 紧急修复与优化 (进行中)
+## 迭代 8: 紧急修复与优化 (已完成)
 
 ### 目标
 - [x] **修复 404 错误**: 解决 `trailingSlash` 配置冲突问题，统一设置为 `always` (在 `astro.config.ts` 和 `src/config.yaml` 中)，确保 URL 结构一致且符合目录索引生成的行为。
+
+## 迭代 9: 交互式工具集开发 (进行中)
+
+### 目标
+- [x] **创建工具页面**: 新增 `src/pages/tools.astro` 作为工具集入口。
+- [x] **实现 Docker Compose 生成器**: 支持 Local/VPS 部署配置生成，集成 Vultr/DigitalOcean 推广链接。
+- [x] **实现 Claude API 成本估算器**: 提供基于使用强度和任务复杂度的成本预测。
+- [x] **实现安全策略生成器**: 可视化生成 OpenClaw 安全白名单配置 (allowedCommands)。
+- [x] **导航更新**: 在顶部菜单栏增加 `Tools` 入口。
+- [x] **资源植入**: 增加推荐资源板块 (stoiclines.store, linktoai.top, 24kwebgames.com)。

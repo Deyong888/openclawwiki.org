@@ -1,0 +1,48 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import ConfigGenerator from '~/components/tools/ConfigGenerator';
+import Headline from '~/components/ui/Headline.astro';
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+
+const metadata = {
+  title: 'Docker Compose Generator - OpenClaw Deployment Tools',
+  description: 'Generate production-ready Docker Compose configurations for OpenClaw deployment on Vultr, DigitalOcean, or Zeabur. Optimize your AI agent infrastructure.',
+};
+---
+
+<Layout metadata={metadata}>
+  <WidgetWrapper containerClass="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <Headline
+      title="Docker Compose Generator"
+      subtitle="Create the perfect deployment configuration for your OpenClaw instance in seconds."
+      classes={{ container: 'mb-8' }}
+    />
+
+    <div class="mb-12">
+      <ConfigGenerator client:load />
+    </div>
+
+    {/* SEO Content Section */}
+    <div class="prose dark:prose-invert max-w-4xl mx-auto mt-20">
+      <h2>Why use the Docker Compose Generator?</h2>
+      <p>
+        Deploying autonomous AI agents requires a robust infrastructure. Manually configuring <code>docker-compose.yml</code> files is prone to syntax errors and security misconfigurations. This tool ensures you follow OpenClaw's best practices for:
+      </p>
+      <ul>
+        <li><strong>Security Sandboxing:</strong> Automatically configures the <code>SANDBOX_ENABLED</code> environment variable to prevent unauthorized file system access.</li>
+        <li><strong>Data Persistence:</strong> Correctly maps Docker volumes to <code>/home/node/.openclaw</code> so your agent's memory and identity persist across restarts.</li>
+        <li><strong>Network Configuration:</strong> Sets up the correct port mappings (default 18789) for the Gateway Protocol.</li>
+      </ul>
+
+      <h3>Supported Platforms</h3>
+      <p>
+        We support generating configurations for all major deployment environments:
+      </p>
+      <ul>
+        <li><strong>Local Development:</strong> For testing on Mac or Windows machines.</li>
+        <li><strong>Vultr & DigitalOcean:</strong> Optimized for high-performance VPS hosting.</li>
+        <li><strong>Zeabur:</strong> One-click serverless deployment for users who want zero maintenance.</li>
+      </ul>
+    </div>
+  </WidgetWrapper>
+</Layout>

@@ -1,0 +1,37 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+
+const metadata = {
+  title: 'Frequently Asked Questions',
+};
+---
+
+<Layout metadata={metadata}>
+  <FAQs
+    title="Frequently Asked Questions"
+    subtitle="Find answers to common questions about OpenClaw."
+    items={[
+      {
+        title: 'Is OpenClaw free?',
+        description:
+          'Yes, OpenClaw is 100% open-source and free to use. You can host it on your own server or use our managed cloud service.',
+      },
+      {
+        title: 'Do I need coding skills?',
+        description:
+          'Basic knowledge of Docker and JSON is helpful, but our tools like the Config Generator make it easy for non-developers to get started.',
+      },
+      {
+        title: 'Can I use it for my business?',
+        description:
+          'Absolutely! OpenClaw is designed for both personal and commercial use. Check our license for more details.',
+      },
+      {
+        title: 'How do I get support?',
+        description:
+          'Join our Discord community or check the official documentation for help.',
+      },
+    ]}
+  />
+</Layout>

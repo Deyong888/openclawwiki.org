@@ -32,7 +32,7 @@ If you want a $0/month option and don’t mind ARM + provider-specific setup, se
 
 ## Prerequisites
 
-- DigitalOcean account ([signup with $200 free credit](https://m.do.co/c/signup))
+- DigitalOcean account ([signup with $200 free credit](https://m.do.co/c/fb86ec65bc39))
 - SSH key pair (or willingness to use password auth)
 - ~20 minutes
 
