@@ -8,7 +8,7 @@ image: ~/assets/images/openclaw-evolution-analysis.png
 tags: [openclaw, moltbot, clawdbot, self-hosted-ai, brand-analysis, security-audit]
 category: 'Technical Analysis'
 author: 'Moltbot Wiki Editorial Team'
-canonical: 'https://moltbotwiki.org/blog/openclaw-brand-evolution-analysis/'
+canonical: 'https://openclawwiki.org/blog/from-clawdbot-to-moltbot-to-openclaw/'
 relatedPosts:
   - '/docs/migration/from-moltbot/'
   - '/docs/install/mac-mini/'
