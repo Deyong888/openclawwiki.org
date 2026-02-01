@@ -20,7 +20,8 @@ export default function ConfigGenerator() {
   const generateYaml = () => {
     const key = apiKey || 'sk-ant-api-key-placeholder';
     const volumeConfig = persistence ? `    volumes:
-      - ./data:/home/node/.openclaw` : '';
+      - ./data:/home/node/.openclaw
+      - ./workspace:/home/node/.openclaw/workspace` : '';
     
     const sandboxConfig = sandboxing ? `    environment:
       - SANDBOX_ENABLED=true
@@ -30,14 +31,23 @@ export default function ConfigGenerator() {
       - PORT=${port}`;
 
     return `version: '3.8'
+
 services:
-  openclaw:
-    image: openclaw/openclaw:latest
+  openclaw-gateway:
+    image: openclaw:local
+    build: .
     restart: unless-stopped
     ports:
       - "${port}:${port}"
 ${sandboxConfig}
 ${volumeConfig}
+
+  openclaw-cli:
+    image: openclaw:local
+    build: .
+${volumeConfig}
+    profiles:
+      - tools
 `;
   };
 
@@ -221,11 +231,11 @@ ${volumeConfig}
                     <span>Quick Start Guide</span>
                 </div>
                 <ol className="list-decimal list-inside space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                    <li>Install Docker & Docker Compose on your machine/server.</li>
-                    <li>Create a folder named <code>openclaw</code>.</li>
-                    <li>Save the code above as <code>docker-compose.yml</code> in that folder.</li>
-                    <li>Run <code className="bg-gray-200 dark:bg-gray-900 px-1.5 py-0.5 rounded text-xs font-mono">docker-compose up -d</code> in your terminal.</li>
-                    <li>Access OpenClaw at <code className="bg-gray-200 dark:bg-gray-900 px-1.5 py-0.5 rounded text-xs font-mono">http://localhost:{port}</code> (or your server IP).</li>
+                    <li>Clone the OpenClaw repository and enter the directory.</li>
+                    <li>Save the code above as <code>docker-compose.yml</code> (replacing the existing one).</li>
+                    <li>Run <code className="bg-gray-200 dark:bg-gray-900 px-1.5 py-0.5 rounded text-xs font-mono">docker compose run --rm openclaw-cli onboard</code> to set up.</li>
+                    <li>Start the gateway: <code className="bg-gray-200 dark:bg-gray-900 px-1.5 py-0.5 rounded text-xs font-mono">docker compose up -d openclaw-gateway</code></li>
+                    <li>Access Control UI at <code className="bg-gray-200 dark:bg-gray-900 px-1.5 py-0.5 rounded text-xs font-mono">http://localhost:{port}</code>.</li>
                 </ol>
             </div>
         </div>
