@@ -11,49 +11,70 @@ export const starlightConfig: StarlightUserConfig = {
   },
   sidebar: [
     {
-      label: 'Quick Start',
+      label: 'Start Here',
       items: [
         { label: 'What is Openclaw?', link: '/docs/getting-started/what-is-openclaw/' },
-        { label: 'Quick Start Guide', link: '/docs/getting-started/quick-start/' },
+        { label: 'Quick Start', link: '/docs/getting-started/quick-start/' },
         { label: 'Brand History', link: '/clawdbot-vs-moltbot-vs-openclaw/' },
       ],
     },
     {
-      label: 'Rebrand & Migration',
-      collapsed: false,
+      label: 'Installation',
+      autogenerate: { directory: 'docs/install' },
+    },
+    {
+      label: 'Migration',
       items: [
         { label: 'Moltbot → Openclaw', link: '/moltbot-to-openclaw/', badge: 'New' },
-        { label: 'Migrate from Moltbot', link: '/docs/migration/from-moltbot/' },
-        { label: 'Migrate from Clawdbot', link: '/docs/migration/from-clawdbot/' },
         { label: 'Migration FAQ', link: '/docs/migration/faq/' },
+        { label: 'From Moltbot', link: '/docs/migration/from-moltbot/' },
+        { label: 'From Clawdbot', link: '/docs/migration/from-clawdbot/' },
       ],
     },
     {
-      label: 'Installation',
-      collapsed: false,
+      label: 'Essentials',
+      autogenerate: { directory: 'docs/start' },
+    },
+    {
+      label: 'Core Concepts',
+      autogenerate: { directory: 'docs/concepts' },
+    },
+    {
+      label: 'Configuration',
       items: [
-        { label: 'Mac Mini M4', link: '/docs/install/mac-mini/', badge: 'Popular' },
-        { label: 'Docker Setup', link: '/docs/install/docker/' },
-        { label: 'Railway Cloud', link: '/docs/install/railway/', badge: 'Easy' },
-        { label: 'AWS Free Tier', link: '/docs/install/aws/' },
+        {
+          label: 'LLM Providers',
+          autogenerate: { directory: 'docs/providers' },
+        },
+        {
+          label: 'Channels',
+          autogenerate: { directory: 'docs/channels' },
+        },
+        {
+          label: 'Automation',
+          autogenerate: { directory: 'docs/automation' },
+        },
       ],
+    },
+    {
+      label: 'Tools & Skills',
+      autogenerate: { directory: 'docs/tools' },
+    },
+    {
+      label: 'Gateway',
+      autogenerate: { directory: 'docs/gateway' },
+    },
+    {
+      label: 'CLI Reference',
+      autogenerate: { directory: 'docs/cli' },
+    },
+    {
+      label: 'Web Dashboard',
+      autogenerate: { directory: 'docs/web' },
     },
     {
       label: 'Security',
-      collapsed: true,
-      items: [
-        { label: 'Is it Safe?', link: '/docs/security/is-it-safe/' },
-        { label: 'Best Practices', link: '/docs/security/best-practices/' },
-      ],
-    },
-     {
-      label: 'Configuration',
-      collapsed: true,
-      items: [
-        { label: 'WhatsApp', link: '/docs/config/whatsapp/' },
-        { label: 'Telegram', link: '/docs/config/telegram/' },
-        { label: 'Gmail', link: '/docs/config/gmail/' },
-      ],
+      autogenerate: { directory: 'docs/security' },
     },
   ],
 };

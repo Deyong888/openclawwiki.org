@@ -1,29 +1,88 @@
 ---
-title: 'Migration Guide: Moltbot to Openclaw'
-description: How to migrate your existing Moltbot setup to Openclaw.
+title: 'Migration Guide: Moltbot to OpenClaw'
+description: 'Complete guide to upgrading from Moltbot/Clawdbot to the latest OpenClaw version.'
+sidebar:
+  label: Moltbot Migration
+  order: 2
 ---
 
-If you are currently running Moltbot, upgrading to Openclaw is straightforward.
+OpenClaw (formerly Moltbot/Clawdbot) is moving fast. This guide covers how to safely migrate your existing installation to the latest version (v2026.1.30+).
 
-## Why Migrate?
+## Before You Start
 
-- **Improved Security**: Enhanced privacy controls.
-- **Better Performance**: Optimized for M4 chips.
-- **New Features**: Latest model support.
+:::caution
+Always backup your data before performing a major upgrade.
+:::
 
-## Migration Steps
+Snapshot your current configuration and workspace:
+- **Config**: `~/.openclaw/openclaw.json` (or `~/.moltbot/moltbot.json`)
+- **Credentials**: `~/.openclaw/credentials/`
+- **Workspace**: `~/.openclaw/workspace`
 
-1. **Backup your data**:
-   ```bash
-   moltbot backup --all
-   ```
+## Method 1: Automated Update (Preferred)
 
-2. **Update your instance**:
-   ```bash
-   curl -sL https://openclaw.ai/update.sh | bash
-   ```
+The easiest way to update is to re-run the installer. It detects existing installs, upgrades in place, and runs `openclaw doctor` automatically.
 
-3. **Verify installation**:
-   ```bash
-   openclaw --version
-   ```
+```bash
+curl -fsSL https://openclaw.ai/install.sh | bash
+```
+
+**Notes:**
+- Add `--no-onboard` if you don’t want the onboarding wizard to run again.
+- This works for both **global** and **source** installs.
+
+## Method 2: Global Install Update
+
+If you installed via `npm` or `pnpm` globally, you can update using your package manager.
+
+**Using npm:**
+```bash
+npm i -g openclaw@latest
+```
+
+**Using pnpm:**
+```bash
+pnpm add -g openclaw@latest
+```
+
+After updating, run the doctor command to ensure everything is migrated correctly:
+
+```bash
+openclaw doctor
+openclaw gateway restart
+```
+
+## Method 3: Source Install Update
+
+If you are running from a git clone, use the built-in update command:
+
+```bash
+openclaw update
+```
+
+This command will:
+1. Switch to the selected channel.
+2. Fetch and rebase against upstream.
+3. Rebuild dependencies and the Control UI.
+4. Run `openclaw doctor`.
+5. Restart the gateway.
+
+## Verification
+
+After updating, verify your installation status:
+
+```bash
+openclaw --version
+openclaw health
+```
+
+### New in v2026.1.30
+- **Per-Agent Models**: Check model status with `openclaw gateway status --agent`.
+- **Shell Completion**: Run `openclaw completion` to set up tab completion for Zsh/Bash/PowerShell.
+
+## Troubleshooting
+
+If you encounter issues:
+1. Run **`openclaw doctor`** - it fixes most common config and migration issues.
+2. Check the logs: `openclaw logs --follow`.
+3. If necessary, you can rollback to a specific version (see [Updating Docs](/docs/install/updating)).
