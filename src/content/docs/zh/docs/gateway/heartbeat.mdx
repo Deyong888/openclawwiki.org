@@ -1,0 +1,91 @@
+---
+title: 心跳 (Gateway)
+description: 心跳轮询消息和通知规则。
+sidebar:
+  label: 心跳
+  order: 6
+---
+
+# 心跳 (Gateway)
+
+> **心跳 vs Cron?** 参见 [Cron vs Heartbeat](/zh/docs/automation/cron-vs-heartbeat) 了解何时使用哪种方式。
+
+心跳在主会话中运行 **周期性代理轮次**，以便模型可以提出任何需要关注的事情，而不会向你发送垃圾邮件。
+
+## 快速入门 (初学者)
+
+1. 保持心跳启用 (默认为 `30m`，对于 Anthropic OAuth/setup-token 为 `1h`) 或设置你自己的节奏。
+2. 在代理工作区创建一个微小的 `HEARTBEAT.md` 清单 (可选但推荐)。
+3. 决定心跳消息应该去哪里 (`target: "last"` 是默认值)。
+4. 可选：启用心跳推理传递以提高透明度。
+5. 可选：将心跳限制在活跃时间 (本地时间)。
+
+配置示例：
+
+```json5
+{
+  agents: {
+    defaults: {
+      heartbeat: {
+        every: "30m",
+        target: "last",
+        // activeHours: { start: "08:00", end: "24:00" },
+        // includeReasoning: true, // 可选：也发送单独的 `Reasoning:` 消息
+      }
+    }
+  }
+}
+```
+
+## 默认值
+
+- 间隔：`30m` (或当检测到的认证模式为 Anthropic OAuth/setup-token 时为 `1h`)。设置 `agents.defaults.heartbeat.every` 或每个代理的 `agents.list[].heartbeat.every`；使用 `0m` 禁用。
+- 提示体 (可通过 `agents.defaults.heartbeat.prompt` 配置)：
+  `Read HEARTBEAT.md if it exists (workspace context). Follow it strictly. Do not infer or repeat old tasks from prior chats. If nothing needs attention, reply HEARTBEAT_OK.`
+- 心跳提示作为用户消息 **逐字** 发送。系统提示包含一个“Heartbeat”部分，并且运行在内部被标记。
+- 活跃时间 (`heartbeat.activeHours`) 在配置的时区中检查。
+  在窗口之外，心跳会被跳过，直到窗口内的下一个时刻。
+
+## 心跳提示的作用
+
+默认提示故意很宽泛：
+- **后台任务**：“考虑未完成的任务” 推动代理审查后续事项 (收件箱、日历、提醒、排队的工作) 并提出任何紧急事项。
+- **人类签到**：“白天有时检查你的人类” 推动偶尔的轻量级“你需要什么吗？”消息，但通过使用你配置的本地时区避免夜间垃圾邮件 (参见 [/zh/docs/concepts/timezone](/zh/docs/concepts/timezone))。
+
+如果你希望心跳做一些非常具体的事情 (例如“检查 Gmail PubSub 统计数据”或“验证 Gateway 健康状况”)，请将 `agents.defaults.heartbeat.prompt` (或 `agents.list[].heartbeat.prompt`) 设置为自定义内容 (逐字发送)。
+
+## 响应契约
+
+- 如果不需要关注，回复 **`HEARTBEAT_OK`**。
+- 在心跳运行期间，当 `HEARTBEAT_OK` 出现在回复的 **开头或结尾** 时，OpenClaw 将其视为确认。如果剩余内容 **≤ `ackMaxChars`** (默认：300)，令牌将被剥离并且回复被丢弃。
+- 如果 `HEARTBEAT_OK` 出现在回复的 **中间**，它不会被特殊处理。
+- 对于警报，**不要** 包含 `HEARTBEAT_OK`；仅返回警报文本。
+
+在心跳之外，消息开头/结尾的零散 `HEARTBEAT_OK` 会被剥离并记录；仅包含 `HEARTBEAT_OK` 的消息会被丢弃。
+
+## 配置
+
+```json5
+{
+  agents: {
+    defaults: {
+      heartbeat: {
+        every: "30m",           // 默认：30m (0m 禁用)
+        model: "anthropic/claude-opus-4-5",
+        includeReasoning: false, // 默认：false (可用时传递单独的 Reasoning: 消息)
+        target: "last",         // last | none | <channel id> (核心或插件，例如 "bluebubbles")
+        to: "+15551234567",     // 可选的特定于频道的覆盖
+        prompt: "Read HEARTBEAT.md if it exists (workspace context). Follow it strictly. Do not infer or repeat old tasks from prior chats. If nothing needs attention, reply HEARTBEAT_OK.",
+        ackMaxChars: 300         // HEARTBEAT_OK 后允许的最大字符数
+      }
+    }
+  }
+}
+```
+
+### 范围和优先级
+
+- `agents.defaults.heartbeat` 设置全局心跳行为。
+- `agents.list[].heartbeat` 在此之上合并；如果任何代理有 `heartbeat` 块，**只有那些代理** 运行心跳。
+- `channels.defaults.heartbeat` 设置所有频道的可见性默认值。
+- `channels.<channel>.heartbeat` 覆盖频道默认值。

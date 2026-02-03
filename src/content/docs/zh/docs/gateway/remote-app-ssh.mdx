@@ -1,0 +1,107 @@
+---
+title: 通过 SSH 的远程 App
+description: 如何通过 SSH 隧道将 OpenClaw.app 连接到远程 Gateway
+---
+
+如果您在远程服务器（例如 VPS、家庭实验室服务器或云实例）上运行 OpenClaw Gateway，您可以将本地 OpenClaw 桌面应用程序连接到它。
+
+最安全的方法是使用 **SSH 隧道**。这会加密您的连接，并且不需要向公共互联网暴露 Gateway 的端口。
+
+## 1. 准备 SSH 连接
+
+确保您可以从终端 SSH 到您的远程服务器：
+
+```bash
+ssh user@your-server.com
+```
+
+## 2. 设置 SSH 隧道
+
+您需要将远程服务器的 Gateway 端口（默认为 `18789`）转发到您的本地机器。
+
+打开终端并运行：
+
+```bash
+ssh -N -L 18789:127.0.0.1:18789 user@your-server.com
+```
+
+*   此命令将挂起并保持连接打开。
+*   只要此命令正在运行，您的本地机器就会认为 `localhost:18789` 是远程 Gateway。
+
+## 3. 配置 OpenClaw.app
+
+1.  打开 **OpenClaw.app**。
+2.  转到 **Settings** (设置) > **Connection** (连接)。
+3.  将 **Gateway URL** 设置为：
+    `ws://127.0.0.1:18789`
+4.  如果您的远程 Gateway 配置了身份验证令牌，请在 **Auth Token** 字段中输入它。
+5.  点击 **Connect** (连接) 或保存。
+
+应用程序现在应该显示已连接状态，您可以看到远程 Gateway 上的代理和工具。
+
+## 自动化隧道 (macOS/Linux)
+
+为了避免每次手动运行 SSH 命令，您可以将其设置为后台服务或使用 SSH 配置。
+
+### 使用 `~/.ssh/config`
+
+编辑 `~/.ssh/config` 以简化命令：
+
+```ssh
+Host my-gateway
+    HostName your-server.com
+    User user
+    LocalForward 18789 127.0.0.1:18789
+    IdentityFile ~/.ssh/id_rsa
+```
+
+现在您只需运行 `ssh -N my-gateway`。
+
+### 使用 AutoSSH (保持连接活跃)
+
+`autossh` 是一个在连接断开时自动重启 SSH 会话的工具。
+
+```bash
+autossh -M 0 -f -N -L 18789:127.0.0.1:18789 user@your-server.com
+```
+
+### macOS Launch Agent
+
+您可以创建一个 `.plist` 文件在登录时自动启动隧道。
+
+1.  创建 `~/Library/LaunchAgents/com.user.ssh-gateway.plist`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.user.ssh-gateway</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/ssh</string>
+        <string>-N</string>
+        <string>-L</string>
+        <string>18789:127.0.0.1:18789</string>
+        <string>-o</string>
+        <string>ServerAliveInterval=60</string>
+        <string>user@your-server.com</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+</dict>
+</plist>
+```
+
+2.  加载它：
+    ```bash
+    launchctl load ~/Library/LaunchAgents/com.user.ssh-gateway.plist
+    ```
+
+## 故障排除
+
+*   **连接被拒绝 (Connection Refused)**: 确保 Gateway 实际上正在远程服务器上运行，并且监听的是 `127.0.0.1` 或 `0.0.0.0` 上的 `18789` 端口。
+*   **端口已在使用 (Port already in use)**: 确保本地机器上没有运行本地 Gateway 实例占用 `18789` 端口。如果是，请更改本地转发端口（例如 `ssh -L 19999:127.0.0.1:18789 ...`）并在 App 中更新 URL 为 `ws://127.0.0.1:19999`。

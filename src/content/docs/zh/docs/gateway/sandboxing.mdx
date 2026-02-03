@@ -1,0 +1,112 @@
+---
+title: 沙盒 (Sandboxing)
+description: 配置 Docker 沙盒以安全执行代码
+---
+
+OpenClaw Gateway 的核心功能之一是能够在一个隔离的**沙盒**环境中执行 LLM 生成的代码。这可以防止代理意外（或恶意）修改您的主机系统、访问敏感文件或使系统崩溃。
+
+目前，主要的沙盒实现是基于 **Docker** 的。
+
+## 先决条件
+
+您必须在运行 Gateway 的机器上安装并运行 Docker。
+
+*   **Windows**: 安装 Docker Desktop (使用 WSL2 后端)。
+*   **macOS**: 安装 Docker Desktop 或 OrbStack。
+*   **Linux**: 安装 Docker Engine。
+
+## 启用沙盒
+
+在您的 `config.json5` 中，配置 `sandbox` 部分：
+
+```json5
+{
+  gateway: {
+    // ... 其他配置
+  },
+  
+  sandbox: {
+    // 模式: "docker" (推荐) 或 "local" (无隔离，危险!)
+    mode: "docker",
+    
+    docker: {
+      // 用于执行代码的 Docker 镜像
+      // 必须包含 Python, Bash 等环境
+      image: "python:3.11-bookworm",
+      
+      // 可选: 容器资源限制
+      cpuLimit: 1.0, // CPU 核心数
+      memoryLimit: "512mb",
+      
+      // 可选: 挂载到容器的卷
+      // 格式: "主机路径:容器路径:模式"
+      binds: [
+        "./workspace:/workspace:rw" 
+      ],
+      
+      // 网络模式: "bridge" (默认), "host", "none"
+      // 使用 "none" 禁止互联网访问
+      networkMode: "bridge"
+    }
+  }
+}
+```
+
+## 配置选项详解
+
+### `mode`
+*   `docker`: 在 Docker 容器中启动临时的执行环境。这是生产环境和处理不可信任务的推荐模式。
+*   `local`: 直接在主机操作系统上执行代码。**仅在开发环境或您完全信任代理操作时使用。** 风险极高。
+
+### `docker.image`
+指定用于沙盒的 Docker 镜像。默认通常是基于 Debian 的 Python 镜像。
+*   如果您的代理需要特定的系统依赖（例如 `ffmpeg`, `gcc`），您应该构建一个自定义 Docker 镜像并在配置中指定它。
+
+### `docker.binds`
+允许您将主机目录挂载到沙盒中。这对于让代理访问特定文件而不暴露整个文件系统非常有用。
+*   示例：`"/home/user/project:/project:rw"` 允许代理读写 `project` 目录。
+
+### `docker.networkMode`
+*   `bridge`: 允许容器访问互联网（如果主机可以）。
+*   `none`: 完全断开网络连接。如果您的任务只需要处理本地数据，这是最安全的选项。
+
+## 自定义沙盒镜像
+
+如果您需要预安装 Python 包或系统工具，可以创建一个 `Dockerfile`：
+
+```dockerfile
+# Dockerfile
+FROM python:3.11-bookworm
+
+# 安装系统工具
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装 Python 包
+RUN pip install numpy pandas requests
+
+WORKDIR /workspace
+```
+
+构建镜像：
+```bash
+docker build -t my-openclaw-sandbox .
+```
+
+然后在 `config.json5` 中使用它：
+```json5
+sandbox: {
+  mode: "docker",
+  docker: {
+    image: "my-openclaw-sandbox"
+  }
+}
+```
+
+## 故障排除
+
+*   **Docker not found**: 确保 `docker` 命令在 Gateway 的 PATH 中可用。
+*   **Permission denied**: 确保运行 Gateway 的用户有权访问 Docker 守护进程（在 Linux 上通常需要加入 `docker` 组）。
+*   **Container fails to start**: 检查镜像名称是否正确，以及是否有足够的系统资源。使用 `docker logs` 查看容器内的错误。

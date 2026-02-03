@@ -1,0 +1,52 @@
+---
+title: 提权模式
+description: 提权执行模式和 /elevated 指令。
+sidebar:
+  label: 提权模式
+  order: 15
+---
+
+# 提权模式 (/elevated 指令)
+
+## 它的作用
+- `/elevated on` 在网关主机上运行并保持执行审批（与 `/elevated ask` 相同）。
+- `/elevated full` 在网关主机上运行 **并** 自动批准执行（跳过执行审批）。
+- `/elevated ask` 在网关主机上运行但保持执行审批（与 `/elevated on` 相同）。
+- `on`/`ask` **不** 强制 `exec.security=full`；配置的安全/询问策略仍然适用。
+- 仅在代理被 **沙盒化** 时改变行为（否则执行已在主机上运行）。
+- 指令形式：`/elevated on|off|ask|full`, `/elev on|off|ask|full`。
+- 仅接受 `on|off|ask|full`；任何其他内容都会返回提示且不会改变状态。
+
+## 它控制什么（以及它不控制什么）
+- **可用性门控**：`tools.elevated` 是全局基准。`agents.list[].tools.elevated` 可以进一步限制每个代理的提权（两者都必须允许）。
+- **按会话状态**：`/elevated on|off|ask|full` 设置当前会话密钥的提权级别。
+- **内联指令**：消息中的 `/elevated on|ask|full` 仅适用于该条消息。
+- **群组**：在群组聊天中，仅当提及代理时才会采纳提权指令。绕过提及要求的仅限指令消息被视为已提及。
+- **主机执行**：提权强制 `exec` 在网关主机上运行；`full` 还会设置 `security=full`。
+- **审批**：`full` 跳过执行审批；`on`/`ask` 在白名单/询问规则要求时遵守它们。
+- **非沙盒化代理**：对位置无操作；仅影响门控、日志记录和状态。
+- **工具策略仍然适用**：如果 `exec` 被工具策略拒绝，则无法使用提权。
+- **与 `/exec` 分开**：`/exec` 为授权发送者调整按会话的默认值，不需要提权。
+
+## 解析顺序
+1. 消息上的内联指令（仅适用于该条消息）。
+2. 会话覆盖（通过发送仅限指令的消息设置）。
+3. 全局默认值（配置中的 `agents.defaults.elevatedDefault`）。
+
+## 设置会话默认值
+- 发送一条 **仅** 包含指令的消息（允许空格），例如 `/elevated full`。
+- 发送确认回复（`Elevated mode set to full...` / `Elevated mode disabled.`）。
+- 如果禁用了提权访问或发送者不在批准的白名单中，指令会回复一个可操作的错误且不会更改会话状态。
+- 发送不带参数的 `/elevated`（或 `/elevated:`）以查看当前的提权级别。
+
+## 可用性 + 白名单
+- 功能开关：`tools.elevated.enabled`（即使代码支持，也可以通过配置默认关闭）。
+- 发送者白名单：`tools.elevated.allowFrom` 带有每个提供商的白名单（例如 `discord`, `whatsapp`）。
+- 按代理开关：`agents.list[].tools.elevated.enabled`（可选；只能进一步限制）。
+- 按代理白名单：`agents.list[].tools.elevated.allowFrom`（可选；设置后，发送者必须同时匹配全局 + 按代理白名单）。
+- Discord 回退：如果省略 `tools.elevated.allowFrom.discord`，则使用 `channels.discord.dm.allowFrom` 列表作为回退。设置 `tools.elevated.allowFrom.discord`（即使是 `[]`）以覆盖。按代理白名单 **不** 使用回退。
+- 所有门控都必须通过；否则提权被视为不可用。
+
+## 日志记录 + 状态
+- 提权执行调用记录在 info 级别。
+- 会话状态包括提权模式（例如 `elevated=ask`, `elevated=full`）。

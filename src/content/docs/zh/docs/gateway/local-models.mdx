@@ -1,0 +1,87 @@
+---
+title: 本地模型
+description: 在本地 LLM (LM Studio, vLLM, LiteLLM, 自定义 OpenAI 端点) 上运行 OpenClaw。
+sidebar:
+  label: 本地模型
+  order: 21
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+# 本地模型
+
+OpenClaw 支持使用本地大型语言模型 (LLM) 运行，允许：
+- **隐私**: 数据从不离开你的机器。
+- **离线使用**: 无需互联网即可运行。
+- **成本**: 无 API 费用。
+
+<Aside type="caution">
+**硬件警告**: 运行有能力的代理需要大量硬件。
+- **最低**: 16GB RAM (M1/M2/M3)。
+- **推荐**: 32GB+ RAM, 专用 GPU (Mac Studio, RTX 4090)。
+</Aside>
+
+## 推荐设置: LM Studio
+
+[LM Studio](https://lmstudio.ai) 是服务 OpenAI 兼容本地模型的最简单方法。
+
+<Steps>
+
+1.  **安装 LM Studio**
+    从 [lmstudio.ai](https://lmstudio.ai) 下载。
+
+2.  **加载模型**
+    搜索并下载模型。
+    - **推荐**: `MiniMax-Text-01` 或 `Llama-3-70B` (如果硬件允许)。
+    - *避免使用小型 (&lt;7B) 量化模型处理复杂的代理任务。*
+
+3.  **启动服务器**
+    在 LM Studio 中，转到 **Local Server** 选项卡并点击 **Start Server**。
+    - 确保它运行在 `http://127.0.0.1:1234`。
+
+4.  **配置 OpenClaw**
+    将本地提供商添加到 `~/.openclaw/openclaw.json`。
+
+    ```json5
+    {
+      models: {
+        providers: {
+          lmstudio: {
+            baseUrl: "http://127.0.0.1:1234/v1",
+            apiKey: "lm-studio", // 值不重要
+            models: [
+              {
+                id: "local-model", // 匹配 LM Studio 中的 ID
+                name: "My Local Model",
+                contextWindow: 32000
+              }
+            ]
+          }
+        }
+      },
+      agents: {
+        defaults: {
+          model: { primary: "lmstudio/local-model" }
+        }
+      }
+    }
+    ```
+
+</Steps>
+
+## 混合模式 (两全其美)
+
+你可以使用本地模型处理“简单”任务 (聊天)，并使用托管模型 (Claude/GPT-4) 处理复杂的推理或作为回退。
+
+```json5
+{
+  agents: {
+    defaults: {
+      model: {
+        primary: "anthropic/claude-3-5-sonnet", // 智能云模型
+        fallbacks: ["lmstudio/local-model"]      // 本地回退
+      }
+    }
+  }
+}
+```

@@ -1,0 +1,150 @@
+---
+title: 连接 Slack
+description: 使用 Socket 模式或 HTTP Webhook 将 OpenClaw 与 Slack 工作区集成。
+sidebar:
+  label: Slack
+  order: 21
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+OpenClaw 与 Slack 集成，为你的团队提供智能助手。它支持 **Socket Mode**（最简单，可在防火墙后工作）和 **HTTP Mode**（用于公共服务器）。
+
+## 先决条件
+
+- 一个你有权安装应用的 **Slack 工作区**。
+- 已安装 **OpenClaw**。
+
+## 设置指南 (Socket 模式)
+
+Socket 模式推荐给大多数用户，因为它不需要暴露公共 IP 地址。
+
+<Steps>
+
+1.  ### 创建 Slack 应用
+    前往 [api.slack.com/apps](https://api.slack.com/apps) 并点击 **Create New App**。选择 **From scratch**，给它起个名字（例如 "OpenClaw"），并选择你的工作区。
+
+2.  ### 启用 Socket 模式
+    *   在侧边栏中导航到 **Socket Mode**。
+    *   切换 **Enable Socket Mode**。
+    *   给令牌起个名字（例如 "Socket Token"）并点击 **Generate**。
+    *   **复制 `xapp-...` 令牌**。这是你的 **App Token**。
+
+3.  ### 配置范围 (Scopes)
+    前往 **OAuth & Permissions**。向下滚动到 **Bot Token Scopes** 并添加：
+    *   `app_mentions:read` (听到 @mentions)
+    *   `chat:write` (回复)
+    *   `channels:history` (读取公共频道)
+    *   `groups:history` (读取私有频道)
+    *   `im:history` (读取私信)
+    *   `im:write` (发送私信)
+    *   `users:read` (知道谁在说话)
+    *   `files:write` (上传图片/文件)
+
+4.  ### 安装应用
+    向上滚动到 **OAuth & Permissions** 的顶部，点击 **Install to Workspace**。
+    *   **复制 `xoxb-...` 令牌**。这是你的 **Bot Token**。
+
+5.  ### 订阅事件
+    前往 **Event Subscriptions**。
+    *   切换 **Enable Events**。
+    *   展开 **Subscribe to bot events** 并添加：
+        *   `message.channels`
+        *   `message.groups`
+        *   `message.im`
+        *   `app_mention`
+        *   `member_joined_channel`
+
+6.  ### 启用私信 (DMs)
+    前往 **App Home**。
+    *   勾选 **Allow users to send Slash commands and messages from the messages tab**。
+
+7.  ### 配置 OpenClaw
+    将令牌添加到你的 `config.json`。
+
+    ```json5
+    {
+      channels: {
+        slack: {
+          enabled: true,
+          // App Token (Socket Mode)
+          appToken: "xapp-...",
+          // Bot Token (OAuth)
+          botToken: "xoxb-..."
+        }
+      }
+    }
+    ```
+
+</Steps>
+
+## 线程行为
+
+Slack 对话通常发生在线程中。你可以控制 OpenClaw 如何回复。
+
+| 模式 | 行为 | 配置 |
+| :--- | :--- | :--- |
+| **Off** (默认) | 在主频道回复（除非用户已经在线程中）。 | `replyToMode: "off"` |
+| **First** | *第一次*回复开始一个线程；后续回复保持在该线程中。保持频道整洁。 | `replyToMode: "first"` |
+| **All** | 每次回复都是线程化的。 | `replyToMode: "all"` |
+
+**示例：**
+```json5
+{
+  channels: {
+    slack: {
+      // 总是线程化私信，但保持群聊扁平
+      replyToModeByChatType: {
+        direct: "all",
+        group: "off"
+      }
+    }
+  }
+}
+```
+
+## 访问控制
+
+### 私信 (Direct Messages)
+默认情况下，OpenClaw 对私信使用 **配对模式 (Pairing Mode)**。
+*   **批准用户：** `openclaw pairing approve slack <code>`
+*   **对所有人开放：**
+    ```json5
+    {
+      channels: {
+        slack: {
+          dm: { policy: "open", allowFrom: ["*"] }
+        }
+      }
+    }
+    ```
+
+### 频道访问
+你可以限制机器人响应哪些频道。
+
+```json5
+{
+  channels: {
+    slack: {
+      groupPolicy: "allowlist",
+      channels: {
+        "C12345678": { allow: true }, // 允许特定频道 ID
+        "#general": { allow: true }   // 按名称允许
+      }
+    }
+  }
+}
+```
+
+## 故障排除
+
+**机器人不响应私信：**
+*   你是否在 api.slack.com 的 **App Home** 部分启用了 **Messages Tab**？
+*   你是否订阅了 `message.im` 事件？
+
+**机器人不响应频道：**
+*   你是否 **邀请机器人** 到该频道？（`/invite @OpenClaw`）
+*   你是否订阅了 `message.channels`？
+
+**"missing_scope" 错误：**
+*   检查日志看缺少哪个范围，然后在 **OAuth & Permissions** 中添加它并 **Reinstall the App**（重新安装应用）（更改范围后必须重新安装才能生效）。

@@ -1,0 +1,97 @@
+---
+title: 远程访问
+description: 将 OpenClaw Gateway 配置为允许远程连接
+---
+
+默认情况下，OpenClaw Gateway 仅监听 `127.0.0.1`（localhost）。这是一种安全措施，旨在防止意外地将您的 Gateway 暴露给公共互联网。
+
+如果您需要从另一台计算机访问您的 Gateway，您有几种选择：
+
+1.  **SSH 隧道**（推荐用于简单设置）
+2.  **Tailscale**（推荐用于网状网络）
+3.  **反向代理**（Nginx, Caddy 等）
+4.  **监听 0.0.0.0**（如果不受防火墙/VPN 保护，则**不推荐**）
+
+## 选项 1：SSH 隧道
+
+这是最简单且最安全的方法，因为它不需要更改 Gateway 的配置。您只需通过 SSH 将本地端口转发到运行 Gateway 的远程机器。
+
+### 客户端命令
+
+在您的**本地**机器（您想要连接 *从* 的地方）上运行：
+
+```bash
+# 语法: ssh -L <本地端口>:127.0.0.1:<远程网关端口> <用户>@<远程主机>
+ssh -N -L 18789:127.0.0.1:18789 user@remote-server.com
+```
+
+*   `-N`: 不执行远程命令（仅转发端口）。
+*   `-L 18789:127.0.0.1:18789`: 将本地端口 18789 转发到远程服务器的 localhost:18789。
+
+现在，您可以配置您的本地 OpenClaw 客户端连接到 `ws://127.0.0.1:18789`。
+
+## 选项 2：Tailscale
+
+Tailscale 创建一个安全的私有网络。如果您在 Gateway 机器和客户端机器上都安装了 Tailscale，它们可以使用其 Tailscale IP 地址相互通信。
+
+1.  在两台机器上安装 [Tailscale](https://tailscale.com/)。
+2.  获取 Gateway 机器的 Tailscale IP（例如 `100.x.y.z`）。
+3.  配置 Gateway 监听 Tailscale 接口或所有接口（见下文），**或者**依靠 Tailscale 的安全性并结合防火墙规则。
+
+更简单的 Tailscale 方法通常是结合 SSH 隧道或仅允许 Tailscale IP 访问。
+
+## 选项 3：反向代理 (Nginx/Caddy)
+
+如果您想要通过 HTTPS 暴露 Gateway，请使用反向代理处理 SSL 终止和身份验证。
+
+### Caddy 示例
+
+```caddy
+gateway.example.com {
+    reverse_proxy localhost:18789
+    basicauth {
+        # 使用 'caddy hash-password' 生成哈希
+        username JDJhJDEwJEVVN...
+    }
+}
+```
+
+## 选项 4：更改监听地址
+
+如果您处于受信任的私有网络（LAN 或 VPN）中，您可以配置 Gateway 监听所有网络接口 (`0.0.0.0`)。
+
+:::caution[安全警告]
+将 Gateway 暴露给 `0.0.0.0` 意味着任何能访问您机器 IP 的人都可以尝试连接。**强烈建议**在这样做时配置[身份验证](/zh/docs/gateway/authentication)。
+:::
+
+### 配置
+
+编辑您的 `config.json5`：
+
+```json5
+{
+  gateway: {
+    // 监听所有接口
+    host: "0.0.0.0", 
+    port: 18789,
+    
+    // 强烈建议：设置身份验证
+    auth: {
+      mode: "password",
+      password: "your-secure-password"
+    },
+    
+    // 可选：限制允许的来源
+    allowedOrigins: ["*"] 
+  }
+}
+```
+
+### 防火墙规则
+
+确保您的防火墙（`ufw`, `iptables`, AWS Security Groups 等）允许端口 `18789` 上的入站流量。
+
+```bash
+# UFW 示例 (Ubuntu)
+sudo ufw allow 18789/tcp
+```

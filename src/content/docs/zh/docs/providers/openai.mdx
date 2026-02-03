@@ -1,0 +1,29 @@
+---
+summary: "配置 OpenAI 模型"
+read_when:
+  - 您想使用 GPT-4, GPT-4o, 或 O1 模型
+  - 您需要配置 OpenAI 提供商
+title: "OpenAI"
+---
+
+# OpenAI
+
+OpenAI 提供 GPT-4o、GPT-4 Turbo 和 O1 模型。
+
+```bash
+openclaw onboard --auth-choice openai-api-key
+```
+
+## 配置片段
+
+```json5
+{
+  env: { OPENAI_API_KEY: "sk-..." },
+  agents: { defaults: { model: { primary: "openai/gpt-4o" } } },
+}
+```
+
+## 注意事项
+
+- 支持 `o1` 和 `o1-mini` (推理模型)。
+- 支持函数调用 (工具)。

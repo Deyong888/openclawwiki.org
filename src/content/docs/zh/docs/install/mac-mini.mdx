@@ -1,0 +1,70 @@
+---
+title: Mac Mini M4 设置 (Mac Mini M4 Setup)
+description: 在 Mac Mini M4 上运行 OpenClaw 的指南。
+sidebar:
+  label: Mac Mini M4
+  order: 1
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+# macOS 上的网关 (Mac Mini M4)
+
+OpenClaw 针对 Apple Silicon (M1/M2/M3/M4) 进行了优化。在专用的 Mac Mini 上运行是 24/7 个人助理的推荐设置。
+
+## 硬件要求
+
+<Aside type="tip" title="推荐规格">
+为了获得运行本地 LLM 和 24/7 自动化的流畅体验：
+
+- **型号**：Mac Mini M4 (或 M2/M1)
+- **内存**：最低 16GB (如果使用较大的本地模型，建议 32GB+)
+- **存储**：256GB SSD (如果存储许多模型权重，建议 512GB+)
+- **网络**：首选有线以太网以保证稳定性
+</Aside>
+
+## 安装 CLI (必需)
+
+您需要在 Mac 上安装 Node 22+，然后全局安装 `openclaw`：
+
+<Steps>
+
+1.  **安装 Node.js**
+    确保您安装了 Node.js 22 或更高版本。
+
+2.  **安装 OpenClaw CLI**
+    ```bash
+    npm install -g openclaw@latest
+    ```
+
+</Steps>
+
+## Launchd (作为 LaunchAgent 运行网关)
+
+保持 OpenClaw 运行的最佳方法是使用 `launchd`。CLI 可以在入门过程中自动为您设置此项。
+
+```bash
+openclaw onboard --install-daemon
+```
+
+这将：
+1. 在 `~/Library/LaunchAgents/` 中创建 `bot.molt.gateway.plist`。
+2. 立即加载服务。
+3. 确保它在重新启动时自动重启。
+
+## 日志记录
+
+如果您需要检查日志：
+
+- launchd stdout/err: `/tmp/openclaw/openclaw-gateway.log`
+
+## 冒烟测试
+
+验证您的安装：
+
+```bash
+openclaw --version
+
+# 测试网关健康状况（如果正在运行）
+openclaw gateway call health --url ws://127.0.0.1:18789 --timeout 3000
+```

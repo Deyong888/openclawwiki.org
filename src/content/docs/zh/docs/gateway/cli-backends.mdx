@@ -1,0 +1,117 @@
+---
+title: CLI 后端 (回退运行时)
+description: CLI 后端通过本地 AI CLI 提供纯文本回退。
+sidebar:
+  label: CLI 后端
+  order: 18
+---
+
+# CLI 后端 (回退运行时)
+
+OpenClaw 可以运行 **本地 AI CLI** 作为 **纯文本回退**，以便在 API 提供商宕机、限流或暂时行为异常时使用。这种方式有意设计得很保守：
+
+- **禁用工具** (无工具调用)。
+- **文本进 -> 文本出** (可靠)。
+- **支持会话** (因此后续对话保持连贯)。
+- **可以通过图像** (如果 CLI 接受图像路径)。
+
+这被设计为一个 **安全网**，而不是主要路径。当你想要“总是有效”的文本响应而不依赖外部 API 时使用它。
+
+## 初学者快速入门
+
+你可以 **无需任何配置** 直接使用 Claude Code CLI (OpenClaw 内置了默认设置)：
+
+```bash
+openclaw agent --message "hi" --model claude-cli/opus-4.5
+```
+
+Codex CLI 也可以开箱即用：
+
+```bash
+openclaw agent --message "hi" --model codex-cli/gpt-5.2-codex
+```
+
+如果你的 Gateway 在 launchd/systemd 下运行且 PATH 很简略，只需添加命令路径：
+
+```json5
+{
+  agents: {
+    defaults: {
+      cliBackends: {
+        "claude-cli": {
+          command: "/opt/homebrew/bin/claude"
+        }
+      }
+    }
+  }
+}
+```
+
+就是这样。除了 CLI 本身，不需要密钥或额外的身份验证配置。
+
+## 将其用作回退
+
+将 CLI 后端添加到你的回退列表中，以便仅在主要模型失败时运行：
+
+```json5
+{
+  agents: {
+    defaults: {
+      model: {
+        primary: "anthropic/claude-opus-4-5",
+        fallbacks: [
+          "claude-cli/opus-4.5"
+        ]
+      },
+      models: {
+        "anthropic/claude-opus-4-5": { alias: "Opus" },
+        "claude-cli/opus-4.5": {}
+      }
+    }
+  }
+}
+```
+
+注意：
+- 如果你使用 `agents.defaults.models` (允许列表)，你必须包含 `claude-cli/...`。
+- 如果主要提供商失败 (认证、速率限制、超时)，OpenClaw 将接下来尝试 CLI 后端。
+
+## 配置概览
+
+所有 CLI 后端都在以下路径下配置：
+
+```
+agents.defaults.cliBackends
+```
+
+每个条目都以 **提供商 ID** 为键 (例如 `claude-cli`, `my-cli`)。
+提供商 ID 成为你模型引用的左侧部分：
+
+```
+<provider>/<model>
+```
+
+### 配置示例
+
+```json5
+{
+  agents: {
+    defaults: {
+      cliBackends: {
+        "claude-cli": {
+          // 二进制文件的绝对路径 (如果在 PATH 中则可选)
+          command: "/opt/homebrew/bin/claude",
+          
+          // 子进程的环境变量
+          env: {
+            "ANTHROPIC_API_KEY": "sk-..."
+          },
+          
+          // CLI 进程的超时时间
+          timeoutMs: 60000
+        }
+      }
+    }
+  }
+}
+```

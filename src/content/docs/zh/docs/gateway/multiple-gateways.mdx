@@ -1,0 +1,102 @@
+---
+title: 多个 Gateway
+description: 在一台主机上运行多个 OpenClaw Gateway (隔离、端口和配置文件)。
+sidebar:
+  label: 多个 Gateway
+  order: 4
+---
+
+# 多个 Gateway (同一主机)
+
+大多数设置应该使用一个 Gateway，因为单个 Gateway 可以处理多个消息连接和代理。如果你需要更强的隔离或冗余 (例如，一个救援机器人)，请运行带有隔离配置文件/端口的独立 Gateway。
+
+## 隔离清单 (必需)
+
+- `OPENCLAW_CONFIG_PATH` — 每个实例的配置文件
+- `OPENCLAW_STATE_DIR` — 每个实例的会话、凭据、缓存
+- `agents.defaults.workspace` — 每个实例的工作区根目录
+- `gateway.port` (或 `--port`) — 每个实例唯一
+- 派生端口 (browser/canvas) 必须不重叠
+
+如果这些被共享，你将遇到配置竞争和端口冲突。
+
+## 推荐：配置文件 (`--profile`)
+
+配置文件自动作用于 `OPENCLAW_STATE_DIR` + `OPENCLAW_CONFIG_PATH` 并为服务名称添加后缀。
+
+```bash
+# main
+openclaw --profile main setup
+openclaw --profile main gateway --port 18789
+
+# rescue
+openclaw --profile rescue setup
+openclaw --profile rescue gateway --port 19001
+```
+
+每个配置文件的服务：
+```bash
+openclaw --profile main gateway install
+openclaw --profile rescue gateway install
+```
+
+## 救援机器人指南
+
+在同一台主机上运行第二个 Gateway，拥有它自己的：
+- 配置文件/配置
+- 状态目录
+- 工作区
+- 基础端口 (加上派生端口)
+
+这使救援机器人与主机器人隔离，以便在主机器人宕机时可以调试或应用配置更改。
+
+端口间隔：在基础端口之间留出至少 20 个端口，以便派生的 browser/canvas/CDP 端口永远不会冲突。
+
+### 如何安装 (救援机器人)
+
+```bash
+# 主机器人 (现有的或新的，不带 --profile 参数)
+# 运行在端口 18789 + Chrome CDC/Canvas/... 端口
+openclaw onboard
+openclaw gateway install
+
+# 救援机器人 (隔离的配置文件 + 端口)
+openclaw --profile rescue onboard
+# 注意：
+# - 默认情况下，工作区名称将后缀为 -rescue
+# - 端口应至少为 18789 + 20 个端口，
+#   最好选择完全不同的基础端口，如 19789，
+# - 其余的入职流程与正常情况相同
+
+# 安装服务 (如果在入职期间没有自动发生)
+openclaw --profile rescue gateway install
+```
+
+## 端口映射 (派生)
+
+基础端口 = `gateway.port` (或 `OPENCLAW_GATEWAY_PORT` / `--port`)。
+
+- 浏览器控制服务端口 = 基础 + 2 (仅回环)
+- `canvasHost.port = 基础 + 4`
+- 浏览器配置文件 CDP 端口自动分配自 `browser.controlPort + 9 .. + 108`
+
+如果你在配置或环境变量中覆盖了其中任何一个，你必须保持它们在每个实例中唯一。
+
+## 浏览器/CDP 注意事项 (常见陷阱)
+
+- **不要** 在多个实例上将 `browser.cdpUrl` 固定为相同的值。
+- 每个实例都需要自己的浏览器控制端口和 CDP 范围 (派生自其 Gateway 端口)。
+- 如果你需要显式 CDP 端口，请按实例设置 `browser.profiles.<name>.cdpPort`。
+- 远程 Chrome：使用 `browser.profiles.<name>.cdpUrl` (每个配置文件，每个实例)。
+
+## 手动环境示例
+
+```bash
+OPENCLAW_CONFIG_PATH=~/.openclaw/main.json \
+OPENCLAW_STATE_DIR=~/.openclaw-main \
+openclaw gateway --port 18789
+
+OPENCLAW_CONFIG_PATH=~/.openclaw/rescue.json \
+OPENCLAW_STATE_DIR=~/.openclaw-rescue \
+openclaw gateway --port 19001
+```

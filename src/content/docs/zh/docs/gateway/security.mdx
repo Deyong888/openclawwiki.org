@@ -1,0 +1,75 @@
+---
+title: 安全性
+description: 保护您的 OpenClaw Gateway 部署
+---
+
+OpenClaw Gateway 是一个强大的工具，它可以执行代码、访问文件系统并与互联网交互。因此，保护您的 Gateway 部署至关重要，特别是当它暴露在网络上时。
+
+## 核心安全原则
+
+1.  **最小权限原则**: 仅授予代理完成任务所需的最低权限。
+2.  **纵深防御**: 结合使用身份验证、网络隔离、沙盒和工具策略。
+3.  **监控**: 关注 Gateway 的日志和活动。
+
+## 1. 身份验证 (Authentication)
+
+切勿在没有身份验证的情况下将 Gateway 暴露给不受信任的网络。
+
+*   **配置**: 在 `config.json5` 中设置 `auth`。
+*   **建议**: 使用强密码或令牌。
+
+```json5
+gateway: {
+  auth: {
+    mode: "password", // 或 "token"
+    password: "YOUR_STRONG_PASSWORD_HERE"
+  }
+}
+```
+
+详见 [身份验证文档](/zh/docs/gateway/authentication)。
+
+## 2. 网络隔离
+
+*   **绑定地址**: 默认情况下，Gateway 仅绑定到 `127.0.0.1`。除非您配置了适当的防火墙和身份验证，否则不要更改为 `0.0.0.0`。
+*   **远程访问**: 优先使用 SSH 隧道或 VPN (Tailscale) 进行远程访问，而不是直接暴露端口。
+
+## 3. 沙盒 (Sandboxing)
+
+始终使用 **Docker 沙盒模式** 运行代码执行任务。
+
+*   避免在生产环境中使用 `local` 模式。
+*   配置 Docker 网络模式为 `none`（如果不需要互联网），以防止数据渗漏。
+*   限制挂载卷（Binds）的范围，只挂载必要的数据目录。
+
+详见 [沙盒文档](/zh/docs/gateway/sandboxing)。
+
+## 4. 工具策略 (Tool Policy)
+
+使用工具策略来限制代理可以调用的功能。
+
+*   如果代理只需要读取文件，不要授予写入或删除权限。
+*   如果代理不需要执行 Shell 命令，禁用 `system_exec` 类工具。
+
+详见 [沙盒 vs 工具策略](/zh/docs/gateway/sandbox-vs-tool-policy-vs-elevated)。
+
+## 5. 环境变量与机密管理
+
+*   **不要**将 API 密钥直接硬编码在提示词或对话中。
+*   使用 Gateway 的环境变量配置将密钥传递给工具。
+*   确保存储 `config.json5` 的服务器文件系统权限是安全的（例如 `chmod 600 config.json5`）。
+
+## 6. 安全审计
+
+定期检查您的配置。OpenClaw CLI 将来可能包含自动审计工具。目前，请手动检查以下清单：
+
+*   [ ] Gateway 是否仅监听 localhost？（如果不是，是否有强身份验证？）
+*   [ ] 身份验证密码是否足够复杂？
+*   [ ] 沙盒模式是否已启用 (`mode: "docker"`)？
+*   [ ] Docker 镜像是否是最新的且没有已知漏洞？
+*   [ ] 工具策略是否遵循最小权限原则？
+*   [ ] 日志记录是否已启用以便进行取证？
+
+## 报告安全漏洞
+
+如果您发现 OpenClaw 本身存在安全漏洞，请不要在公共 Issue Tracker 中报告。请通过官方安全渠道（如 GitHub Security Advisory 或指定的安全邮箱）联系维护团队。

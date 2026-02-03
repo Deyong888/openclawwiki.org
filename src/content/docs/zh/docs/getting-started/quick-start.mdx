@@ -1,0 +1,70 @@
+---
+title: 快速开始指南
+description: 从零开始，快速实现与 OpenClaw 的首次对话。
+sidebar:
+  label: 快速开始指南
+  order: 2
+---
+
+# 快速开始
+
+目标：尽快从 **零** → **首次工作对话**（使用合理的默认设置）。
+
+最快对话方式：打开控制界面（无需设置频道）。运行 `openclaw dashboard`
+并在浏览器中聊天，或者在网关主机上打开 `http://127.0.0.1:18789/`。
+
+推荐路径：使用 **CLI 入门向导** (`openclaw onboard`)。它会设置：
+- 模型/认证（推荐 OAuth）
+- 网关设置
+- 频道（WhatsApp/Telegram/Discord/Mattermost (插件)/...）
+- 配对默认值（安全私信）
+- 工作区引导 + 技能
+- 可选的后台服务
+
+## 0) 先决条件
+
+- Node `>=22`
+- `pnpm`（可选；如果你从源码构建则推荐）
+- **推荐：** 用于网络搜索的 Brave Search API 密钥。最简单的路径：
+  `openclaw configure --section web`（存储 `tools.web.search.apiKey`）。
+
+**macOS**：如果你计划构建应用，请安装 Xcode / CLT。仅用于 CLI + 网关，Node 就足够了。
+**Windows**：使用 **WSL2**（推荐 Ubuntu）。强烈推荐 WSL2；原生 Windows 未经测试，问题更多，且工具兼容性较差。先安装 WSL2，然后在 WSL 内运行 Linux 步骤。
+
+## 1) 安装 CLI（推荐）
+
+```bash
+curl -fsSL https://openclaw.bot/install.sh | bash
+```
+
+Windows (PowerShell):
+
+```powershell
+iwr -useb https://openclaw.ai/install.ps1 | iex
+```
+
+替代方案（全局安装）：
+
+```bash
+npm install -g openclaw@latest
+```
+
+## 2) 运行入门向导
+
+```bash
+openclaw onboard --install-daemon
+```
+
+你将选择：
+- **本地 (Local) vs 远程 (Remote)** 网关
+- **认证 (Auth)**：OpenAI Code (Codex) 订阅 (OAuth) 或 API 密钥。对于 Anthropic 我们推荐 API 密钥；也支持 `claude setup-token`。
+- **提供商 (Providers)**：WhatsApp 二维码登录，Telegram/Discord 机器人令牌，Mattermost 插件令牌等。
+- **守护进程 (Daemon)**：后台安装（launchd/systemd；WSL2 使用 systemd）
+  - **运行时 (Runtime)**：Node（推荐；WhatsApp/Telegram 需要）。**不推荐**使用 Bun。
+- **网关令牌 (Gateway token)**：向导默认会生成一个（即使在环回接口上）并将其存储在 `gateway.auth.token` 中。
+
+### 认证：它的位置（重要）
+
+- **推荐的 Anthropic 路径：** 设置一个 API 密钥（向导可以将其存储以供服务使用）。如果你想复用 Claude Code 凭据，也支持 `claude setup-token`。
+- OAuth 凭据（旧版导入）：`~/.openclaw/credentials/oauth.json`
+- 认证配置文件（OAuth + API 密钥）：`~/.openclaw/agents/<agentId>/agent/auth-profiles.json`

@@ -1,0 +1,27 @@
+---
+title: GrammY (Telegram 内部)
+description: 通过 grammY 进行 Telegram Bot API 集成及设置说明
+sidebar:
+  label: GrammY (Telegram 内部)
+  order: 22
+---
+
+# 为什么选择 grammY
+- TS 优先的 Bot API 客户端，内置长轮询 (long-poll) + webhook 助手、中间件、错误处理、速率限制器。
+- 比手动处理 fetch + FormData 更整洁的媒体助手；支持所有 Bot API 方法。
+- 可扩展：支持通过自定义 fetch 进行代理、会话中间件（可选）、类型安全的上下文。
+
+# 我们发布了什么
+- **单一客户端路径：** 移除了基于 fetch 的实现；grammY 现在是唯一的 Telegram 客户端（发送 + 网关），默认启用 grammY 限制器。
+- **网关：** `monitorTelegramProvider` 构建一个 grammY `Bot`，连接提及/白名单门控，通过 `getFile`/`download` 下载媒体，并使用 `sendMessage/sendPhoto/sendVideo/sendAudio/sendDocument` 传递回复。支持长轮询或通过 `webhookCallback` 的 webhook。
+- **代理：** 可选的 `channels.telegram.proxy` 通过 grammY 的 `client.baseFetch` 使用 `undici.ProxyAgent`。
+- **Webhook 支持：** `webhook-set.ts` 包装了 `setWebhook/deleteWebhook`；`webhook.ts` 托管带有健康检查 + 优雅关闭的回调。当设置了 `channels.telegram.webhookUrl` 时，网关启用 webhook 模式（否则进行长轮询）。
+- **会话：** 直接聊天折叠到 Agent 主会话 (`agent:<agentId>:<mainKey>`)；群组使用 `agent:<agentId>:telegram:group:<chatId>`；回复路由回同一通道。
+- **配置项：** `channels.telegram.botToken`, `channels.telegram.dmPolicy`, `channels.telegram.groups` (白名单 + 提及默认值), `channels.telegram.allowFrom`, `channels.telegram.groupAllowFrom`, `channels.telegram.groupPolicy`, `channels.telegram.mediaMaxMb`, `channels.telegram.linkPreview`, `channels.telegram.proxy`, `channels.telegram.webhookSecret`, `channels.telegram.webhookUrl`.
+- **草稿流式传输：** 可选的 `channels.telegram.streamMode` 在私人话题聊天中使用 `sendMessageDraft` (Bot API 9.3+)。这与通道块流式传输是分开的。
+- **测试：** grammy mocks 覆盖了 DM + 群组提及门控和出站发送；仍欢迎更多媒体/webhook 固定测试数据。
+
+待解决问题
+- 如果我们遇到 Bot API 429 错误，可选的 grammY 插件（限制器）。
+- 添加更多结构化的媒体测试（贴纸、语音笔记）。
+- 使 webhook 监听端口可配置（除非通过网关连接，否则目前固定为 8787）。

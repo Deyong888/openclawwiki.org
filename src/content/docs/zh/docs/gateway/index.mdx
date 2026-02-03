@@ -1,0 +1,103 @@
+---
+title: Gateway 运行手册 (Gateway Runbook)
+description: Gateway 服务的运行手册、生命周期和操作。
+sidebar:
+  label: 概览 (Overview)
+  order: 0
+---
+
+# Gateway 服务运行手册
+
+最后更新：2025-12-09
+
+## 它是什么
+- 始终在线的进程，拥有单一的 Baileys/Telegram 连接以及控制/事件平面。
+- 取代了旧版的 `gateway` 命令。CLI 入口点：`openclaw gateway`。
+- 持续运行直到停止；在发生致命错误时以非零状态退出，以便监管程序（supervisor）重新启动它。
+
+## 如何运行 (本地)
+```bash
+openclaw gateway --port 18789
+# 要在 stdio 中查看完整的调试/跟踪日志：
+openclaw gateway --port 18789 --verbose
+# 如果端口繁忙，终止监听器然后启动：
+openclaw gateway --force
+# 开发循环 (TS 更改时自动重新加载)：
+pnpm gateway:watch
+```
+- 配置热重载会监视 `~/.openclaw/openclaw.json`（或 `OPENCLAW_CONFIG_PATH`）。
+  - 默认模式：`gateway.reload.mode="hybrid"`（热应用安全更改，关键更改时重启）。
+  - 需要时，热重载使用进程内重启（通过 **SIGUSR1**）。
+  - 使用 `gateway.reload.mode="off"` 禁用。
+- 将 WebSocket 控制平面绑定到 `127.0.0.1:<port>`（默认 18789）。
+- 同一个端口也提供 HTTP 服务（控制 UI、钩子、A2UI）。单端口多路复用。
+  - OpenAI Chat Completions (HTTP): [`/v1/chat/completions`](./openai-http-api).
+  - OpenResponses (HTTP): [`/v1/responses`](./openresponses-http-api).
+  - Tools Invoke (HTTP): [`/tools/invoke`](./tools-invoke-http-api).
+- 默认在 `canvasHost.port`（默认 `18793`）上启动 Canvas 文件服务器，从 `~/.openclaw/workspace/canvas` 提供 `http://<gateway-host>:18793/__openclaw__/canvas/`。使用 `canvasHost.enabled=false` 或 `OPENCLAW_SKIP_CANVAS_HOST=1` 禁用。
+- 记录到 stdout；使用 launchd/systemd 保持其运行并轮换日志。
+- 故障排除时，传递 `--verbose` 将调试日志（握手、请求/响应、事件）从日志文件镜像到 stdio。
+- `--force` 使用 `lsof` 查找所选端口上的监听器，发送 SIGTERM，记录它杀死了什么，然后启动 gateway（如果缺少 `lsof` 则快速失败）。
+- 如果您在监管程序（launchd/systemd/mac app 子进程模式）下运行，停止/重启通常会发送 **SIGTERM**；较旧的构建可能会将其显示为 `pnpm` `ELIFECYCLE` 退出代码 **143** (SIGTERM)，这是正常的关闭，而不是崩溃。
+- **SIGUSR1** 在授权时触发进程内重启（gateway 工具/配置应用/更新，或启用 `commands.restart` 进行手动重启）。
+- 默认情况下需要 Gateway 身份验证：设置 `gateway.auth.token`（或 `OPENCLAW_GATEWAY_TOKEN`）或 `gateway.auth.password`。客户端必须发送 `connect.params.auth.token/password`，除非使用 Tailscale Serve 身份。
+- 即使在环回接口上，向导现在也会默认生成一个令牌。
+- 端口优先级：`--port` > `OPENCLAW_GATEWAY_PORT` > `gateway.port` > 默认 `18789`。
+
+## 远程访问
+- 首选 Tailscale/VPN；否则使用 SSH 隧道：
+  ```bash
+  ssh -N -L 18789:127.0.0.1:18789 user@host
+  ```
+- 然后客户端通过隧道连接到 `ws://127.0.0.1:18789`。
+- 如果配置了令牌，即使通过隧道，客户端也必须在 `connect.params.auth.token` 中包含它。
+
+## 多网关 (同一主机)
+
+通常不需要：一个 Gateway 可以服务多个消息渠道和 Agent。仅在需要冗余或严格隔离（例如：救援机器人）时使用多个 Gateway。
+
+如果您隔离状态 + 配置并使用唯一端口，则支持此功能。完整指南：[多网关](./multiple-gateways)。
+
+服务名称能够感知配置文件：
+- macOS: `bot.molt.<profile>` (旧版 `com.openclaw.*` 可能仍然存在)
+- Linux: `openclaw-gateway-<profile>.service`
+- Windows: `OpenClaw Gateway (<profile>)`
+
+安装元数据嵌入在服务配置中：
+- `OPENCLAW_SERVICE_MARKER=openclaw`
+- `OPENCLAW_SERVICE_KIND=gateway`
+- `OPENCLAW_SERVICE_VERSION=<version>`
+
+救援机器人模式：保持第二个 Gateway 隔离，拥有自己的配置文件、状态目录、工作区和基本端口间隔。完整指南：[救援机器人指南](./multiple-gateways#rescue-bot-guide)。
+
+### 开发配置文件 (`--dev`)
+
+快速路径：运行一个完全隔离的开发实例（配置/状态/工作区），而不触及您的主要设置。
+
+```bash
+openclaw --dev setup
+openclaw --dev gateway --allow-unconfigured
+# 然后定位开发实例：
+openclaw --dev status
+openclaw --dev health
+```
+
+默认值（可以通过 env/flags/config 覆盖）：
+- `OPENCLAW_STATE_DIR=~/.openclaw-dev`
+- `OPENCLAW_CONFIG_PATH=~/.openclaw-dev/openclaw.json`
+- `OPENCLAW_GATEWAY_PORT=19001` (Gateway WS + HTTP)
+- 浏览器控制服务端口 = `19003` (推导值: `gateway.port+2`, 仅环回)
+- `canvasHost.port=19005` (推导值: `gateway.port+4`)
+- 当您在 `--dev` 下运行 `setup`/`onboard` 时，`agents.defaults.workspace` 默认变为 `~/.openclaw/workspace-dev`。
+
+推导端口（经验法则）：
+- 基础端口 = `gateway.port` (或 `OPENCLAW_GATEWAY_PORT` / `--port`)
+- 浏览器控制服务端口 = 基础端口 + 2 (仅环回)
+- `canvasHost.port = 基础端口 + 4` (或 `OPENCLAW_CANVAS_HOST_PORT` / 配置覆盖)
+- 浏览器配置文件 CDP 端口从 `browser.controlPort + 9 .. + 108` 自动分配（按配置文件持久化）。
+
+每个实例的检查清单：
+- 唯一的 `gateway.port`
+- 唯一的 `OPENCLAW_CONFIG_PATH`
+- 唯一的 `OPENCLAW_STATE_DIR`
+- 唯一的 `agents.defaults.workspace`

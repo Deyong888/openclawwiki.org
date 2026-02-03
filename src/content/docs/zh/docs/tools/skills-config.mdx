@@ -1,0 +1,83 @@
+---
+title: 技能配置 (Skills Configuration)
+description: 如何在 OpenClaw 中配置和管理技能。
+---
+
+所有与技能相关的配置都位于 `~/.openclaw/openclaw.json` 配置文件的 `skills` 字段下。
+
+## 配置结构
+
+```json5
+{
+  // ... 其他配置
+  skills: {
+    // 允许加载与 OpenClaw 捆绑的内置技能
+    // 默认: true
+    allowBundled: true,
+
+    // 显式启用的技能列表
+    // 如果为空或未设置，OpenClaw 将尝试加载所有可用技能
+    enabled: [
+      "openclaw-core",
+      "browser",
+      "my-custom-skill"
+    ],
+
+    // 显式禁用的技能列表
+    disabled: [
+      "dangerous-skill"
+    ],
+
+    // 加载技能的额外目录路径
+    // 这些目录中的技能将被视为 "Local" (本地) 技能
+    load: {
+      extraDirs: [
+        "/path/to/my/skills",
+        "C:\\Users\\Me\\Dev\\Skills"
+      ]
+    },
+
+    // 技能特定的配置
+    // 键是技能的名称
+    config: {
+      "browser": {
+        "headless": false
+      },
+      "weather": {
+        "apiKey": "..."
+      }
+    }
+  }
+}
+```
+
+## 选项详解
+
+### `allowBundled`
+- **类型**: `boolean`
+- **默认**: `true`
+- **描述**: 控制是否加载 OpenClaw 安装中包含的默认技能（如 `openclaw-core`, `files`, `exec` 等）。
+
+### `enabled`
+- **类型**: `string[]`
+- **描述**: 允许运行的技能名称白名单。如果指定了此列表，只有列表中的技能（以及必要的依赖）会被加载。
+
+### `disabled`
+- **类型**: `string[]`
+- **描述**: 禁止运行的技能名称黑名单。此列表中的技能即使在 `enabled` 中存在也不会被加载。
+
+### `load.extraDirs`
+- **类型**: `string[]`
+- **描述**: OpenClaw 在启动时扫描技能的附加文件系统路径。这对于开发新技能或加载私有技能非常有用。
+
+### `config`
+- **类型**: `object`
+- **描述**: 传递给特定技能的配置对象。每个技能可以定义自己的配置模式（Schema）。
+  - 键：技能名称（例如 `browser`）。
+  - 值：任意 JSON 对象，将作为配置传递给技能的初始化函数。
+
+## 环境变量
+
+除了 `openclaw.json`，某些技能可能通过环境变量进行配置（例如 API 密钥）。请查阅具体技能的文档以获取详情。
+
+例如，许多 LLM 相关的技能会查找 `OPENAI_API_KEY` 或 `ANTHROPIC_API_KEY`。

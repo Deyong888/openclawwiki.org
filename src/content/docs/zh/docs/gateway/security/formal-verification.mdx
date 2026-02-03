@@ -1,0 +1,101 @@
+---
+title: 形式化验证 (安全模型)
+description: 针对 OpenClaw 最高风险路径的机器检查安全模型。
+sidebar:
+  label: 形式化验证
+  order: 9
+---
+
+# 形式化验证 (安全模型)
+
+本页跟踪 OpenClaw 的 **形式化安全模型** (目前是 TLA+/TLC；根据需要增加)。
+
+> 注意：一些旧链接可能指向以前的项目名称。
+
+**目标 (北极星):** 在明确的假设下，提供机器检查的论证，证明 OpenClaw 执行其预期的安全策略 (授权、会话隔离、工具门控和错误配置安全)。
+
+**这是什么 (目前):** 一个可执行的、攻击者驱动的 **安全回归套件**:
+- 每个主张都有一个在有限状态空间上的可运行模型检查。
+- 许多主张都有一个配对的 **负模型**，它为现实的错误类生成反例跟踪。
+
+**这不是什么 (目前):** 证明 “OpenClaw 在所有方面都是安全的” 或完整的 TypeScript 实现是正确的。
+
+## 模型所在位置
+
+模型维护在一个单独的仓库中: [vignesh07/openclaw-formal-models](https://github.com/vignesh07/openclaw-formal-models)。
+
+## 重要警告
+
+- 这些是 **模型**，而不是完整的 TypeScript 实现。模型和代码之间可能存在偏差。
+- 结果受 TLC 探索的状态空间的限制；“绿色”并不意味着超出建模假设和界限的安全性。
+- 一些主张依赖于明确的环境假设 (例如，正确的部署、正确的配置输入)。
+
+## 复现结果
+
+目前，结果通过在本地克隆模型仓库并运行 TLC (见下文) 来复现。未来的迭代可能提供：
+- 具有公共构件 (反例跟踪、运行日志) 的 CI 运行模型
+- 用于小型、有界检查的托管 “运行此模型” 工作流
+
+入门：
+
+```bash
+git clone https://github.com/vignesh07/openclaw-formal-models
+cd openclaw-formal-models
+
+# 需要 Java 11+ (TLC 运行在 JVM 上)。
+# 该仓库内置了固定的 `tla2tools.jar` (TLA+ 工具) 并提供了 `bin/tlc` + Make 目标。
+
+make <target>
+```
+
+### Gateway 暴露和开放 Gateway 错误配置
+
+**主张:** 在没有 auth 的情况下绑定超出 loopback 可能导致远程入侵 / 增加暴露；令牌/密码阻止未经授权的攻击者 (根据模型假设)。
+
+- 绿色运行:
+  - `make gateway-exposure-v2`
+  - `make gateway-exposure-v2-protected`
+- 红色 (预期):
+  - `make gateway-exposure-v2-negative`
+
+另请参阅模型仓库中的 `docs/gateway-exposure-matrix.md`。
+
+### Nodes.run 管道 (最高风险能力)
+
+**主张:** `nodes.run` 需要 (a) 节点命令白名单加上声明的命令，以及 (b) 配置时的实时批准；批准被令牌化以防止重放 (在模型中)。
+
+- 绿色运行:
+  - `make nodes-pipeline`
+  - `make approvals-token`
+- 红色 (预期):
+  - `make nodes-pipeline-negative`
+  - `make approvals-token-negative`
+
+### 配对存储 (DM 门控)
+
+**主张:** 配对请求遵守 TTL 和挂起请求上限。
+
+- 绿色运行:
+  - `make pairing`
+  - `make pairing-cap`
+- 红色 (预期):
+  - `make pairing-negative`
+  - `make pairing-cap-negative`
+
+### 入口门控 (提及 + 控制命令绕过)
+
+**主张:** 在需要提及的群组上下文中，未经授权的 “控制命令” 无法绕过提及门控。
+
+- 绿色:
+  - `make ingress-gating`
+- 红色 (预期):
+  - `make ingress-gating-negative`
+
+### 路由/会话密钥隔离
+
+**主张:** 来自不同对等方的 DM 不会折叠到同一个会话中，除非明确链接/配置。
+
+- 绿色:
+  - `make routing-isolation`
+- 红色 (预期):
+  - `make routing-isolation-negative`

@@ -1,0 +1,100 @@
+---
+title: OpenResponses API (HTTP)
+description: 从 Gateway 暴露一个 OpenResponses 兼容的 /v1/responses HTTP 端点。
+sidebar:
+  label: OpenResponses API
+  order: 23
+---
+
+# OpenResponses API (HTTP)
+
+OpenClaw 的 Gateway 可以服务于一个 OpenResponses 兼容的 `POST /v1/responses` 端点。
+
+此端点 **默认禁用**。请先在配置中启用它。
+
+- `POST /v1/responses`
+- 与 Gateway 相同的端口 (WS + HTTP 复用)：`http://<gateway-host>:<port>/v1/responses`
+
+在底层，请求作为正常的 Gateway 代理运行执行 (与 `openclaw agent` 相同的代码路径)，因此路由/权限/配置与你的 Gateway 匹配。
+
+## 认证
+
+使用 Gateway 认证配置。发送 Bearer 令牌：
+
+- `Authorization: Bearer <token>`
+
+注意：
+- 当 `gateway.auth.mode="token"` 时，使用 `gateway.auth.token` (或 `OPENCLAW_GATEWAY_TOKEN`)。
+- 当 `gateway.auth.mode="password"` 时，使用 `gateway.auth.password` (或 `OPENCLAW_GATEWAY_PASSWORD`)。
+
+## 选择代理
+
+无需自定义标头：在 OpenResponses `model` 字段中编码代理 ID：
+
+- `model: "openclaw:<agentId>"` (例如：`"openclaw:main"`, `"openclaw:beta"`)
+- `model: "agent:<agentId>"` (别名)
+
+或者通过标头定位特定的 OpenClaw 代理：
+
+- `x-openclaw-agent-id: <agentId>` (默认：`main`)
+
+高级：
+- `x-openclaw-session-key: <sessionKey>` 以完全控制会话路由。
+
+## 启用端点
+
+将 `gateway.http.endpoints.responses.enabled` 设置为 `true`：
+
+```json5
+{
+  gateway: {
+    http: {
+      endpoints: {
+        responses: { enabled: true }
+      }
+    }
+  }
+}
+```
+
+## 禁用端点
+
+将 `gateway.http.endpoints.responses.enabled` 设置为 `false`：
+
+```json5
+{
+  gateway: {
+    http: {
+      endpoints: {
+        responses: { enabled: false }
+      }
+    }
+  }
+}
+```
+
+## 会话行为
+
+默认情况下，端点是 **每个请求无状态的** (每次调用生成一个新的会话密钥)。
+
+如果请求包含 OpenResponses `user` 字符串，Gateway 会从中派生一个稳定的会话密钥，以便重复调用可以共享代理会话。
+
+## 请求形状 (支持)
+
+请求遵循具有基于项目的输入的 OpenResponses API。当前支持：
+
+- `input`: 字符串或项目对象数组。
+- `instructions`: 合并到系统提示中。
+- `tools`: 客户端工具定义 (函数工具)。
+- `tool_choice`: 过滤或要求客户端工具。
+- `stream`: 启用 SSE 流式传输。
+- `max_output_tokens`: 尽力而为的输出限制 (取决于提供商)。
+- `user`: 稳定的会话路由。
+
+接受但 **当前忽略**：
+
+- `max_tool_calls`
+- `reasoning`
+- `metadata`
+- `store`
+- `previous_response_id`

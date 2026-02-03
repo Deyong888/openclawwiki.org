@@ -1,0 +1,73 @@
+---
+title: "Firecrawl: 反爬虫网页抓取"
+description: 使用 Firecrawl 进行可靠的网页提取，绕过机器人检测并缓存内容。
+sidebar:
+  label: Firecrawl
+  order: 42
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+# Firecrawl
+
+OpenClaw 集成了 **Firecrawl**，这是一项强大的内容提取服务，旨在绕过机器人检测并处理复杂的、重 JavaScript 的网站。
+
+## 为什么使用 Firecrawl？
+
+- **反机器人规避**：成功抓取阻止标准 HTTP 请求的站点（例如 Cloudflare 挑战）。
+- **JavaScript 渲染**：处理需要 JS 加载内容的单页应用（SPA）。
+- **智能缓存**：通过将结果缓存长达 2 天（可配置）来降低 API 成本和延迟。
+- **回退机制**：当本地提取失败时，`web_fetch` 工具会自动使用它。
+
+## 设置
+
+<Steps>
+
+1.  **获取 API 密钥**
+    在 [Firecrawl.dev](https://firecrawl.dev) 创建帐户并生成 API 密钥。
+
+2.  **配置 OpenClaw**
+    将密钥添加到您的配置文件 (`~/.openclaw/openclaw.json`) 或环境变量中。
+
+</Steps>
+
+### 配置
+
+```json5
+{
+  tools: {
+    web: {
+      fetch: {
+        firecrawl: {
+          apiKey: "FIRECRAWL_API_KEY_HERE",
+          baseUrl: "https://api.firecrawl.dev",
+          onlyMainContent: true,     // 仅提取文章正文
+          maxAgeMs: 172800000,       // 缓存持续时间（默认：2 天）
+          timeoutSeconds: 60
+        }
+      }
+    }
+  }
+}
+```
+
+<Aside type="tip">
+您也可以在网关的环境中设置 `FIRECRAWL_API_KEY` 环境变量，而不是将其放在配置文件中。
+</Aside>
+
+## 工作原理
+
+`web_fetch` 工具使用智能瀑布策略来检索内容：
+
+1.  **本地可读性**：尝试在本地获取和解析页面（最快，免费）。
+2.  **Firecrawl**：如果本地获取失败（例如 403 Forbidden, 401 Unauthorized 或空内容），它会无缝重试使用 Firecrawl。
+3.  **基本 HTML**：如果所有其他方法都失败，最终回退到原始 HTML 提取。
+
+### 隐身模式
+
+Firecrawl 使用智能代理系统：
+- OpenClaw 请求 `proxy: "auto"`。
+- Firecrawl 首先尝试标准请求。
+- 如果被阻止，它会自动使用 **隐身代理**（住宅 IP）重试以绕过防御。
+
+有关完整的网页抓取工具包的更多详细信息，请参阅 [Web 工具](/zh/docs/tools/web)。

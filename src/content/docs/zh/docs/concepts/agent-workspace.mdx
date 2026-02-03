@@ -1,0 +1,95 @@
+---
+title: Agent Workspace
+description: 管理 OpenClaw 代理的文件系统工作区。
+sidebar:
+  order: 2
+---
+
+**Agent Workspace**（代理工作区）是代理运行、存储文件和管理其“家”的目录。它是代理在重启之间保持持久性的文件系统。
+
+## 默认位置
+
+默认情况下，工作区位于：
+
+*   **Linux/macOS**: `~/.openclaw/workspace`
+*   **Windows**: `%USERPROFILE%\.openclaw\workspace`
+
+你可以通过运行以下命令来验证位置：
+
+```bash
+openclaw config get agent.workspace
+```
+
+## 配置
+
+你可以在 `config.json`（或通过环境变量）中覆盖工作区位置。
+
+```json5
+// config.json
+{
+  agent: {
+    // 自定义工作区路径
+    workspace: "/var/lib/openclaw/workspace"
+  }
+}
+```
+
+### 环境变量
+
+*   `OPENCLAW_WORKSPACE`: 覆盖工作区路径。
+
+## 结构
+
+典型的工作区包含：
+
+```text
+workspace/
+├── .git/               # (可选) 用于备份的 Git 历史
+├── memories/           # 向量存储或记忆文件
+├── sessions/           # 特定于会话的数据
+├── skills/             # 本地技能/工具
+├── storage/            # 代理的一般文件存储
+└── temp/               # 临时暂存空间
+```
+
+## 文件映射与访问
+
+代理通常对此目录具有读/写访问权限。
+*   **读 (Read)**：代理可以读取工作区中的任何文件。
+*   **写 (Write)**：代理可以在此处创建或修改文件。
+
+### 安全说明
+代理在逻辑上被 **沙盒化 (sandboxed)** 到此目录。虽然底层进程可能具有操作系统级别的权限，但 OpenClaw 运行时将高级文件操作限制在工作区内，以防止意外修改系统文件。
+
+## 备份策略
+
+由于工作区包含你所有的代理状态（记忆、自定义技能、会话日志），因此备份它至关重要。
+
+### Git 备份
+OpenClaw 内置支持使用 Git 对工作区进行版本控制。
+
+1.  在工作区中初始化 git 仓库：
+    ```bash
+    cd ~/.openclaw/workspace
+    git init
+    ```
+2.  配置远程仓库（例如，私有 GitHub 仓库）：
+    ```bash
+    git remote add origin git@github.com:username/my-agent-workspace.git
+    ```
+3.  OpenClaw 可以配置为自动提交更改（功能可用性取决于版本）。
+
+### 手动备份
+只需归档目录：
+```bash
+tar -czvf openclaw-backup.tar.gz ~/.openclaw/workspace
+```
+
+## 迁移到新机器
+
+要迁移你的代理：
+1.  **停止** OpenClaw 服务。
+2.  **复制** 整个 `workspace` 目录到新机器。
+3.  在新机器上 **安装** OpenClaw。
+4.  将配置 **指向** 复制的工作区。
+5.  **启动** 服务。

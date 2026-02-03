@@ -1,0 +1,98 @@
+---
+summary: "运行用于 IDE 集成的 ACP 桥接器"
+read_when:
+  - 设置基于 ACP 的 IDE 集成
+  - 调试到网关的 ACP 会话路由
+title: "acp"
+---
+
+# acp
+
+运行与 OpenClaw 网关对话的 ACP (代理客户端协议) 桥接器。
+
+此命令通过 stdio 为 IDE 使用 ACP 协议，并通过 WebSocket 将提示转发到网关。它将 ACP 会话映射到网关会话密钥。
+
+## 用法
+
+```bash
+openclaw acp
+
+# 远程网关
+openclaw acp --url wss://gateway-host:18789 --token <token>
+
+# 附加到现有会话密钥
+openclaw acp --session agent:main:main
+
+# 按标签附加 (必须已存在)
+openclaw acp --session-label "support inbox"
+
+# 在第一个提示之前重置会话密钥
+openclaw acp --session agent:main:main --reset-session
+```
+
+## ACP 客户端 (调试)
+
+使用内置的 ACP 客户端在没有 IDE 的情况下对桥接器进行完整性检查。
+它会启动 ACP 桥接器并允许您交互式地输入提示。
+
+```bash
+openclaw acp client
+
+# 将生成的桥接器指向远程网关
+openclaw acp client --server-args --url wss://gateway-host:18789 --token <token>
+
+# 覆盖服务器命令 (默认: openclaw)
+openclaw acp client --server "node" --server-args openclaw.mjs acp --url ws://127.0.0.1:19001
+```
+
+## 如何使用
+
+当 IDE (或其他客户端) 使用代理客户端协议并且您希望它驱动 OpenClaw 网关会话时，请使用 ACP。
+
+1. 确保网关正在运行 (本地或远程)。
+2. 配置网关目标 (配置或标志)。
+3. 将您的 IDE 指向通过 stdio 运行 `openclaw acp`。
+
+配置示例 (持久化):
+
+```bash
+openclaw config set gateway.remote.url wss://gateway-host:18789
+openclaw config set gateway.remote.token <token>
+```
+
+直接运行示例 (无配置写入):
+
+```bash
+openclaw acp --url wss://gateway-host:18789 --token <token>
+```
+
+## 选择代理
+
+ACP 不直接选择代理。它通过网关会话密钥进行路由。
+
+使用代理范围的会话密钥来定位特定代理:
+
+```bash
+openclaw acp --session agent:main:main
+openclaw acp --session agent:design:main
+openclaw acp --session agent:qa:bug-123
+```
+
+每个 ACP 会话映射到一个网关会话密钥。一个代理可以有多个会话；除非您覆盖密钥或标签，否则 ACP 默认为隔离的 `acp:<uuid>` 会话。
+
+## Zed 编辑器设置
+
+在 `~/.config/zed/settings.json` 中添加自定义 ACP 代理 (或使用 Zed 的设置 UI):
+
+```json
+{
+  "agent_servers": {
+    "OpenClaw ACP": {
+      "type": "custom",
+      "command": "openclaw",
+      "args": ["acp"],
+      "env": {}
+    }
+  }
+}
+```

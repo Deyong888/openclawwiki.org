@@ -1,0 +1,76 @@
+---
+title: 故障排除
+description: 常见 OpenClaw 故障的快速故障排除指南。
+sidebar:
+  label: 故障排除
+  order: 99
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+# 故障排除 🔧
+
+遇到问题了？这里是如何诊断和修复常见问题的方法。
+
+## 快速诊断
+
+<Steps>
+
+1.  **检查状态**
+    ```bash
+    openclaw status
+    ```
+    提供 Gateway、频道和会话的高级概览。
+
+2.  **查看日志**
+    ```bash
+    openclaw logs --follow
+    ```
+    观看实时日志，查看当您与机器人交互时发生了什么。
+
+3.  **深度健康检查**
+    ```bash
+    openclaw doctor
+    ```
+    扫描配置错误和缺失的依赖项。
+
+</Steps>
+
+## 常见问题
+
+<Tabs>
+  <TabItem label="身份验证 / 模型">
+    **错误**: `No API key found for provider "anthropic"`
+    
+    代理缺少凭据。
+    - **修复**: 在 Gateway 主机上运行 `openclaw models auth setup-token --provider anthropic`。
+    - **验证**: 运行 `openclaw models status`。
+
+    **错误**: `OAuth token refresh failed`
+    - **修复**: 您的 OAuth 令牌已过期。重新生成它或切换到 API 密钥。
+  </TabItem>
+
+  <TabItem label="连接">
+    **错误**: `Control UI fails on HTTP`
+    
+    浏览器阻止不安全 HTTP 上的加密功能。
+    - **修复**: 使用 `http://127.0.0.1:18789` (localhost) 或设置 HTTPS (Tailscale)。
+    - **解决方法**: 启用 `gateway.controlUi.allowInsecureAuth: true` (不推荐)。
+  </TabItem>
+
+  <TabItem label="服务">
+    **症状**: 服务已安装但未运行。
+    
+    - **检查**: `openclaw gateway status`
+    - **修复**: 检查日志 (`/tmp/openclaw/openclaw-gateway.log` 在 macOS 上) 以查找崩溃原因。
+  </TabItem>
+</Tabs>
+
+## 诊断命令参考
+
+| 命令 | 用法 |
+| :--- | :--- |
+| `openclaw status` | 一般概览。 |
+| `openclaw status --all` | 完整报告 (已编辑敏感信息) 用于共享。 |
+| `openclaw gateway probe` | 测试网络可达性。 |
+| `openclaw channels status --probe` | 检查频道 (WhatsApp/Telegram) 是否已连接。 |

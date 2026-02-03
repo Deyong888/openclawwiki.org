@@ -1,0 +1,100 @@
+---
+summary: "`openclaw hooks` 的 CLI 参考 (代理钩子)"
+read_when:
+  - 您想管理代理钩子
+  - 您想安装或更新钩子
+title: "hooks"
+---
+
+# `openclaw hooks`
+
+管理代理钩子 (针对 `/new`、`/reset` 等命令和网关启动的事件驱动自动化)。
+
+相关:
+
+- 钩子: [Hooks](/zh/docs/hooks)
+- 插件钩子: [Plugins](/zh/docs/plugin#plugin-hooks)
+
+## 列出所有钩子
+
+```bash
+openclaw hooks list
+```
+
+列出从工作区、托管和捆绑目录中发现的所有钩子。
+
+**选项:**
+
+- `--eligible`: 仅显示合格的钩子 (满足要求)
+- `--json`: 输出为 JSON
+- `-v, --verbose`: 显示详细信息，包括缺失的要求
+
+**示例输出:**
+
+```
+Hooks (4/4 ready)
+
+Ready:
+  🚀 boot-md ✓ - Run BOOT.md on gateway startup
+  📝 command-logger ✓ - Log all command events to a centralized audit file
+  💾 session-memory ✓ - Save session context to memory when /new command is issued
+  😈 soul-evil ✓ - Swap injected SOUL content during a purge window or by random chance
+```
+
+**示例 (详细):**
+
+```bash
+openclaw hooks list --verbose
+```
+
+显示不合格钩子的缺失要求。
+
+**示例 (JSON):**
+
+```bash
+openclaw hooks list --json
+```
+
+返回用于编程用途的结构化 JSON。
+
+## 获取钩子信息
+
+```bash
+openclaw hooks info <name>
+```
+
+显示有关特定钩子的详细信息。
+
+**参数:**
+
+- `<name>`: 钩子名称 (例如 `session-memory`)
+
+**选项:**
+
+- `--json`: 输出为 JSON
+
+**示例:**
+
+```bash
+openclaw hooks info session-memory
+```
+
+**输出:**
+
+```
+💾 session-memory ✓ Ready
+
+Save session context to memory when /new command is issued
+
+Details:
+  Source: openclaw-bundled
+  Path: /path/to/openclaw/hooks/bundled/session-memory/HOOK.md
+  Handler: /path/to/openclaw/hooks/bundled/session-memory/handler.ts
+  Homepage: https://docs.openclaw.ai/hooks#session-memory
+  Events: command:new
+
+Requirements:
+  Config: ✓ workspace.dir
+```
+
+## 检查钩子资格

@@ -1,0 +1,116 @@
+---
+title: 配置示例
+description: 常见 OpenClaw 设置的架构准确配置示例。
+sidebar:
+  label: 配置示例
+  order: 10
+---
+
+# 配置示例
+
+以下示例与当前的配置架构保持一致。有关详尽的参考和每个字段的说明，请参阅 [配置](/zh/docs/gateway/configuration)。
+
+## 快速入门
+
+### 绝对最小配置
+```json5
+{
+  agent: { workspace: "~/.openclaw/workspace" },
+  channels: { whatsapp: { allowFrom: ["+15555550123"] } }
+}
+```
+
+保存到 `~/.openclaw/openclaw.json`，你就可以从该号码向机器人发送私信。
+
+### 推荐的入门配置
+```json5
+{
+  identity: {
+    name: "Clawd",
+    theme: "helpful assistant",
+    emoji: "🦞"
+  },
+  agent: {
+    workspace: "~/.openclaw/workspace",
+    model: { primary: "anthropic/claude-sonnet-4-5" }
+  },
+  channels: {
+    whatsapp: {
+      allowFrom: ["+15555550123"],
+      groups: { "*": { requireMention: true } }
+    }
+  }
+}
+```
+
+## 扩展示例 (主要选项)
+
+> JSON5 允许你使用注释和尾随逗号。常规 JSON 也可以工作。
+
+```json5
+{
+  // 环境 + shell
+  env: {
+    OPENROUTER_API_KEY: "sk-or-...",
+    vars: {
+      GROQ_API_KEY: "gsk-..."
+    },
+    shellEnv: {
+      enabled: true,
+      timeoutMs: 15000
+    }
+  },
+
+  // 认证配置文件元数据 (密钥存在 auth-profiles.json 中)
+  auth: {
+    profiles: {
+      "anthropic:me@example.com": { provider: "anthropic", mode: "oauth", email: "me@example.com" },
+      "anthropic:work": { provider: "anthropic", mode: "api_key" },
+      "openai:default": { provider: "openai", mode: "api_key" },
+      "openai-codex:default": { provider: "openai-codex", mode: "oauth" }
+    },
+    order: {
+      anthropic: ["anthropic:me@example.com", "anthropic:work"],
+      openai: ["openai:default"],
+      "openai-codex": ["openai-codex:default"]
+    }
+  },
+
+  // 身份
+  identity: {
+    name: "Samantha",
+    theme: "helpful sloth",
+    emoji: "🦥"
+  },
+
+  // 日志
+  logging: {
+    level: "info",
+    file: "/tmp/openclaw/openclaw.log",
+    consoleLevel: "info",
+    consoleStyle: "pretty",
+    redactSensitive: "tools"
+  },
+
+  // 消息格式化
+  messages: {
+    messagePrefix: "[openclaw]",
+    responsePrefix: ">",
+    ackReaction: "👀",
+    ackReactionScope: "group-mentions"
+  },
+
+  // Gateway
+  gateway: {
+    port: 18789,
+    auth: {
+      mode: "password",
+      password: "correct-horse-battery-staple"
+    },
+    bind: "loopback",
+    cors: {
+      origin: ["https://dashboard.example.com"]
+    }
+  }
+}
+```

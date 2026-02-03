@@ -1,0 +1,70 @@
+---
+title: OpenClaw 是什么？
+description: OpenClaw 介绍，自托管的 AI 助手。
+sidebar:
+  label: OpenClaw 是什么？
+  order: 1
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+# 使用 OpenClaw 构建个人助手
+
+**OpenClaw**（前身为 **Moltbot** 和 **Clawdbot**）是一个自托管网关，可将你的消息应用（WhatsApp, Telegram, Discord, iMessage, Slack）转变为强大的 AI 助手。它运行在你自己的硬件上，确保隐私和控制权。
+
+<Aside type="note" title="命名困惑？">
+你可能会在旧教程中看到 "Moltbot" 或 "Clawdbot"。**OpenClaw** 是当前且永久的名称。它们是同一个项目。
+</Aside>
+
+## 🔍 品牌历史与常见问题
+
+为什么有这么多名字？以下是详细说明：
+
+### 1. Clawdbot (最初)
+- **起源**：受到 Anthropic 的 "Claude" 模型的启发，但设计为一个 "bot" 封装器。
+- **更名原因**：为了避免与 Anthropic 的官方产品产生商标混淆。"Clawdbot" 听起来太像官方的 Claude 机器人了。
+- **与 Claude 的关系**：OpenClaw **不**隶属于 Anthropic，尽管它支持使用 Claude 模型（通过 API）作为助手的核心。
+
+### 2. Moltbot (过渡)
+- **含义**："Molt" 指的是蜕皮和成长（像螃蟹或龙虾一样）。它象征着项目从简单的封装器演变为复杂的代理系统。
+- **更名原因**：用户发现这个名字令人困惑或难以记忆。
+
+### 3. OpenClaw (未来)
+- **含义**：强调 "Open"（开源），并保留了最初螃蟹/龙虾主题中的 "Claw"（爪子）（致敬 Rust/Ferris 生态系统和最初的名字）。
+
+## 🚀 主要特性
+
+- **自托管**：你拥有你的数据。没有中间人读取你的聊天记录。
+- **多 LLM 支持**：连接到 OpenAI, Anthropic, Gemini, DeepSeek 或本地模型 (Ollama/LM Studio)。
+- **通用网关**：一个代理，随处可用 (WhatsApp, Telegram, Discord, Signal, iMessage, Slack, Matrix)。
+- **工具使用**：代理可以浏览网页、写入文件、运行代码并使用自定义 "技能"。
+
+## 🆚 比较
+
+### OpenClaw vs. Claude Code / Cursor
+- **Claude Code/Cursor**：专注于 IDE 内的 *代码辅助*。
+- **OpenClaw**：专注于通过消息应用进行的 *生活辅助* 和 *自动化*。它生活在你手机的聊天应用中，而不是你的代码编辑器里。
+
+### OpenClaw vs. ChatGPT / Gemini App
+- **ChatGPT/Gemini**：基于云的封闭生态系统。你无法轻松添加自定义工具，且数据归他们所有。
+- **OpenClaw**：运行在你的机器上。你可以让它访问你的本地文件、日历、智能家居，并且它可以执行真实的 shell 命令。
+
+### OpenClaw vs. AutoGPT / BabyAGI
+- **AutoGPT**：通常是自主运行以解决任务的 "代理"。
+- **OpenClaw**：一个 "对话式" 代理。它等待你与它交谈，但也可以运行后台任务（cron 作业）。它被设计为长期的伴侣，而不仅仅是任务解决者。
+
+## ⚠️ 安全第一
+
+你正在让代理处于以下位置：
+- 在你的机器上运行命令（`exec` 工具）。
+- 读/写你工作区中的文件。
+- 通过消息应用发送消息。
+
+**保持保守**：
+1.  **白名单**：始终将 `channels.<channel>.allowFrom` 设置为你的个人用户 ID。永远不要将其开放给全世界运行。
+2.  **沙盒**：如果你不确定，请使用 Docker 沙盒来运行工具。
+3.  **人在回路**：使用 `exec.approvals` 在代理运行危险命令之前要求确认。
+
+## 为什么选择 OpenClaw？
+
+与基于云的助手不同，OpenClaw 运行在你的硬件上（如 Mac Mini M4 或 Raspberry Pi），确保你的对话保持私密，且你的工具拥有本地访问权限。

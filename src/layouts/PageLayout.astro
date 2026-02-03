@@ -4,18 +4,21 @@ import Header from '~/components/widgets/Header.astro';
 import Footer from '~/components/widgets/Footer.astro';
 import Announcement from '~/components/widgets/Announcement.astro';
 
-import { headerData, footerData } from '~/navigation';
+import { headerData as defaultHeaderData, footerData as defaultFooterData } from '~/navigation';
 
 import type { MetaData } from '~/types';
 
 export interface Props {
   metadata?: MetaData;
+  language?: string;
+  headerData?: any;
+  footerData?: any;
 }
 
-const { metadata } = Astro.props;
+const { metadata, language, headerData = defaultHeaderData, footerData = defaultFooterData } = Astro.props;
 ---
 
-<Layout metadata={metadata}>
+<Layout metadata={metadata} language={language}>
   <slot name="announcement">
     <Announcement />
   </slot>

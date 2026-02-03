@@ -1,0 +1,95 @@
+---
+title: Tailscale (Gateway 仪表板)
+description: 为 Gateway 仪表板集成了 Tailscale Serve/Funnel。
+sidebar:
+  label: Tailscale
+  order: 5
+---
+
+# Tailscale (Gateway 仪表板)
+
+OpenClaw 可以为 Gateway 仪表板和 WebSocket 端口自动配置 Tailscale **Serve** (tailnet) 或 **Funnel** (公共)。这使得 Gateway 可以保持绑定到 loopback (本地回环)，而 Tailscale 提供 HTTPS、路由和 (对于 Serve) 身份头信息。
+
+## 模式
+
+- `serve`: 仅 Tailnet 访问，通过 `tailscale serve`。Gateway 保持在 `127.0.0.1`。
+- `funnel`: 公共 HTTPS 访问，通过 `tailscale funnel`。OpenClaw 要求配置共享密码。
+- `off`: 默认值 (无 Tailscale 自动化)。
+
+## 身份验证
+
+设置 `gateway.auth.mode` 来控制握手：
+
+- `token` (设置了 `OPENCLAW_GATEWAY_TOKEN` 时的默认值)
+- `password` (通过 `OPENCLAW_GATEWAY_PASSWORD` 或配置设置的共享密钥)
+
+当 `tailscale.mode = "serve"` 且 `gateway.auth.allowTailscale` 为 `true` 时，有效的 Serve 代理请求可以通过 Tailscale 身份头 (`tailscale-user-login`) 进行身份验证，而无需提供令牌/密码。OpenClaw 通过解析本地 Tailscale 守护进程 (`tailscale whois`) 中的 `x-forwarded-for` 地址并将其与头信息匹配来验证身份，然后才接受请求。
+
+OpenClaw 仅在请求来自 loopback 且带有 Tailscale 的 `x-forwarded-for`、`x-forwarded-proto` 和 `x-forwarded-host` 头信息时，才将其视为 Serve 请求。
+
+要要求显式凭据，请设置 `gateway.auth.allowTailscale: false` 或强制 `gateway.auth.mode: "password"`。
+
+## 配置示例
+
+### 仅 Tailnet (Serve)
+
+```json5
+{
+  gateway: {
+    bind: "loopback",
+    tailscale: { mode: "serve" }
+  }
+}
+```
+
+打开: `https://<magicdns>/` (或您配置的 `gateway.controlUi.basePath`)
+
+### 仅 Tailnet (绑定到 Tailnet IP)
+
+当您希望 Gateway 直接监听 Tailnet IP (无 Serve/Funnel) 时使用此选项。
+
+```json5
+{
+  gateway: {
+    bind: "tailnet",
+    auth: { mode: "token", token: "your-token" }
+  }
+}
+```
+
+从另一台 Tailnet 设备连接:
+- 控制 UI: `http://<tailscale-ip>:18789/`
+- WebSocket: `ws://<tailscale-ip>:18789`
+
+注意: 在此模式下，loopback (`http://127.0.0.1:18789`) 将**无法**工作。
+
+### 公共互联网 (Funnel + 共享密码)
+
+```json5
+{
+  gateway: {
+    bind: "loopback",
+    tailscale: { mode: "funnel" },
+    auth: { mode: "password", password: "replace-me" }
+  }
+}
+```
+
+建议使用 `OPENCLAW_GATEWAY_PASSWORD` 而不是将密码提交到磁盘。
+
+## CLI 示例
+
+```bash
+openclaw gateway --tailscale serve
+openclaw gateway --tailscale funnel --auth password
+```
+
+## 注意事项
+
+- Tailscale Serve/Funnel 需要安装 `tailscale` CLI 并登录。
+- `tailscale.mode: "funnel"` 拒绝启动，除非 auth 模式为 `password`，以避免公共暴露。
+- 如果您希望 OpenClaw 在关闭时撤销 `tailscale serve` 或 `tailscale funnel` 配置，请设置 `gateway.tailscale.resetOnExit`。
+- `gateway.bind: "tailnet"` 是直接 Tailnet 绑定 (无 HTTPS，无 Serve/Funnel)。
+- `gateway.bind: "auto"` 优先选择 loopback；如果只需要 Tailnet，请使用 `tailnet`。
+- Serve/Funnel 仅暴露 **Gateway 控制 UI + WS**。节点通过 WebSocket 连接。其他 HTTP API (OpenAI, Tools Invoke) 也被暴露。
+- 有关身份验证详情，请参阅 [控制 UI](/zh/docs/web/control-ui#insecure-http)。

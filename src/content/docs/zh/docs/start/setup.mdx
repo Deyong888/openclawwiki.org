@@ -1,0 +1,109 @@
+---
+title: 设置 (Setup)
+description: 根据您的需求定制 OpenClaw
+sidebar:
+  order: 2
+---
+
+OpenClaw 的设计理念是“以您的方式运行”。本指南涵盖了配置和维护安装的常见策略。
+
+## 定制策略
+
+OpenClaw 是高度可配置的。大多数设置都位于您的 `workspace/openclaw.yaml` 文件中。
+
+### 关键配置区域
+
+1.  **LLM 提供商**：在 `llm` 部分配置您的 API 密钥和模型偏好。
+2.  **渠道**：在 `channels` 部分启用和配置您想要使用的聊天平台（Telegram, Discord 等）。
+3.  **技能**：在 `skills` 部分启用或禁用特定功能。
+4.  **代理**：在 `agents` 部分定义您的 AI 代理及其个性。
+
+## 稳定工作流 (Stable Workflow)
+
+如果您是 OpenClaw 的新用户，或者希望获得最稳定的体验，请遵循此工作流。
+
+1.  **使用 macOS 应用程序**（如果适用）：这是最简单的入门方式。它将处理后台服务和更新。
+2.  **使用发布的版本**：坚持使用 `npm install -g openclaw` 安装的稳定版本，而不是从源代码运行。
+3.  **通过向导进行配置**：使用 `openclaw onboard` 来更改设置，因为它会验证您的输入。
+
+## 前沿工作流 (Bleeding Edge Workflow)
+
+对于开发人员和那些想要最新功能的人。
+
+1.  **从源代码运行**：克隆仓库并使用 `pnpm install` 和 `pnpm build`。
+2.  **在终端中运行网关**：使用 `pnpm gateway:watch` 在开发模式下运行，这样您可以看到实时日志并在更改代码时自动重启。
+    ```bash
+    pnpm gateway:watch
+    ```
+3.  **手动编辑 YAML**：直接在编辑器中打开 `workspace/openclaw.yaml` 进行更改。
+
+## 凭据存储映射
+
+OpenClaw 将敏感信息（如 API 密钥）存储在何处？
+
+*   **macOS**：系统钥匙串 (System Keychain)。
+*   **Windows**：凭据管理器 (Credential Manager)。
+*   **Linux**：`~/.config/openclaw/credentials.json` (或类似的 XDG 路径)，或者如果可用则使用 GNOME Keyring/KWallet。
+
+您可以通过环境变量覆盖这些设置（例如 `OPENCLAW_API_KEY`），这在 Docker 容器中很有用。
+
+## 更新
+
+### 使用 NPM
+
+```bash
+npm update -g openclaw
+```
+
+### 使用 Docker
+
+```bash
+docker pull openclaw/gateway:latest
+docker-compose up -d
+```
+
+### 从源代码
+
+```bash
+git pull
+pnpm install
+pnpm build
+```
+
+## Linux Systemd 用户服务
+
+要在 Linux 上将 OpenClaw 作为后台服务运行：
+
+1.  **生成服务文件**：
+    （手动创建 `~/.config/systemd/user/openclaw.service`）
+
+    ```ini
+    [Unit]
+    Description=OpenClaw Gateway
+    After=network.target
+
+    [Service]
+    ExecStart=/usr/bin/node /path/to/openclaw/dist/index.js start
+    Restart=always
+    RestartSec=10
+    Environment=NODE_ENV=production
+
+    [Install]
+    WantedBy=default.target
+    ```
+
+2.  **启用并启动**：
+    ```bash
+    systemctl --user enable openclaw
+    systemctl --user start openclaw
+    ```
+
+3.  **启用逗留 (Linger)**（即使用户注销也保持运行）：
+    ```bash
+    sudo loginctl enable-linger $USER
+    ```
+
+## 还可以看看
+
+*   [入门向导](/zh/docs/start/wizard/)
+*   [配对](/zh/docs/start/pairing/)

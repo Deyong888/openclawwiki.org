@@ -1,0 +1,67 @@
+---
+title: 安全最佳实践
+description: 运行 Openclaw 的安全考量。
+sidebar:
+  label: 最佳实践
+  order: 2
+---
+
+# 安全性 (Security) 🔒
+
+## 快速检查：`openclaw security audit`
+
+定期运行此命令（尤其是在更改配置或暴露网络面之后）：
+
+```bash
+openclaw security audit
+openclaw security audit --deep
+openclaw security audit --fix
+```
+
+它会标记常见的隐患（Gateway 认证暴露、浏览器控制暴露、提权的允许列表、文件系统权限）。
+
+`--fix` 应用安全护栏：
+- 将常用频道的 `groupPolicy="open"` 收紧为 `groupPolicy="allowlist"`（以及每账户变体）。
+- 将 `logging.redactSensitive="off"` 恢复为 `"tools"`。
+- 收紧本地权限（`~/.openclaw` → `700`，配置文件 → `600`，加上常见状态文件）。
+
+## 核心原则
+
+在你的机器上运行一个具有 Shell 访问权限的 AI Agent 是... *刺激的*。以下是如何避免被攻陷的方法。
+
+OpenClaw 既是产品也是实验：你正在将前沿模型的行为连接到真实的消息界面和真实的工具上。**没有“绝对安全”的设置。** 目标是审慎地对待：
+- 谁可以与你的机器人交谈
+- 机器人被允许在哪里行动
+- 机器人可以触碰什么
+
+从仍然有效的最小权限开始，随着信心的增加再放宽。
+
+## 审计检查内容 (高层级)
+
+- **入站访问** (DM 策略, 群组策略, 允许列表): 陌生人能触发机器人吗？
+- **工具爆炸半径** (提权工具 + 开放房间): 提示注入能否转化为 shell/文件/网络操作？
+- **网络暴露** (Gateway 绑定/认证, Tailscale Serve/Funnel)。
+- **浏览器控制暴露** (远程节点, 中继端口, 远程 CDP 端点)。
+- **本地磁盘卫生** (权限, 符号链接, config includes, “同步文件夹”路径)。
+- **插件** (没有明确允许列表的情况下存在扩展)。
+- **模型卫生** (当配置的模型看起来是旧版时发出警告；不是硬性阻止)。
+
+## 凭证存储映射
+
+在审计访问权限或决定备份什么时使用此表：
+
+- **WhatsApp**: `~/.openclaw/credentials/whatsapp/<accountId>/creds.json`
+- **Telegram bot token**: config/env 或 `channels.telegram.tokenFile`
+- **配对允许列表**: `~/.openclaw/credentials/<channel>-allowFrom.json`
+- **模型认证 profile**: `~/.openclaw/agents/<agentId>/agent/auth-profiles.json`
+
+## 安全审计检查清单
+
+当审计打印出发现时，请按此优先级处理：
+
+1. **任何“开放” + 启用工具**: 首先锁定 DM/群组 (配对/允许列表)，然后收紧工具策略/沙盒。
+2. **公共网络暴露** (LAN 绑定, Funnel, 缺失认证): 立即修复。
+3. **浏览器控制远程暴露**: 像对待操作员访问权限一样对待它 (仅 tailnet, 审慎配对节点, 避免公共暴露)。
+4. **权限**: 确保 state/config/credentials/auth 不可被组/世界读取。
+5. **插件/扩展**: 仅加载你明确信任的内容。
+6. **模型选择**: 对于任何拥有工具的机器人，首选现代的、经过指令强化的模型。

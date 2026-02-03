@@ -1,0 +1,96 @@
+---
+title: 技能 (Skills)
+description: OpenClaw 技能系统概览，包括技能类型、优先级和 ClawdHub。
+---
+
+**技能 (Skills)** 是 OpenClaw 的核心扩展机制。它们定义了 Agent 可以使用的工具（Tools）、可以响应的事件以及可以执行的操作。
+
+## 技能类型与优先级
+
+OpenClaw 支持多种来源的技能，并按以下优先级顺序（从高到低）加载和解析：
+
+1.  **Workspace Skills (工作区技能)**:
+    - 定义在当前项目或工作区的本地配置中。
+    - 优先级最高，覆盖其他同名技能。
+2.  **Managed/User Skills (托管/用户技能)**:
+    - 通过 `claw install` 安装到用户全局目录 (`~/.openclaw/skills`) 的技能。
+    - 通常来自 ClawdHub。
+3.  **Local Skills (本地技能)**:
+    - 通过 `skills.load.extraDirs` 配置指定的本地目录中的技能。
+4.  **Bundled Skills (内置技能)**:
+    - OpenClaw 发行版中自带的核心技能（如 `openclaw-core`, `files`, `exec`）。
+
+如果存在同名技能，优先级高的版本将生效。
+
+## ClawdHub
+
+[ClawdHub](https://clawdhub.dev) 是 OpenClaw 的公共技能注册表。用户可以从中发现、共享和安装社区创建的技能。
+
+### 安装技能
+
+使用 CLI 从 ClawdHub 安装技能：
+
+```bash
+claw install <skill-name>
+```
+
+例如：
+
+```bash
+claw install browser
+```
+
+### 列出已安装技能
+
+```bash
+claw list
+```
+
+### 搜索技能
+
+```bash
+claw search <query>
+```
+
+## 技能结构
+
+一个典型的技能是一个包含 `skill.json` (或 `package.json`) 和源代码的目录。
+
+```text
+my-skill/
+├── skill.json       # 技能元数据
+├── index.js         # 入口点 (对于 JS/TS 技能)
+└── ...
+```
+
+### 元数据示例
+
+在 `package.json` 或 Markdown frontmatter 中：
+
+```markdown
+---
+name: nano-banana-pro
+description: Generate or edit images via Gemini 3 Pro Image
+metadata: {
+  "openclaw": {
+    "requires": {
+      "bins": ["uv"],
+      "env": ["GEMINI_API_KEY"]
+    }
+  }
+}
+---
+```
+
+## 插件集成
+
+技能可以包含 **插件 (Plugins)**。插件是技能的实际执行单元，可以是：
+- **JavaScript/TypeScript 函数**: 在 OpenClaw 进程中运行。
+- **可执行文件/脚本**: 作为子进程运行（例如 Python 脚本、Bash 脚本）。
+- **HTTP 服务**: 通过网络调用。
+
+## 安全性
+
+- **沙箱化**: 尽可能在受限环境中运行技能（例如 Docker 容器）。
+- **审批**: 敏感操作（如 `exec`）可以配置为需要人工审批。
+- **白名单**: 管理员可以通过配置显式控制允许哪些技能运行。

@@ -1,0 +1,84 @@
+---
+title: Agent Loop
+description: 了解 OpenClaw 代理运行的生命周期，从接收到流式回复。
+sidebar:
+  order: 1
+---
+
+**Agent Loop**（代理循环）是将传入消息（或事件）转化为一组操作并最终回复的核心运行时生命周期。它管理上下文组装、模型推理、工具执行和流式响应。
+
+## 概览
+
+在宏观层面上，循环过程如下：
+1.  **接收输入 (Receives Input)**：来自通道（例如 Telegram, Discord）的消息或 API 调用。
+2.  **组装上下文 (Assembles Context)**：收集最近的历史记录、相关记忆和系统指令。
+3.  **推理 (Inference)**：将上下文发送给 LLM（大型语言模型）。
+4.  **工具执行 (Tool Execution)**：如果模型请求调用工具（例如“搜索网络”、“查询数据库”），循环将执行它们并将结果反馈回去。
+5.  **流式传输 (Streaming)**：向用户实时发送部分文本增量。
+6.  **持久化 (Persistence)**：将交互保存到会话历史记录中。
+
+## 工作原理（高层）
+
+1.  **`agent` RPC**：验证参数，解析会话 (`sessionKey`/`sessionId`)，持久化会话元数据，并立即返回 `{ runId, acceptedAt }`。
+2.  **`agentCommand`**：运行代理：
+    *   解析模型 + 思考/详细模式默认值。
+    *   加载技能快照。
+    *   调用 `runEmbeddedPiAgent` (pi-agent-core 运行时)。
+    *   如果嵌入式循环没有发出结束/错误信号，则发出 **生命周期结束/错误 (lifecycle end/error)**。
+3.  **`runEmbeddedPiAgent`**：
+    *   通过每会话 + 全局队列序列化运行。
+    *   解析模型 + 认证配置文件并构建 pi 会话。
+    *   订阅 pi 事件并流式传输助手/工具增量。
+    *   强制执行超时 -> 如果超时则中止运行。
+    *   返回有效载荷 + 使用情况元数据。
+
+## 详细流程
+
+### 1. 摄入与排队 (Intake & Queueing)
+每个请求都被分配一个 `runId`。为了防止竞争条件（例如，用户快速发送两条消息），同一 `sessionKey` 的运行通常会被序列化（排队），以便代理按顺序处理它们。
+
+### 2. 会话准备 (Session Preparation)
+循环加载 **Session** 状态，其中包括：
+*   **历史记录 (History)**：最近的聊天消息。
+*   **记忆 (Memory)**：长期回忆（如果启用）。
+*   **便签 (Scratchpad)**：当前任务的临时笔记。
+
+### 3. 提示词组装 (Prompt Assembly)
+OpenClaw 为 LLM 构建提示词。这包括：
+*   **系统提示词 (System Prompt)**：定义角色（例如，“你是一个有用的助手...”）。
+*   **技能定义 (Skill Definitions)**：可用工具（函数）的描述。
+*   **上下文 (Context)**：相关的历史记录和记忆。
+
+### 4. 模型推理与工具使用 (Model Inference & Tool Use)
+提示词被发送到 LLM。模型可能会生成：
+*   **文本 (Text)**：对话响应。
+*   **工具调用 (Tool Calls)**：执行代码或外部 API 的请求。
+
+如果调用了工具，循环将：
+*   执行工具（例如，运行 Python 脚本，调用天气 API）。
+*   捕获输出（stdout/stderr/返回值）。
+*   将结果追加到对话历史记录中。
+*   **回环** 到第 3 步，让模型看到工具输出并继续。
+
+### 5. 流式传输与回复 (Streaming & Reply)
+随着模型生成文本，OpenClaw 通过服务器发送事件 (SSE) 将其流式传输到客户端，或直接流式传输到聊天通道（通过特定的 Channel 集成）。
+
+### 6. 压缩与终结 (Compaction & Finalization)
+一旦运行完成：
+*   新消息被提交到数据库。
+*   如果历史记录超过上下文窗口限制，可能会触发 **压缩 (Compaction)**（总结旧消息）。
+*   可能会提取并保存 **记忆 (Memories)**。
+
+## 事件与流 (Events & Streams)
+
+代理循环在执行期间发出各种事件：
+*   `run.start`：循环已开始。
+*   `text.delta`：生成的一块文本。
+*   `tool.call`：正在执行工具。
+*   `tool.result`：工具已完成。
+*   `run.complete`：循环成功完成。
+*   `run.error`：发生错误。
+
+## 超时 (Timeouts)
+
+为了防止代理“卡住”，循环强制执行严格的超时（可配置，例如 60 秒）。如果模型在此时间内未完成，运行将被中止以释放资源。

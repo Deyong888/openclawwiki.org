@@ -1,0 +1,163 @@
+---
+title: Web 工具 (Web Tools)
+description: 配置 OpenClaw Agent 的 Web 搜索和获取功能 (Brave/Perplexity)。
+sidebar:
+  label: Web 工具 (Web Tools)
+  order: 5
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Web 工具
+
+OpenClaw 包含两个强大的互联网访问工具：
+
+1.  **`web_search`**: 使用搜索引擎 (Brave 或 Perplexity) 查找信息。
+2.  **`web_fetch`**: 检索并读取特定网页的内容 (HTML 转 Markdown)。
+
+<Aside type="note">
+这些工具是轻量级且基于 API 的。对于复杂的交互（如登录、点击按钮或处理繁重的 JavaScript），请使用 [Browser Tool](/docs/tools/browser)。
+</Aside>
+
+## Web 搜索 (Web Search)
+
+OpenClaw 支持两个 Web 搜索提供商：
+
+| 提供商 | 描述 | 适用场景 |
+| :--- | :--- | :--- |
+| **Brave Search** | 标准搜索结果 (链接 + 摘要)。 | 一般查询，查找 URL。 |
+| **Perplexity** | 带引用的 AI 合成答案。 | 复杂问题，研究。 |
+
+### 配置
+
+你可以在 `~/.openclaw/openclaw.json` 中配置搜索提供商。
+
+<Tabs>
+  <TabItem label="Brave Search (默认)">
+    1.  从 [Brave Search API](https://brave.com/search/api/) 获取 API Key。
+    2.  在环境变量中设置 `BRAVE_API_KEY` 或在配置中设置：
+
+    ```json5
+    {
+      tools: {
+        web: {
+          search: {
+            provider: "brave",
+            apiKey: "BSA-..." // 如果设置了环境变量则可选
+          }
+        }
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Perplexity (via OpenRouter)">
+    1.  从 [OpenRouter](https://openrouter.ai/) 获取 API Key。
+    2.  在环境变量中设置 `OPENROUTER_API_KEY` 或在配置中设置：
+
+    ```json5
+    {
+      tools: {
+        web: {
+          search: {
+            provider: "perplexity",
+            perplexity: {
+              apiKey: "sk-or-...", // 如果设置了环境变量则可选
+              model: "perplexity/sonar-pro"
+            }
+          }
+        }
+      }
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+## Web 获取 (Web Fetch)
+
+`web_fetch` 工具下载网页并将其转换为 Agent 可读的文本 (Markdown)。
+
+- **自动回退**: 如果直接获取失败 (例如由于反爬虫保护)，如果配置了 [Firecrawl](/docs/tools/firecrawl)，它可以自动尝试使用 Firecrawl。
+- **隐私**: 获取操作从 Gateway 服务器 IP 执行。
+
+### 使用示例
+
+Agent 决定何时使用这些工具。你可能会看到如下日志：
+
+```text
+[agent] invoking tool: web_search({ query: "latest SpaceX launch" })
+[agent] invoking tool: web_fetch({ url: "https://www.spacex.com/launches/" })
+```
+
+## 高级设置
+
+```json5
+{
+  tools: {
+    web: {
+      search: {
+        enabled: true,
+        maxResults: 5,
+        cacheTtlMinutes: 15 // 缓存结果以节省 API 额度
+      },
+      fetch: {
+        timeoutSeconds: 30,
+        userAgent: "OpenClaw/1.0" // 自定义 User-Agent
+      }
+    }
+  }
+}
+```
+
+## web_fetch 详解
+
+获取 URL 并提取可读内容。
+
+### 要求
+
+- `tools.web.fetch.enabled` 必须不为 `false` (默认：启用)
+- 可选 Firecrawl 回退：设置 `tools.web.fetch.firecrawl.apiKey` 或 `FIRECRAWL_API_KEY`。
+
+### 配置
+
+```json5
+{
+  tools: {
+    web: {
+      fetch: {
+        enabled: true,
+        maxChars: 50000,
+        timeoutSeconds: 30,
+        cacheTtlMinutes: 15,
+        maxRedirects: 3,
+        userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_7_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        readability: true,
+        firecrawl: {
+          enabled: true,
+          apiKey: "FIRECRAWL_API_KEY_HERE", // 如果设置了 FIRECRAWL_API_KEY 则可选
+          baseUrl: "https://api.firecrawl.dev",
+          onlyMainContent: true,
+          maxAgeMs: 86400000, // ms (1 天)
+          timeoutSeconds: 60
+        }
+      }
+    }
+  }
+}
+```
+
+### 工具参数
+
+- `url` (必填, 仅限 http/https)
+- `extractMode` (`markdown` | `text`)
+- `maxChars` (截断长页面)
+
+注意：
+- `web_fetch` 首先使用 Readability (主要内容提取)，然后使用 Firecrawl (如果已配置)。如果两者都失败，工具返回错误。
+- Firecrawl 请求默认使用绕过机器人模式并缓存结果。
+- `web_fetch` 默认发送类似 Chrome 的 User-Agent 和 `Accept-Language`；如果需要可覆盖 `userAgent`。
+- `web_fetch` 阻止私有/内部主机名并重新检查重定向 (限制为 `maxRedirects`)。
+- `web_fetch` 是尽力而为的提取；某些站点可能需要浏览器工具。
+- 查看 [Firecrawl](/docs/tools/firecrawl) 获取关键设置和服务详情。
+- 响应会被缓存 (默认 15 分钟) 以减少重复获取。
+- 如果你使用工具配置文件/白名单，请添加 `web_search`/`web_fetch` 或 `group:web`。
+- 如果缺少 Brave key，`web_search` 会返回一个简短的设置提示和文档链接。

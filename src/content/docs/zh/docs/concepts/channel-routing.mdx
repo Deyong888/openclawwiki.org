@@ -1,0 +1,78 @@
+---
+title: 渠道路由 (Channel Routing)
+description: OpenClaw 如何在渠道和 Agent 会话之间路由消息。
+sidebar:
+  order: 3
+---
+
+**渠道路由** 决定了来自平台（如 Telegram 或 Discord）的传入消息如何映射到特定的 Agent 会话（Session），以及 Agent 的回复如何路由回正确的用户或相关会话。
+
+## 关键概念
+
+*   **渠道 (Channel)**：集成点（例如 `telegram`, `discord`, `http`）。
+*   **会话密钥 (Session Key)**：标识对话上下文的唯一字符串。
+*   **路由规则 (Routing Rule)**：将 `(Channel, User, Chat)` 映射到 `Session Key` 的逻辑。
+
+## 会话密钥的形式
+
+`sessionKey` 是对话的基础 ID。其格式因上下文而异：
+
+### 1. 私聊 (Direct Messages, 1:1)
+通常为 `channel:userId`。
+*   示例：`telegram:123456789`
+*   Agent 将其视为与该用户的私人对话。
+
+### 2. 群聊 (Group Chats)
+通常为 `channel:groupId`。
+*   示例：`discord:987654321098765432`
+*   Agent 将其视为共享房间。群组中的所有用户都向 *同一个* 会话历史贡献内容。
+
+### 3. 话题/帖子 (Threads / Topics)
+某些平台支持话题（Threads）。
+*   示例：`slack:C12345:thread:167890.123`
+*   Agent 将话题视为与主频道分离的独立会话。
+
+## 路由逻辑
+
+当消息到达时：
+1.  **摄入 (Ingest)**：渠道插件接收 webhook/事件。
+2.  **标准化 (Normalize)**：提取 `userId`, `chatId`, `threadId`, `content`。
+3.  **解析密钥 (Resolve Key)**：构建 `sessionKey`。
+    *   *如果是私聊*：使用 `userId`。
+    *   *如果是群聊*：使用 `chatId`。
+4.  **查找会话 (Lookup Session)**：检查此密钥是否存在会话。
+    *   *新建*：创建一个新会话。
+    *   *现有*：加载历史记录。
+5.  **分发 (Dispatch)**：发送到 Agent Loop。
+
+## 广播组 (Broadcast Groups)
+
+您可以配置 **广播组** 以将来自一个源的消息路由到多个会话，或为群组设置别名。
+
+```json5
+// config.json
+{
+  broadcast: {
+    strategy: "parallel", // 发送给所有目标
+    // 将一个 WhatsApp 群组映射到两个特定的 agent 角色
+    "120363403215116621@g.us": ["alfred", "baerbel"],
+    // 将一个电话号码映射到支持 agent
+    "+15555550123": ["support", "logger"]
+  }
+}
+```
+
+在此模式下，一条传入消息会触发多次 agent 运行（一次针对 "alfred"，一次针对 "baerbel"），从而允许而在同一个群聊中独立存在多个机器人。
+
+## WebChat 行为
+
+内置的 WebChat (OpenClaw UI) 使用生成的 UUID 作为会话密钥，并存储在浏览器的 `localStorage` 中。
+*   清除浏览器数据会重置会话（除非已登录）。
+
+## 回复上下文
+
+当 Agent 回复时，循环会保留 **路由上下文**：
+*   `replyToId`：正在回复哪条消息（用于话题回复）。
+*   `channelId`：发送文本的位置。
+
+渠道插件使用它来正确格式化传出的消息（例如，调用 Discord API 回复特定的消息 ID）。

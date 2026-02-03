@@ -1,0 +1,36 @@
+---
+title: Openclaw 文档
+description: 开始使用 Openclaw.
+template: splash
+hero:
+  tagline: 您的自托管 AI 助手之旅从这里开始。
+  image:
+    file: ../../../../assets/images/openclaw-logo.svg
+  actions:
+    - text: 快速开始
+      link: /zh/docs/getting-started/quick-start/
+      icon: right-arrow
+      variant: primary
+    - text: 查看 GitHub
+      link: https://github.com/openclaw/openclaw
+      icon: external
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## 下一步
+
+<CardGrid stagger>
+	<Card title="安装 Openclaw" icon="pencil">
+		按照 [快速开始](/zh/docs/getting-started/quick-start/) 进行设置。
+	</Card>
+	<Card title="迁移" icon="add-document">
+		来自 Moltbot？查看 [迁移指南](/zh/moltbot-to-openclaw/)。
+	</Card>
+	<Card title="配置" icon="setting">
+		连接 [Telegram](/zh/docs/config/telegram/)、[WhatsApp](/zh/docs/config/whatsapp/) 和 [Gmail](/zh/docs/config/gmail/)。
+	</Card>
+	<Card title="探索工具" icon="rocket">
+		发现 [浏览器自动化](/zh/docs/tools/browser/) 和 [技能](/zh/docs/tools/skills/)。
+	</Card>
+</CardGrid>

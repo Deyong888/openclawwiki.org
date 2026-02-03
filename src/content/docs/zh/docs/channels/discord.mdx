@@ -1,0 +1,188 @@
+---
+title: 连接 Discord
+description: 为 OpenClaw 设置一个 Discord 机器人，支持私信、服务器频道和斜杠命令。
+sidebar:
+  label: Discord
+  order: 20
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+将 OpenClaw 连接到 Discord，以便通过私信（DM）或在公会（服务器）频道内与你的智能体互动。此集成支持文本、图片、文件上传和斜杠命令。
+
+## 先决条件
+
+- 一个启用了开发者模式的 **Discord 账户**。
+- 已安装并运行 **OpenClaw**。
+- 将机器人添加到服务器的权限（或创建你自己的测试服务器）。
+
+## 设置指南
+
+按照以下步骤创建你的机器人并将其连接到 OpenClaw。
+
+<Steps>
+
+1.  ### 创建 Discord 应用
+    前往 [Discord Developer Portal](https://discord.com/developers/applications) 并点击 **New Application**。给它起个名字（例如 "ClawBot"）。
+
+2.  ### 创建机器人用户
+    导航到侧边栏中的 **Bot** 选项卡，然后点击 **Add Bot**。
+    
+    <Aside type="caution">
+    **关键步骤：** 在 **Privileged Gateway Intents** 部分下，你 **必须** 启用：
+    *   **Message Content Intent**：读取消息所需。
+    *   **Server Members Intent**：白名单和用户查找所需。
+    </Aside>
+
+    点击 **Save Changes**。然后，点击 **Reset Token** 以生成你的 **Bot Token**。复制此令牌；稍后你会用到它。
+
+3.  ### 邀请机器人到你的服务器
+    前往 **OAuth2** -> **URL Generator** 选项卡。
+    
+    **Scopes (范围):**
+    *   `bot`
+    *   `applications.commands` (用于斜杠命令)
+
+    **Bot Permissions (机器人权限):**
+    *   Read Messages/View Channels (读取消息/查看频道)
+    *   Send Messages (发送消息)
+    *   Embed Links (嵌入链接)
+    *   Attach Files (附加文件)
+    *   Read Message History (读取消息历史)
+    *   Add Reactions (添加反应)
+
+    复制生成的 URL，在浏览器中打开它，然后选择你要邀请机器人的服务器。
+
+4.  ### 配置 OpenClaw
+    将配置添加到你的 `config.json` 或使用环境变量。
+
+    <Tabs>
+      <TabItem label="config.json">
+      ```json5
+      {
+        channels: {
+          discord: {
+            enabled: true,
+            // 替换为你的实际令牌
+            token: "OTk...<your_bot_token>"
+          }
+        }
+      }
+      ```
+      </TabItem>
+      <TabItem label="Environment Variable">
+      ```bash
+      export DISCORD_BOT_TOKEN="OTk...<your_bot_token>"
+      ```
+      </TabItem>
+    </Tabs>
+
+5.  ### 启动 OpenClaw
+    运行你的智能体。你应该会看到一条日志消息，指示 Discord 网关已连接。
+    
+    ```bash
+    openclaw run
+    ```
+
+6.  ### 验证连接
+    向你的机器人发送私信或在频道中提及它：`@ClawBot hello`。
+    
+    *   **首次运行 (DMs):** 默认情况下，OpenClaw 为了安全起见使用 **配对模式 (Pairing Mode)**。机器人将回复一个配对代码（例如 `123-456`）。
+    *   运行 `openclaw pairing approve discord <code>` 来授权你自己。
+
+</Steps>
+
+## 配置选项
+
+### 访问控制
+
+控制谁可以与你的智能体交谈。
+
+#### 私信 (Direct Messages)
+| 策略 | 描述 | 配置 |
+| :--- | :--- | :--- |
+| **Pairing** (默认) | 未知用户会收到一个代码。管理员必须通过 CLI 批准。 | `dm: { policy: "pairing" }` |
+| **Allowlist** | 只有特定的用户 ID 可以聊天。 | `dm: { policy: "allowlist", allowFrom: ["123456..."] }` |
+| **Open** | 任何人都可以聊天（慎用）。 | `dm: { policy: "open", allowFrom: ["*"] }` |
+| **Disabled** | 忽略所有私信。 | `dm: { enabled: false }` |
+
+#### 服务器频道 (Guilds)
+默认情况下，机器人会监听它是成员的频道，但可能需要提及（mention）。
+
+```json5
+{
+  channels: {
+    discord: {
+      guilds: {
+        // "你的 Guild ID" (右键点击服务器 -> Copy ID)
+        "9876543210": {
+          // 是否要求用户 @提及 机器人才能获得回复？
+          requireMention: true,
+          // 仅允许特定频道
+          channels: {
+            "general": { allow: true },
+            "secret-lab": { allow: false }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### 斜杠命令 (Slash Commands)
+
+如果 `commands.native` 为 `"auto"`（默认值），OpenClaw 会自动将其命令（如 `/help`, `/reset`）注册为原生 Discord 斜杠命令。
+
+要禁用此功能：
+```json5
+{
+  channels: {
+    discord: {
+      commands: { native: false }
+    }
+  }
+}
+```
+
+## 故障排除
+
+<Aside type="tip">
+使用内置的 doctor 命令检查常见问题：
+`openclaw doctor`
+</Aside>
+
+**机器人上线但不回复：**
+*   **检查 Intents：** 你是否在 Discord Developer Portal 中启用了 "Message Content Intent"？这是导致沉默的第一大原因。
+*   **检查权限：** 机器人在该特定频道是否有 "Send Messages" 权限？
+*   **检查日志：** 使用 `openclaw run --verbose` 运行，查看消息是否被接收但被过滤了（例如，由于白名单）。
+
+**"Used disallowed intents" 错误：**
+*   你在 `config.json`（或默认值）中启用了某个 intent，但该 intent 在 Developer Portal 中 *未* 启用。在门户中开启它们。
+
+**回复被拆分成多条消息：**
+*   Discord 有 2000 个字符的限制。OpenClaw 会自动分块长回复。如果需要，你可以调整 `channels.discord.textChunkLimit`。
+
+## 高级用法
+
+### 多账户支持
+你可以从一个 OpenClaw 实例运行多个机器人。
+
+```json5
+{
+  channels: {
+    discord: {
+      accounts: {
+        "personal": { token: "..." },
+        "work": { token: "..." }
+      }
+    }
+  }
+}
+```
+
+### 获取 ID
+要查找用户、服务器 (Guild) 或频道 ID：
+1.  打开 Discord 用户设置 -> **Advanced** (高级)。
+2.  启用 **Developer Mode** (开发者模式)。
+3.  右键点击任何用户、服务器或频道，选择 **Copy ID** (复制 ID)。

@@ -1,0 +1,86 @@
+---
+title: 斜杠命令 (Slash Commands)
+description: 处理来自用户的斜杠命令（如 /help, /reset）。
+---
+
+`slash-commands` 工具允许 Agent 注册和处理斜杠命令。这是一种标准的用户与 Bot 交互的方式，通常用于触发特定操作而不是进行自然语言对话。
+
+## 默认命令
+
+OpenClaw 通常内置了一些基本命令：
+
+- `/help`: 显示帮助信息，列出可用技能和命令。
+- `/reset`: 重置当前对话上下文/短期记忆。
+- `/mode <mode>`: 切换 Agent 的运行模式（如果支持）。
+
+## 注册自定义命令
+
+技能可以通过 `slash-commands` 工具注册新的命令。
+
+### 工具定义
+
+```json
+{
+  "name": "register_slash_command",
+  "description": "注册一个新的斜杠命令",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "command": {
+        "type": "string",
+        "description": "命令名称（不带 /），例如 'weather'"
+      },
+      "description": {
+        "type": "string",
+        "description": "命令的简短描述"
+      },
+      "handler": {
+        "type": "string",
+        "description": "处理该命令的函数或动作 ID"
+      }
+    },
+    "required": ["command", "description"]
+  }
+}
+```
+
+## 处理命令
+
+当用户输入 `/command` 时，OpenClaw 会：
+1. 解析命令名称和参数。
+2. 查找已注册的处理程序。
+3. 调用相应的工具或函数，并将参数传递给它。
+
+### 示例交互
+
+**用户**: `/weather beijing`
+
+**Agent (内部)**:
+1. 识别到斜杠命令 `weather`。
+2. 参数为 `beijing`。
+3. 查找 `weather` 的处理程序（例如 `weather_tool`）。
+4. 调用 `weather_tool(location="beijing")`。
+
+**Agent (回复)**: "北京当前天气晴朗，温度 25°C。"
+
+## 权限与范围
+
+- 命令可以是**全局的**（在所有频道可用）或**局部的**（仅在特定频道或 DM 中可用）。
+- 可以配置命令仅对特定用户组（如管理员）可见或可执行。
+
+## 配置
+
+在 `openclaw.json` 中，你可以配置是否启用斜杠命令解析：
+
+```json5
+{
+  skills: {
+    config: {
+      "slash-commands": {
+        "enabled": true,
+        "prefix": "/" // 默认为 /，也可以改为其他字符，如 !
+      }
+    }
+  }
+}
+```

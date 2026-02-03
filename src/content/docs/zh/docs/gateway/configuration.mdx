@@ -1,0 +1,117 @@
+---
+title: 配置
+description: ~/.openclaw/openclaw.json 的所有配置选项及示例。
+sidebar:
+  label: 配置
+  order: 1
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+# 配置 🔧
+
+OpenClaw 通过 `~/.openclaw/openclaw.json` 下的 JSON5 文件进行配置。
+
+<Aside type="note">
+**JSON5** 允许注释 (`//`) 和尾随逗号，使其比标准 JSON 更友好。
+</Aside>
+
+## 最小配置 (推荐起点)
+
+```json5
+{
+  // "agents" 定义所有代理的默认值
+  agents: {
+    defaults: {
+      // 代理保存其记忆和技能的位置
+      workspace: "~/.openclaw/workspace"
+    }
+  },
+  // "channels" 定义世界如何与 Gateway 对话
+  channels: {
+    // 示例：启用 Telegram
+    telegram: {
+      enabled: true,
+      botToken: "123:abc...",
+      dmPolicy: "pairing"
+    }
+  }
+}
+```
+
+## 示例
+
+<Tabs>
+  <TabItem label="最小">
+    一个简单的设置，启用 Telegram 和自定义工作区。
+
+    ```json5
+    {
+      // 全局设置
+      agents: {
+        defaults: {
+          workspace: "~/.openclaw/workspace"
+        }
+      },
+      // 频道配置
+      channels: {
+        telegram: {
+          enabled: true,
+          botToken: "YOUR_TOKEN",
+          dmPolicy: "pairing"
+        }
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="完整">
+    一个更完整的配置，包含多个频道和网络工具。
+
+    ```json5
+    {
+      gateway: {
+        port: 18789
+      },
+      agents: {
+        defaults: {
+          workspace: "~/.openclaw/workspace",
+          model: { primary: "anthropic/claude-3-5-sonnet" }
+        }
+      },
+      channels: {
+        whatsapp: {
+          enabled: true,
+          dmPolicy: "allowlist",
+          allowFrom: ["+15551234567"]
+        },
+        telegram: {
+          enabled: true,
+          botToken: "YOUR_TOKEN",
+          groups: { "*": { requireMention: true } }
+        }
+      },
+      tools: {
+        web: {
+          search: { enabled: true, provider: "brave" }
+        }
+      }
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+## 管理命令
+
+你不需要总是手动编辑文件。
+
+- **检查配置**: `openclaw doctor`
+- **应用更改**: `openclaw config apply` (重启 Gateway)
+- **获取值**: `openclaw config get channels.telegram.enabled`
+- **设置值**: `openclaw config set channels.telegram.enabled true`
+
+## 严格验证
+
+Gateway 强制执行严格的架构。如果你的配置无效：
+1. Gateway 将 **拒绝启动**。
+2. 运行 `openclaw doctor` 查看错误。
+3. 手动修复错误或使用 `openclaw doctor --fix`。

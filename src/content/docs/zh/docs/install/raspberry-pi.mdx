@@ -1,0 +1,200 @@
+---
+title: Raspberry Pi
+description: Raspberry Pi 上的 OpenClaw（预算内的自托管设置）。
+sidebar:
+  label: Raspberry Pi
+  order: 6
+---
+
+# Raspberry Pi 上的 OpenClaw
+
+## 目标
+
+以 **约 35-80 美元** 的一次性成本（无月费）在 Raspberry Pi 上运行一个持久的、始终在线的 OpenClaw 网关。
+
+非常适合：
+- 24/7 个人 AI 助理
+- 家庭自动化中心
+- 低功耗、始终可用的 Telegram/WhatsApp 机器人
+
+## 硬件要求
+
+| Pi 型号 | 内存 | 可行吗？ | 备注 |
+|----------|-----|--------|-------|
+| **Pi 5** | 4GB/8GB | ✅ 最佳 | 最快，推荐 |
+| **Pi 4** | 4GB | ✅ 良好 | 大多数用户的最佳选择 |
+| **Pi 4** | 2GB | ✅ OK | 可行，添加交换空间 (swap) |
+| **Pi 4** | 1GB | ⚠️ 勉强 | 可以通过交换空间实现，最小化配置 |
+| **Pi 3B+** | 1GB | ⚠️ 慢 | 能工作但反应迟钝 |
+| **Pi Zero 2 W** | 512MB | ❌ | 不推荐 |
+
+**最低规格：** 1GB RAM，1 核心，500MB 磁盘
+**推荐：** 2GB+ RAM，64 位操作系统，16GB+ SD 卡（或 USB SSD）
+
+## 您需要什么
+
+- Raspberry Pi 4 或 5（推荐 2GB+）
+- MicroSD 卡（16GB+）或 USB SSD（性能更好）
+- 电源（推荐官方 Pi 电源）
+- 网络连接（以太网或 WiFi）
+- 约 30 分钟
+
+## 1) 烧录操作系统
+
+使用 **Raspberry Pi OS Lite (64-bit)** — 无头服务器不需要桌面环境。
+
+1. 下载 [Raspberry Pi Imager](https://www.raspberrypi.com/software/)
+2. 选择操作系统：**Raspberry Pi OS Lite (64-bit)**
+3. 点击齿轮图标 (⚙️) 进行预配置：
+   - 设置主机名：`gateway-host`
+   - 启用 SSH
+   - 设置用户名/密码
+   - 配置 WiFi（如果不使用以太网）
+4. 烧录到您的 SD 卡 / USB 驱动器
+5. 插入并启动 Pi
+
+## 2) 通过 SSH 连接
+
+```bash
+ssh user@gateway-host
+# 或者使用 IP 地址
+ssh user@192.168.x.x
+```
+
+## 3) 系统设置
+
+```bash
+# 更新系统
+sudo apt update && sudo apt upgrade -y
+
+# 安装基本包
+sudo apt install -y git curl build-essential
+
+# 设置时区（对 cron/提醒很重要）
+sudo timedatectl set-timezone Asia/Shanghai  # 更改为您的时区
+```
+
+## 4) 安装 Node.js 22 (ARM64)
+
+```bash
+# 通过 NodeSource 安装 Node.js
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# 验证
+node --version  # 应该显示 v22.x.x
+npm --version
+```
+
+## 5) 添加交换空间 (对于 2GB 或更少内存很重要)
+
+交换空间 (Swap) 可防止内存不足崩溃：
+
+```bash
+# 创建 2GB 交换文件
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+
+# 永久生效
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+
+# 针对低内存进行优化（减少 swappiness）
+echo 'vm.swappiness=10' | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
+```
+
+## 6) 安装 OpenClaw
+
+### 选项 A：标准安装（推荐）
+
+```bash
+curl -fsSL https://openclaw.bot/install.sh | bash
+```
+
+### 选项 B：黑客安装（用于折腾）
+
+```bash
+git clone https://github.com/openclaw/openclaw.git
+cd openclaw
+npm install
+npm run build
+npm link
+```
+
+黑客安装让您可以直接访问日志和代码 — 对调试 ARM 特定问题很有用。
+
+## 7) 运行入门向导
+
+```bash
+openclaw onboard --install-daemon
+```
+
+按照向导操作：
+1. **Gateway mode (网关模式):** Local (本地)
+2. **Auth (认证):** 推荐 API 密钥（OAuth 在无头 Pi 上可能比较麻烦）
+3. **Channels (渠道):** Telegram 最容易上手
+4. **Daemon (守护进程):** Yes (systemd)
+
+## 8) 验证安装
+
+```bash
+# 检查状态
+openclaw status
+
+# 检查服务
+sudo systemctl status openclaw
+
+# 查看日志
+journalctl -u openclaw -f
+```
+
+## 9) 访问仪表板
+
+由于 Pi 是无头的，请使用 SSH 隧道：
+
+```bash
+# 从您的笔记本电脑/台式机
+ssh -L 18789:localhost:18789 user@gateway-host
+
+# 然后在浏览器中打开
+open http://localhost:18789
+```
+
+或者使用 Tailscale 进行始终在线访问：
+
+```bash
+# 在 Pi 上
+curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up
+
+# 更新配置
+openclaw config set gateway.bind tailnet
+sudo systemctl restart openclaw
+```
+
+---
+
+## 性能优化
+
+### 使用 USB SSD（巨大提升）
+
+SD 卡速度慢且容易磨损。USB SSD 可以显著提高性能：
+
+```bash
+# 检查是否从 USB 启动
+lsblk
+```
+
+查看 [Pi USB 启动指南](https://www.raspberrypi.com/documentation/computers/raspberry-pi.html#usb-mass-storage-boot) 进行设置。
+
+### 减少内存使用
+
+```bash
+# 禁用 GPU 内存分配（无头模式）
+echo 'gpu_mem=16' | sudo tee -a /boot/config.txt
+
+# 禁用蓝牙（如果不需要）
+sudo systemctl disable bluetooth
+```

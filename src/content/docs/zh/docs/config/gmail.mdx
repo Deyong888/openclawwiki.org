@@ -1,0 +1,140 @@
+---
+title: Gmail 配置 (Gmail Configuration)
+description: 使用 Pub/Sub 配置 Gmail 集成以进行实时电子邮件处理。
+sidebar:
+  label: Gmail
+  order: 3
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Gmail 集成
+
+OpenClaw 可以与 Gmail 集成以读取电子邮件、发送回复和管理您的收件箱。此集成使用 **Google Cloud Pub/Sub** 将实时通知推送到您的网关，确保您的代理立即对新消息做出反应。
+
+## 先决条件
+
+- **Google Cloud 帐户**：您需要在 Google Cloud Console 中创建一个项目。
+- **`gcloud` CLI**：已安装并登录 ([安装指南](https://cloud.google.com/sdk/docs/install))。
+- **`gog` (gogcli)**：用于 Gmail OAuth 和设置的辅助工具 ([gogcli.sh](https://gogcli.sh/))。
+- **Tailscale** (推荐)：用于为 Pub/Sub webhook 暴露安全的公共端点。
+
+## 设置向导 (推荐)
+
+设置 Gmail 的最简单方法是使用 OpenClaw CLI 向导，它会自动执行 OAuth 和 Pub/Sub 连接。
+
+<Steps>
+
+1.  **运行设置命令**
+    使用 `webhooks gmail setup` 命令。将 `you@gmail.com` 替换为您的电子邮件地址。
+    ```bash
+    openclaw webhooks gmail setup --account you@gmail.com
+    ```
+    
+    此命令将：
+    - 指导您完成 Google Cloud 身份验证。
+    - 创建 Pub/Sub 主题和订阅。
+    - 在您的 Gmail 收件箱上配置 `watch` (监视)。
+    - 生成必要的 OpenClaw 配置。
+
+2.  **启动观察者**
+    设置完成后，您可以启动运行时观察者（或重启您的网关）。
+    ```bash
+    openclaw webhooks gmail run
+    ```
+    
+    *注意：如果已配置，网关会自动启动此服务。*
+
+</Steps>
+
+## 手动配置
+
+如果您更喜欢手动配置或需要自定义行为，请将以下内容添加到您的 `~/.openclaw/openclaw.json`。
+
+### 基本配置
+
+```json5
+{
+  hooks: {
+    gmail: {
+      account: "openclaw@gmail.com",
+      // Pub/Sub 详细信息 (由设置向导生成)
+      topic: "projects/my-project/topics/gmail-watch",
+      subscription: "gmail-watch-sub",
+      pushToken: "secret-token",
+      
+      // Google 推送事件的位置 (Tailscale Funnel URL)
+      hookUrl: "https://my-tailnet.ts.net/hooks/gmail",
+      
+      // 接收推送的本地服务器
+      serve: { bind: "127.0.0.1", port: 8788, path: "/" }
+    }
+  }
+}
+```
+
+### 路由与代理行为
+
+要控制代理如何处理电子邮件，请配置 `hooks.mappings` 部分。
+
+```json5
+{
+  hooks: {
+    enabled: true,
+    presets: ["gmail"], // 启用默认的 gmail 处理程序
+    mappings: [
+      {
+        match: { path: "gmail" },
+        action: "agent",
+        wakeMode: "now", // 立即唤醒
+        name: "Gmail",
+        // 唯一的会话密钥防止将电子邮件与其他聊天混合
+        sessionKey: "hook:gmail:{{messages[0].id}}",
+        
+        // 模型的上下文模板
+        messageTemplate: "New email from {{messages[0].from}}\nSubject: {{messages[0].subject}}\n{{messages[0].snippet}}\n{{messages[0].body}}",
+        
+        // 使用更便宜/更快的模型进行电子邮件分类？
+        model: "openai/gpt-4o-mini",
+        
+        // 交付：通过 WhatsApp/Telegram 将代理的回复发送回给用户
+        deliver: true,
+        channel: "last" // 或者指定特定渠道如 "telegram"
+      }
+    ]
+  }
+}
+```
+
+## 高级选项
+
+<Tabs>
+  <TabItem label="模型选择">
+    您可以强制 Gmail 任务使用特定模型以节省成本或提高速度。
+    
+    ```json5
+    {
+      hooks: {
+        gmail: {
+          // Gmail 钩子的全局默认值
+          model: "openrouter/meta-llama/llama-3.3-70b-instruct:free",
+          thinking: "off"
+        }
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="安全性">
+    默认情况下，电子邮件中的外部内容被包裹在安全边界中。
+    
+    <Aside type="caution">
+    要禁用安全包裹（有风险），请设置 `hooks.gmail.allowUnsafeExternalContent: true`。
+    </Aside>
+  </TabItem>
+</Tabs>
+
+## 故障排除
+
+- **监视过期**：Gmail 监视在 7 天后过期。如果网关正在运行，OpenClaw 会自动续订它们。
+- **Tailscale Funnel**：如果您依赖 Tailscale Funnel 作为 webhook URL，请确保它处于活动状态且可公开访问。
+- **权限**：如果您看到 403 错误，请检查您的 Pub/Sub 服务帐户的 Google Cloud IAM 权限。

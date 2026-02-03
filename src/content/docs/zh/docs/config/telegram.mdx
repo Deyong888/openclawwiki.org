@@ -1,0 +1,111 @@
+---
+title: Telegram 配置 (Telegram Configuration)
+description: 为 OpenClaw 配置 Telegram 机器人。
+sidebar:
+  label: Telegram
+  order: 2
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+# Telegram (Bot API)
+
+状态：**生产就绪** (Bot API via grammY)。
+
+<Aside type="note">
+有关架构细节和高级用法，请参阅 [Telegram 渠道指南](/zh/docs/channels/telegram/)。
+</Aside>
+
+OpenClaw 与 Telegram 机器人无缝集成，允许您通过私信 (DM) 与您的代理互动或将其添加到群聊中。
+
+## 快速设置
+
+<Steps>
+
+1.  **创建一个机器人**
+    - 打开 Telegram 并搜索 **@BotFather**。
+    - 发送 `/newbot` 并按照提示操作。
+    - 复制提供的 **HTTP API Token**（例如 `123456789:ABCdefGHIjklMNOpqrstUVwxyz`）。
+
+2.  **配置 OpenClaw**
+    将令牌添加到 `~/.openclaw/openclaw.json`：
+
+    ```json5
+    {
+      channels: {
+        telegram: {
+          enabled: true,
+          botToken: "YOUR_BOT_TOKEN_HERE",
+          dmPolicy: "pairing" // 首次联系需要配对码
+        }
+      }
+    }
+    ```
+    
+    <Aside type="tip">
+    或者，设置 `TELEGRAM_BOT_TOKEN` 环境变量。
+    </Aside>
+
+3.  **启动网关**
+    ```bash
+    openclaw gateway run
+    ```
+
+4.  **配对**
+    - 在 Telegram 上向您的新机器人发送消息（例如 "Hello"）。
+    - 机器人将回复要求提供 **配对码 (pairing code)**。
+    - 检查网关日志获取代码并将其发送给机器人。
+
+</Steps>
+
+## 配置选项
+
+### 私信策略 (DM Policy)
+控制谁可以在私信中与您的机器人交谈。
+
+| 策略 | 描述 |
+| :--- | :--- |
+| **`pairing`** (默认) | 新用户必须输入网关日志中打印的一次性代码。 |
+| **`allowlist`** | 只有在 `allowFrom` (用户 ID 列表) 中的用户可以交互。 |
+| **`open`** | 任何人都可以与机器人交谈（不推荐用于公共机器人）。 |
+
+### 群聊
+要在群组中使用机器人：
+
+1.  **隐私模式**：默认情况下，机器人只能看到提及它们的消息或回复。
+    - 要查看 *所有* 消息：与 @BotFather 交谈，使用 `/setprivacy` -> `Disable`。
+    - *注意：当 OpenClaw 可以看到上下文时，通常工作效果最好。*
+
+2.  **群组配置**：
+    ```json5
+    {
+      channels: {
+        telegram: {
+          // ...
+          groups: {
+            "*": { requireMention: true } // 仅在被 @mention 时回复
+          }
+        }
+      }
+    }
+    ```
+
+## 管理员权限
+
+您可以指定某些 Telegram 用户为 **管理员 (Admins)**。管理员可以：
+- 运行敏感工具（如果已配置）。
+- 绕过某些策略检查。
+
+```json5
+{
+  channels: {
+    telegram: {
+      adminUsers: [123456789] // 您的数字 Telegram 用户 ID
+    }
+  }
+}
+```
+
+<Aside type="note">
+您可以通过向 `@userinfobot` 发送消息来找到您的 Telegram 用户 ID。
+</Aside>

@@ -39,3 +39,11 @@
 - [x] **实现安全策略生成器**: 可视化生成 OpenClaw 安全白名单配置 (allowedCommands)。
 - [x] **导航更新**: 在顶部菜单栏增加 `Tools` 入口。
 - [x] **资源植入**: 增加推荐资源板块 (stoiclines.store, linktoai.top, 24kwebgames.com)。
+
+## 迭代 10: 多语言架构升级 (进行中)
+
+### 目标
+- [x] **修复 Sidebar 配置错误**: 将 `starlightConfig` 中的 `sidebar` 结构从对象改为数组，利用 `translations` 属性实现多语言菜单。
+- [x] **完善中文翻译**: 确保 `Start Here`, `Migration` 等核心栏目的中文标签准确。
+- [x] **检查徽章 (Badges)**: 确保 "New", "Latest" 等徽章文案也实现本地化。
+- [x] **验证 i18n 路由**: 确保 `/zh/` 路径下的侧边栏能正确显示中文（或回退英文）并高亮当前页面。

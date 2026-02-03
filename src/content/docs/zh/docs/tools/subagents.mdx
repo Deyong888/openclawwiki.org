@@ -1,0 +1,60 @@
+---
+title: 子 Agent (Subagents)
+description: 创建和管理子 Agent 以处理复杂任务。
+---
+
+`subagents` 工具允许主 Agent 派生（Spawn）专门的子 Agent 来并行处理任务或隔离复杂的子任务。
+
+## 为什么使用子 Agent？
+
+1.  **关注点分离**: 主 Agent 负责编排，子 Agent 负责具体执行（例如一个负责写代码，一个负责测试）。
+2.  **上下文隔离**: 子 Agent 拥有自己的对话历史和上下文，避免污染主 Agent 的上下文窗口。
+3.  **并行执行**: 多个子 Agent 可以同时运行，加速任务完成。
+4.  **专业化**: 可以为子 Agent 配置不同的系统提示词（System Prompt）和工具集，使其成为特定领域的专家。
+
+## 用法
+
+### `spawn_agent` 工具
+
+主 Agent 调用此工具来启动一个新的子 Agent。
+
+#### 参数
+
+- `name` (string): 子 Agent 的名称或标识符。
+- `goal` (string): 子 Agent 需要完成的具体目标或任务描述。
+- `instructions` (string, 可选): 额外的特定指令或约束。
+- `tools` (array, 可选): 授予子 Agent 的工具列表。如果未指定，可能会继承主 Agent 的工具或使用默认集。
+- `model` (string, 可选): 指定子 Agent 使用的 LLM 模型（例如使用更便宜的模型处理简单任务）。
+
+### 示例
+
+**主 Agent**: "我需要创建一个 React 组件并为其编写测试。"
+
+**操作**: 调用 `spawn_agent`。
+
+```json
+{
+  "name": "coding-bot-01",
+  "goal": "创建一个带有计数器功能的 React 组件 'Counter.tsx'，并编写对应的 Jest 测试 'Counter.test.tsx'。",
+  "tools": ["files", "exec"]
+}
+```
+
+**子 Agent**:
+- 接收目标。
+- 使用 `files` 写代码。
+- 使用 `exec` 运行测试。
+- 报告结果给主 Agent。
+
+**主 Agent**: 收到子 Agent 的完成报告，继续后续工作。
+
+## 生命周期管理
+
+- **创建**: 动态创建，按需启动。
+- **通信**: 父子 Agent 之间可以通过消息传递进行通信。通常子 Agent 完成后会返回一个最终结果。
+- **销毁**: 任务完成后，子 Agent 及其上下文通常会被销毁，释放资源。
+
+## 限制
+
+- **递归深度**: 为了防止失控，通常会限制子 Agent 派生子 Agent 的深度。
+- **资源消耗**: 运行多个 Agent 会消耗更多的 API Token 和计算资源。

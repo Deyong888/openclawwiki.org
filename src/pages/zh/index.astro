@@ -1,0 +1,173 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Hero from '~/components/widgets/Hero.astro';
+import Note from '~/components/widgets/Note.astro';
+import Features from '~/components/widgets/Features.astro';
+import Steps from '~/components/widgets/Steps.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import CallToAction from '~/components/widgets/CallToAction.astro';
+import TrafficBanner from '~/components/custom/TrafficBanner.astro';
+import { headerDataZH, footerDataZH } from '~/navigation';
+
+const metadata = {
+  title: 'Openclaw Wiki — 终极自托管 AI 助手指南',
+  ignoreTitleTemplate: true,
+};
+---
+
+<Layout metadata={metadata} language="zh" headerData={headerDataZH} footerData={footerDataZH}>
+  <!-- Hero Widget ******************* -->
+
+  <Hero
+    actions={[
+      {
+        variant: 'primary',
+        text: '快速开始',
+        href: '/zh/docs/getting-started/quick-start/',
+        icon: 'tabler:rocket',
+      },
+      { text: '迁移指南', href: '/zh/moltbot-to-openclaw/' },
+    ]}
+    image={{ src: '~/assets/images/openclaw-logo.svg', alt: 'Openclaw Hero Image' }}
+  >
+    <Fragment slot="title">
+      解锁 <span class="text-accent dark:text-white highlight">Openclaw</span> 的力量
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="hidden sm:inline">
+        前身为 <b>Moltbot</b> 和 <b>Clawdbot</b>。
+      </span>
+      <span class="block mb-1 font-bold text-blue-600">您的私人 AI 助手。</span>
+      在 Mac Mini M4 上构建您自己的自托管 AI。安全、快速且完全属于您。
+    </Fragment>
+  </Hero>
+
+  <!-- Note Widget ******************* -->
+
+  <Note title="品牌更名通知:" description="Clawdbot → Moltbot → Openclaw. 同一使命，全新名称。" />
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="features"
+    tagline="为什么选择 Openclaw?"
+    title="掌控您的 AI 命运"
+    subtitle="停止依赖窃取您数据的云服务提供商。切换到本地 AI。"
+    items={[
+      {
+        title: '完全隐私',
+        description:
+          '您的数据从未离开您的设备。非常适合敏感工作和个人隐私。',
+        icon: 'tabler:lock',
+      },
+      {
+        title: '多模型支持',
+        description:
+          '连接到 Anthropic Claude、OpenAI GPT-4，或运行 Llama 3 等本地模型。',
+        icon: 'tabler:brain',
+      },
+      {
+        title: '经济高效',
+        description:
+          '停止为每个用户支付月费。一次购买硬件，永久运行。',
+        icon: 'tabler:coin',
+      },
+      {
+        title: '可扩展插件',
+        description:
+          '添加网页搜索、文件管理和家庭自动化等功能。',
+        icon: 'tabler:plug',
+      },
+    ]}
+  />
+
+  <!-- Steps Widget ****************** -->
+
+  <Steps
+    title="3 步开启您的旅程"
+    items={[
+      {
+        title: '第一步: 准备硬件',
+        description:
+          "我们推荐 Mac Mini M4 以获得性能和效率的最佳平衡。也支持 Linux/Docker。",
+        icon: 'tabler:server',
+      },
+      {
+        title: '第二步: 安装 Openclaw',
+        description:
+          "运行一条命令部署整个技术栈。 <br/> <code>curl -fsSL https://openclaw.ai/install.sh | bash</code>",
+        icon: 'tabler:terminal',
+      },
+      {
+        title: '第三步: 连接与配置',
+        description:
+          '链接您首选的 LLM 提供商或下载本地模型。配置您的助手。',
+        icon: 'tabler:settings',
+      },
+    ]}
+    image={{
+      src: 'https://images.unsplash.com/photo-1616469829941-c7200edec809?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+      alt: '步骤图片',
+    }}
+  />
+
+  <!-- FAQs Widget ******************* -->
+
+  <FAQs
+    title="常见问题"
+    subtitle="有问题？我们有答案。"
+    tagline="FAQs"
+    classes={{ container: 'max-w-6xl' }}
+    items={[
+      {
+        title: 'Moltbot 发生了什么？',
+        description:
+          "Moltbot 是一个过渡名称。我们决定更名为 Openclaw，以更好地反映我们的开源价值观并避免混淆。",
+      },
+      {
+        title: 'Openclaw 是免费的吗？',
+        description:
+          '是的，核心软件是 100% 开源和免费的。您只需支付硬件费用和任何云 API 使用费（可选）。',
+      },
+      {
+        title: '我可以在 Windows 上运行吗？',
+        description:
+          "是的，通过 WSL2 (Windows Subsystem for Linux) 或 Docker Desktop。但是，生产环境推荐使用 macOS 或 Linux。",
+      },
+      {
+        title: '我如何从 Clawdbot 迁移？',
+        description:
+          "我们有专门的迁移指南。主要就是重命名配置文件和更新 Docker 镜像。",
+      },
+    ]}
+  />
+
+  <!-- CallToAction Widget *********** -->
+
+  <CallToAction
+    actions={[
+      {
+        variant: 'primary',
+        text: '立即开始',
+        href: '/zh/docs/getting-started/quick-start/',
+        icon: 'tabler:rocket',
+      },
+    ]}
+  >
+    <Fragment slot="title">
+      准备好掌控一切了吗？
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      加入成千上万的开发者，共同构建私人 AI 的未来。
+    </Fragment>
+  </CallToAction>
+
+  <!-- Traffic Banner (Custom) ******* -->
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4">
+    <TrafficBanner variant="footer" site="all" />
+  </div>
+
+</Layout>

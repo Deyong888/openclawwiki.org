@@ -1,0 +1,227 @@
+---
+title: 浏览器自动化 & 抓取
+description: 控制专用的 Chrome/Brave 配置文件，用于安全、隔离的代理自动化和网页抓取。
+sidebar:
+  label: 浏览器
+  order: 3
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+# 浏览器 (OpenClaw 托管)
+
+OpenClaw 允许你的代理控制一个 **专用的 Chrome/Brave/Edge/Chromium 配置文件**。这为 **浏览器自动化** 和 **网页抓取** 提供了一个安全、隔离的环境，与你的个人浏览会话区分开来。
+
+<Aside type="tip" title="初学者视角">
+- 把它想象成一个 **仅限机器人的浏览器**。
+- `openclaw` 配置文件 **不** 会接触你的个人历史记录、Cookies 或登录信息。
+- 代理可以在这个安全通道中 **打开标签页、阅读页面、点击按钮和填写表单**。
+- 默认情况下，它使用本地回环服务来控制浏览器。
+</Aside>
+
+## 为什么要使用托管浏览器？
+
+- **隔离**：保持代理活动与你的个人工作分离。
+- **安全**：防止代理意外关闭你的标签页或泄露你的会话数据。
+- **能力**：启用完全自动化（快照、PDF 生成、截图、复杂交互）。
+- **多配置文件**：支持多个隔离的配置文件（例如，`work`、`research`、`testing`）。
+
+## 快速开始
+
+<Steps>
+
+1.  **检查状态**
+    验证浏览器服务是否就绪。
+    ```bash
+    openclaw browser --browser-profile openclaw status
+    ```
+
+2.  **启动浏览器**
+    启动托管浏览器实例。
+    ```bash
+    openclaw browser --browser-profile openclaw start
+    ```
+
+3.  **打开页面**
+    将代理指向一个 URL。
+    ```bash
+    openclaw browser --browser-profile openclaw open https://example.com
+    ```
+
+4.  **拍摄快照**
+    查看代理看到了什么。
+    ```bash
+    openclaw browser --browser-profile openclaw snapshot
+    ```
+
+</Steps>
+
+<Aside type="caution">
+如果你收到 "Browser disabled" 错误，你需要在你的配置文件中启用它（见下文）并重启网关。
+</Aside>
+
+## 配置文件：`openclaw` vs `chrome`
+
+| 配置文件 | 描述 | 用例 |
+| :--- | :--- | :--- |
+| **`openclaw`** | 托管、隔离的浏览器实例。 | **推荐。** 最适合自动化、抓取和测试。 |
+| **`chrome`** | 到你 *系统* 浏览器的扩展中继。 | 当代理需要访问你的已登录会话时使用（需要 [Chrome 扩展](/zh/docs/tools/chrome-extension)）。 |
+
+要默认使用托管浏览器，在你的配置中设置 `browser.defaultProfile: "openclaw"`。
+
+## 配置
+
+浏览器设置位于 `~/.openclaw/openclaw.json`。
+
+```json5
+{
+  browser: {
+    enabled: true,                    // 总开关
+    // cdpUrl: "http://127.0.0.1:18792", // 旧版覆盖
+    remoteCdpTimeoutMs: 1500,         // 远程 CDP 检查超时
+    remoteCdpHandshakeTimeoutMs: 3000,
+    defaultProfile: "chrome",         // 更改为 "openclaw" 以隔离
+    color: "#FF4500",                 // UI 色调颜色
+    headless: false,                  // 对于后台操作设置为 true
+    noSandbox: false,
+    attachOnly: false,                // "true" = 从不启动，仅附加
+    executablePath: "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
+    profiles: {
+      openclaw: { cdpPort: 18800, color: "#FF4500" },
+      work: { cdpPort: 18801, color: "#0066CC" },
+      remote: { cdpUrl: "http://10.0.0.42:9222", color: "#00AA00" }
+    }
+  }
+}
+```
+
+<Aside type="note">
+- **端口**：浏览器控制服务使用从 `gateway.port` 派生的端口（默认 `18791`）。
+- **自动检测**：OpenClaw 自动查找已安装的 Chromium 浏览器（Chrome, Brave, Edge）。
+- **Headless**：如果你在没有显示器的服务器（如 Mac Mini 或 Docker 容器）上运行，设置 `headless: true`。
+</Aside>
+
+## 浏览器选择 & 覆盖
+
+如果你的 **系统默认** 浏览器是基于 Chromium 的，OpenClaw 会自动使用它。如果需要，你可以强制使用特定的浏览器可执行文件。
+
+<Tabs>
+  <TabItem label="CLI">
+  ```bash
+  openclaw config set browser.executablePath "/usr/bin/google-chrome"
+  ```
+  </TabItem>
+  <TabItem label="macOS Config">
+  ```json5
+  {
+    browser: {
+      executablePath: "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
+    }
+  }
+  ```
+  </TabItem>
+  <TabItem label="Windows Config">
+  ```json5
+  {
+    browser: {
+      executablePath: "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
+    }
+  }
+  ```
+  </TabItem>
+  <TabItem label="Linux Config">
+  ```json5
+  {
+    browser: {
+      executablePath: "/usr/bin/brave-browser"
+    }
+  }
+  ```
+  </TabItem>
+</Tabs>
+
+## 本地 vs 远程控制
+
+OpenClaw 支持灵活的部署模型：
+
+1.  **本地控制（默认）**：网关本地运行，本地启动浏览器。
+2.  **远程控制（节点主机）**：网关在其他地方运行，但使用你机器上的“节点主机”来控制浏览器。
+3.  **远程 CDP**：网关直接连接到远程调试器（例如，Docker 容器中的浏览器或其他服务器）。
+
+### 带认证的远程 CDP
+
+你可以使用 CDP URL 连接到远程浏览器实例。
+
+- **查询令牌**：`https://provider.example?token=<token>`
+- **基本认证**：`https://user:pass@provider.example`
+
+<Aside type="danger">
+避免将敏感令牌提交到你的 `openclaw.json`。尽可能使用环境变量或机密管理器。
+</Aside>
+
+## 无浏览器（托管远程 CDP）
+
+[Browserless](https://browserless.io) 提供托管的 Chromium 服务，非常适合无服务器部署或不想管理本地浏览器资源的情况。
+
+```json5
+{
+  browser: {
+    enabled: true,
+    defaultProfile: "browserless",
+    profiles: {
+      browserless: {
+        cdpUrl: "https://production-sfo.browserless.io?token=<BROWSERLESS_API_KEY>",
+        color: "#00AA00"
+      }
+    }
+  }
+}
+```
+
+## Chrome 扩展中继
+
+使用 Chrome 扩展驱动你的 **现有 Chrome 标签页**（带有你的登录会话）。
+
+<Steps>
+
+1.  **安装扩展**
+    在“开发者模式”下加载扩展。
+    ```bash
+    openclaw browser extension install
+    ```
+    导航到 `chrome://extensions`，启用开发者模式，并从提供的路径“加载已解压的扩展程序”。
+
+2.  **附加到标签页**
+    点击你要控制的标签页上的 OpenClaw 图标。徽章将显示 `ON`。
+
+3.  **通过代理控制**
+    代理现在可以使用 `chrome` 配置文件与该标签页交互。
+    ```bash
+    openclaw browser --browser-profile chrome tabs
+    ```
+
+</Steps>
+
+有关完整指南，请参阅 [Chrome 扩展](/zh/docs/tools/chrome-extension)。
+
+## 故障排除 & 调试
+
+常见问题及其解决方法。
+
+<Tabs>
+  <TabItem label="调试步骤">
+    1.  **拍摄快照**：`openclaw browser snapshot --interactive` 查看代理看到了什么。
+    2.  **检查控制台**：`openclaw browser console --level error` 查看页面错误。
+    3.  **高亮**：`openclaw browser highlight <ref>` 验证元素定位。
+    4.  **跟踪**：`openclaw browser trace start` / `stop` 记录 Playwright 跟踪以进行深入分析。
+  </TabItem>
+  <TabItem label="常见错误">
+    - **"Browser disabled"**：检查配置中的 `browser.enabled: true`。
+    - **"Playwright not available"**：安装完整的 Playwright 包或重新安装带有浏览器支持的 OpenClaw。
+    - **"Not visible"**：元素可能在另一个元素后面或尚未渲染。使用 `wait` 命令。
+  </TabItem>
+</Tabs>
+
+## CLI 参考
+
+有关完整的命令列表，请参阅 [浏览器 CLI 参考](/zh/docs/tools/browser#cli-quick-reference)。

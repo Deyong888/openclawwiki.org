@@ -1,0 +1,99 @@
+---
+title: iMessage (旧版)
+description: 通过传统的 imsg CLI 工具将 OpenClaw 连接到 iMessage。
+sidebar:
+  label: iMessage (旧版)
+  order: 23
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+<Aside type="caution" title="旧版集成">
+此集成使用 `imsg` 和本地 macOS 数据库访问。为了获得更强大、现代的体验（包括通过桥接支持 Windows/Linux），我们推荐使用 **[BlueBubbles](/docs/channels/bluebubbles)**。
+</Aside>
+
+旧版 iMessage 集成直接在 macOS 机器上运行，访问本地 Messages `chat.db` 以读取和发送消息。
+
+## 先决条件
+
+- 一台 **macOS** 机器 (Mac Mini, MacBook 等)。
+- 登录了 Apple ID 的 **Messages 应用**。
+- 授予 OpenClaw **完全磁盘访问权限 (Full Disk Access)**（以读取 `chat.db`）。
+
+## 设置指南
+
+<Steps>
+
+1.  ### 安装 CLI 工具
+    我们使用 `imsg` 将 OpenClaw 连接到 Messages 私有 API。
+    
+    ```bash
+    brew install steipete/tap/imsg
+    ```
+
+2.  ### 配置 OpenClaw
+    告诉 OpenClaw `imsg` 和你的聊天数据库的位置。
+
+    ```json5
+    {
+      channels: {
+        imessage: {
+          enabled: true,
+          // 已安装二进制文件的路径
+          cliPath: "/opt/homebrew/bin/imsg", 
+          // 你的 Messages 数据库
+          dbPath: "/Users/yourname/Library/Messages/chat.db" 
+        }
+      }
+    }
+    ```
+
+3.  ### 授予权限
+    当你第一次运行 OpenClaw 时：
+    *   macOS 将提示你授予终端或 OpenClaw 二进制文件 **完全磁盘访问权限 (Full Disk Access)**。这是读取 `chat.db` 所必需的。
+    *   macOS 可能会提示 **自动化 (Automation)** 权限以允许发送消息。
+
+4.  ### 配对
+    发送一条 iMessage 给自己（或运行机器人的账户）。
+    *   机器人将回复一个 **配对码 (Pairing Code)**。
+    *   运行 `openclaw pairing approve imessage <code>` 进行授权。
+
+</Steps>
+
+## 远程设置 (Tailscale)
+
+如果你在 Linux 上运行 OpenClaw 但有一台用于 iMessage 的 Mac，你可以通过 SSH 和 Tailscale 桥接它们。
+
+1.  **Mac**: 启用 **远程登录 (Remote Login)** (SSH)。
+2.  **Linux**: 创建一个包装脚本以远程运行 `imsg`。
+
+    ```bash
+    #!/bin/bash
+    # /usr/local/bin/imsg-ssh
+    ssh user@my-mac-mini.tailscale.net "/opt/homebrew/bin/imsg $@"
+    ```
+
+3.  **配置**:
+    ```json5
+    {
+      channels: {
+        imessage: {
+          cliPath: "/usr/local/bin/imsg-ssh",
+          remoteHost: "user@my-mac-mini.tailscale.net", // 用于获取附件
+          includeAttachments: true
+        }
+      }
+    }
+    ```
+
+## 比较：旧版 vs. BlueBubbles
+
+| 功能 | 旧版 (`imsg`) | BlueBubbles |
+| :--- | :--- | :--- |
+| **操作系统支持** | 仅 macOS | Linux, Windows, Docker (通过 Android/Mac 桥接) |
+| **可靠性** | 中等 (依赖 AppleScript/DB) | 高 (基于 API) |
+| **附件** | 基础 | 全面支持 |
+| **回应 (Reactions)** | 只读 | 读/写 |
+| **正在输入指示器** | 无 | 有 |
+
+我们强烈建议新部署迁移到 [BlueBubbles](/docs/channels/bluebubbles)。

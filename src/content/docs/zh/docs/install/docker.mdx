@@ -1,0 +1,60 @@
+---
+title: Docker 设置 (Docker Setup)
+description: OpenClaw 的可选 Docker 设置。
+sidebar:
+  label: Docker Setup
+  order: 2
+---
+
+# Docker (可选)
+
+Docker 是**可选的**。仅当您想要容器化的网关或验证 Docker 流程时才使用它。
+
+## Docker 适合我吗？
+
+- **适合**：您想要一个隔离的、一次性的网关环境，或者想在不进行本地安装的主机上运行 OpenClaw。
+- **不适合**：您在自己的机器上运行，只想获得最快的开发循环。请改用正常的安装流程。
+- **沙盒说明**：代理沙盒也使用 Docker，但它**不需要**完整的网关在 Docker 中运行。
+
+## 要求
+
+- Docker Desktop (或 Docker Engine) + Docker Compose v2
+- 足够的磁盘空间用于镜像 + 日志
+
+## 容器化网关 (Docker Compose)
+
+### 快速开始 (推荐)
+
+从仓库根目录：
+
+```bash
+./docker-setup.sh
+```
+
+此脚本会：
+- 构建网关镜像
+- 运行入门向导
+- 打印可选的提供商设置提示
+- 通过 Docker Compose 启动网关
+- 生成网关令牌并将其写入 `.env`
+
+可选的环境变量：
+- `OPENCLAW_DOCKER_APT_PACKAGES` — 在构建期间安装额外的 apt 包
+- `OPENCLAW_EXTRA_MOUNTS` — 添加额外的主机绑定挂载
+- `OPENCLAW_HOME_VOLUME` — 将 `/home/node` 持久化在命名卷中
+
+完成后：
+- 在浏览器中打开 `http://127.0.0.1:18789/`。
+- 将令牌粘贴到控制界面 (设置 → 令牌)。
+
+它会在主机上写入配置/工作区：
+- `~/.openclaw/`
+- `~/.openclaw/workspace`
+
+### 手动流程 (compose)
+
+```bash
+docker build -t openclaw:local -f Dockerfile .
+docker compose run --rm openclaw-cli onboard
+docker compose up -d openclaw-gateway
+```

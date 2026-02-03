@@ -1,0 +1,81 @@
+---
+title: 入门向导 (Onboarding Wizard)
+description: 最简单的入门方式
+sidebar:
+  order: 1
+---
+
+OpenClaw 包含一个内置的 CLI 向导，可指导您完成初始设置过程。这是配置新网关的推荐方法。
+
+要启动向导，请运行：
+
+```bash
+openclaw onboard
+```
+
+或者如果您已经安装并想要重新配置：
+
+```bash
+openclaw configure
+```
+
+## 模式
+
+向导提供两种主要模式：
+
+### 1. 快速启动 (QuickStart)
+*   **最适合**：初学者，或想要快速试用 OpenClaw 的人。
+*   **它的作用**：
+    *   使用默认设置。
+    *   设置一个名为 "Claw" 的默认代理。
+    *   如果您提供了 API 密钥，则配置 Anthropic (Claude)。
+    *   尝试自动检测并设置本地环境。
+*   **它不做的**：配置复杂的数据库、多个代理或高级网络设置。
+
+### 2. 高级模式 (Advanced)
+*   **最适合**：高级用户，生产环境部署。
+*   **功能**：
+    *   选择特定的 LLM 提供商（OpenAI, Anthropic, Gemini, Local 等）。
+    *   配置数据库后端（SQLite, PostgreSQL）。
+    *   设置网络监听接口和端口。
+    *   配置多个初始代理。
+    *   启用/禁用特定技能组。
+
+## 流程详情
+
+当您运行向导时，您将看到以下步骤：
+
+1.  **欢迎与模式选择**：选择 QuickStart 或 Advanced。
+2.  **LLM 设置**：输入您的 API 密钥。向导会验证密钥是否有效。
+3.  **代理配置**：命名您的主代理并赋予其个性（系统提示）。
+    *   *提示：您稍后可以使用 `openclaw agents add <name>` 添加更多代理。*
+4.  **存储**：选择聊天记录和向量嵌入的存储位置。
+5.  **完成**：向导生成 `openclaw.yaml` 配置文件并初始化数据库。
+
+## 非交互式模式
+
+对于自动化部署（例如在 Docker 或 CI/CD 中），您可以使用标志以非交互方式运行向导。
+
+示例：
+
+```bash
+openclaw onboard --non-interactive \
+  --mode local \
+  --auth-choice apiKey \
+  --anthropic-api-key "$ANTHROPIC_API_KEY" \
+  --gateway-port 18789 \
+  --gateway-bind loopback \
+  --install-daemon \
+  --daemon-runtime node \
+  --skip-skills
+```
+
+查看 `openclaw onboard --help` 以获取可用标志的完整列表。
+
+## 下一步
+
+完成向导后，您的网关就可以启动了！
+
+```bash
+openclaw start
+```

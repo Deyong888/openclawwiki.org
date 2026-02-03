@@ -1,0 +1,107 @@
+---
+title: 开发自定义技能 🛠️
+description: 学习如何为 Moltbot/OpenClaw 构建、测试和共享自定义技能。
+sidebar:
+  label: 创建技能
+  order: 51
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+# 开发自定义技能 🛠️
+
+**技能** (Skills) 是扩展 OpenClaw 能力的主要方式。无论你是想集成私有 API、自动化特定工作流，还是添加新工具，技能都提供了一种标准化的方式来打包指令和功能。
+
+## 什么是技能？
+
+一个技能就是一个包含 `SKILL.md` 文件的目录。
+- **元数据**：YAML 前置内容定义了技能的名称和描述。
+- **指令**：Markdown 正文告诉 LLM *何时* 以及 *如何* 使用该技能。
+- **工具**：技能可以定义自己的工具（通过脚本）或使用现有的系统工具。
+
+## 前提条件
+
+- **已安装 OpenClaw/Moltbot**：你需要一个运行中的网关。
+- **工作区访问权限**：你必须能够访问 `~/.openclaw/workspace/skills/` 目录。
+
+## 分步指南
+
+<Steps>
+
+1.  **创建技能目录**
+    技能通常位于你的工作区。为你的技能创建一个新文件夹。
+    ```bash
+    mkdir -p ~/.openclaw/workspace/skills/hello-world
+    ```
+
+2.  **创建 `SKILL.md`**
+    在该目录中创建一个 `SKILL.md` 文件。这是你技能的大脑。
+
+    ```markdown
+    ---
+    name: hello_world
+    description: 一个简单的打招呼技能。
+    ---
+
+    # Hello World 技能
+
+    当用户请求问候或说 "hello" 时，使用 `echo` 工具（或直接回复）说：
+    "Hello from your custom skill! 🚀"
+    ```
+
+3.  **添加功能 (可选)**
+    你可以指示代理使用现有的工具，如 `bash`、`browser` 或 `web_fetch`。
+    *示例：一个检查 Hacker News 的技能。*
+
+    ```markdown
+    # Hacker News 检查器
+    要检查 Hacker News：
+    1. 使用 `web_fetch` 获取 `https://news.ycombinator.com`。
+    2. 总结前 3 条故事。
+    ```
+
+4.  **刷新技能**
+    告诉你的代理 "刷新技能" 或直接重启网关。OpenClaw 会监视技能目录并自动发现新添加的技能。
+
+5.  **测试它**
+    给你的代理发送一条消息。
+    > "使用你的新技能跟我打个招呼。"
+
+</Steps>
+
+## 最佳实践
+
+<Aside type="tip">
+**简洁扼要**：指示模型 *做什么*，而不是 *如何成为 AI*。模型已经知道如何思考；它只需要知道你的具体业务逻辑。
+</Aside>
+
+- **明确的触发器**：准确定义何时应该使用该技能（例如，“当用户询问 X 时使用此技能”）。
+- **安全**：如果你的技能使用 `bash`，请务必小心。除非必要，否则不要允许模型从用户输入执行任意代码。
+- **模块化**：让技能专注于单一领域（例如，“日历技能”、“部署技能”）。
+
+## 高级：添加自定义脚本
+
+你可以在技能目录中包含脚本（Node.js、Python、Bash），并指示代理运行它们。
+
+*示例结构：*
+```
+hello-world/
+├── SKILL.md
+└── greet.js
+```
+
+*SKILL.md:*
+```markdown
+要问候用户，请运行 `node {{skillPath}}/greet.js`。
+```
+（注意：`{{skillPath}}` 是一个占位符，你可以手动解析或指示代理查找相对于技能文件的路径）。
+
+## 共享技能
+
+构建好有用的技能后，你可以与社区或你的团队共享它。
+- **ClawdHub**：[ClawdHub](https://clawdhub.com) 是共享技能的官方注册表。
+- **Git**：将你的 `skills/` 目录提交到私有仓库，以便团队同步。
+
+## 配置
+
+要管理 OpenClaw 查找技能的位置，请参阅 [技能配置](/zh/docs/tools/skills-config)。

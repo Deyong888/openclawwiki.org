@@ -1,0 +1,36 @@
+---
+title: 健康检查 (CLI)
+description: 频道连接性的健康检查步骤。
+sidebar:
+  label: 健康检查
+  order: 11
+---
+
+# 健康检查 (CLI)
+
+验证频道连接性而无需猜测的简短指南。
+
+## 快速检查
+
+- `openclaw status` — 本地摘要：Gateway 可达性/模式，更新提示，链接频道认证时效，会话 + 最近活动。
+- `openclaw status --all` — 完整本地诊断 (只读，彩色，便于粘贴调试)。
+- `openclaw status --deep` — 还会探测运行中的 Gateway (如果支持，则进行每个频道的探测)。
+- `openclaw health --json` — 向运行中的 Gateway 请求完整的健康快照 (仅 WS；无直接 Baileys 套接字)。
+- 在 WhatsApp/WebChat 中作为独立消息发送 `/status`，以获取状态回复而不调用代理。
+- 日志：tail `/tmp/openclaw/openclaw-*.log` 并过滤 `web-heartbeat`, `web-reconnect`, `web-auto-reply`, `web-inbound`。
+
+## 深度诊断
+
+- 磁盘上的凭据：`ls -l ~/.openclaw/credentials/whatsapp/<accountId>/creds.json` (修改时间应该是最近的)。
+- 会话存储：`ls -l ~/.openclaw/agents/<agentId>/sessions/sessions.json` (路径可以在配置中覆盖)。计数和最近的接收者通过 `status` 显示。
+- 重新链接流程：当日志中出现状态码 409–515 或 `loggedOut` 时，执行 `openclaw channels logout && openclaw channels login --verbose`。(注意：QR 登录流程在配对后遇到状态 515 时会自动重启一次。)
+
+## 当出现故障时
+
+- `logged out` 或状态 409–515 → 使用 `openclaw channels logout` 然后 `openclaw channels login` 重新链接。
+- Gateway 不可达 → 启动它：`openclaw gateway --port 18789` (如果端口繁忙，使用 `--force`)。
+- 无入站消息 → 确认链接的手机在线且发送者被允许 (`channels.whatsapp.allowFrom`)；对于群聊，确保允许列表 + 提及规则匹配 (`channels.whatsapp.groups`, `agents.list[].groupChat.mentionPatterns`)。
+
+## 专用 "health" 命令
+
+`openclaw health --json` 向运行中的 Gateway 请求其健康快照 (CLI 不直接连接频道套接字)。它报告链接的凭据/认证时效 (如果可用)、每个频道的探测摘要、会话存储摘要和探测持续时间。如果 Gateway 不可达或探测失败/超时，它将以非零状态退出。使用 `--timeout <ms>` 覆盖默认的 10s。

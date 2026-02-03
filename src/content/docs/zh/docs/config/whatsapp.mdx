@@ -1,0 +1,106 @@
+---
+title: WhatsApp 配置 (WhatsApp Configuration)
+description: 将 OpenClaw 连接到 WhatsApp，在您的手机上实现 24/7 个人助理。
+sidebar:
+  label: WhatsApp
+  order: 1
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+# WhatsApp (Web 渠道)
+
+状态：**稳定** (WhatsApp Web via Baileys)。网关拥有会话。
+
+<Aside type="note">
+有关架构细节和多帐户设置，请参阅 [WhatsApp 渠道指南](/zh/docs/channels/whatsapp/)。
+</Aside>
+
+OpenClaw 使用 **Baileys** 库连接到 WhatsApp，模拟 WhatsApp Web 客户端。这允许您的代理直接在 WhatsApp 内回复消息、管理群组并充当个人助理。
+
+## 快速设置
+
+<Steps>
+
+1.  **准备一个电话号码**
+    如果可能，请使用单独的电话号码（推荐）或您的个人号码。
+
+2.  **配置 OpenClaw**
+    将 WhatsApp 配置添加到 `~/.openclaw/openclaw.json`。
+
+    ```json5
+    {
+      channels: {
+        whatsapp: {
+          enabled: true,
+          dmPolicy: "allowlist",
+          allowFrom: ["+15551234567"] // 您的个人号码
+        }
+      }
+    }
+    ```
+
+3.  **启动网关**
+    运行网关以初始化连接。
+    ```bash
+    openclaw gateway run
+    ```
+
+4.  **扫描二维码**
+    网关将向终端（或日志）打印一个二维码。
+    - 在您的手机上打开 WhatsApp。
+    - 转到 **设置** > **链接设备** > **链接设备**。
+    - 扫描二维码。
+
+</Steps>
+
+## 配置策略
+
+<Aside type="tip" title="最佳实践">
+为了获得最佳体验，请为您的机器人使用 **专用电话号码**。
+</Aside>
+
+### 选项 A：专用号码（推荐）
+在您的主设备上使用备用 Android 手机或 eSIM。
+- **优点**：路由清晰，没有“自聊”怪癖，身份独特。
+- **设置**：在备用设备/配置文件上安装 WhatsApp（或 WhatsApp Business）。将 OpenClaw 链接到此帐户。
+
+### 选项 B：个人号码（备用）
+在您自己的主号码上运行 OpenClaw。
+- **优点**：无需额外的硬件/SIM 卡。
+- **缺点**：您必须给自己发消息（给自己备注）才能与机器人交谈。
+- **怪癖**：您会看到机器人的回复，就像您发送了它们一样。
+
+## 高级配置
+
+```json5
+{
+  channels: {
+    whatsapp: {
+      enabled: true,
+      // 谁可以与机器人交谈？
+      dmPolicy: "allowlist", // "allowlist" (严格) 或 "pairing" (开放)
+      allowFrom: ["+15551234567"],
+      
+      // 管理员用户（可以运行特权命令）
+      adminUsers: ["+15551234567"],
+      
+      // 会话存储（默认为 ~/.openclaw/workspace/sessions/whatsapp）
+      sessionDir: "/path/to/custom/session" 
+    }
+  }
+}
+```
+
+## 故障排除
+
+<Tabs>
+  <TabItem label="连接问题">
+    - **二维码循环**：如果二维码不断重新生成，请确保您的手机有稳定的互联网连接。
+    - **断开连接**：WhatsApp Web 会话可能会超时。重启网关以刷新会话。
+  </TabItem>
+  <TabItem label="消息路由">
+    - **无回复**：检查 `dmPolicy`。如果设置为 `allowlist`，请确保您的号码在 `allowFrom` 中（包括国家代码，例如 `+1...`）。
+    - **群聊**：默认情况下，除非被提及或另有配置，否则机器人可能不会在群组中回复。
+  </TabItem>
+</Tabs>
