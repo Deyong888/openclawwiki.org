@@ -4,13 +4,16 @@ import Layout from '~/layouts/PageLayout.astro';
 import Hero from '~/components/widgets/Hero.astro';
 import Note from '~/components/widgets/Note.astro';
 import Features from '~/components/widgets/Features.astro';
+import Features2 from '~/components/widgets/Features2.astro';
 import Steps from '~/components/widgets/Steps.astro';
+import Video from '~/components/widgets/Video.astro';
 import FAQs from '~/components/widgets/FAQs.astro';
 import CallToAction from '~/components/widgets/CallToAction.astro';
 import TrafficBanner from '~/components/custom/TrafficBanner.astro';
 
 const metadata = {
   title: 'Openclaw Wiki — The Ultimate Self-Hosted AI Assistant Guide',
+  description: 'Openclaw is a self-hosted AI assistant that runs locally on your Mac Mini M4 or Linux server. Secure, private, and powerful. Compatible with Anthropic Claude and OpenAI.',
   ignoreTitleTemplate: true,
 };
 ---
@@ -28,7 +31,7 @@ const metadata = {
       },
       { text: 'Migration Guide', href: '/moltbot-to-openclaw/' },
     ]}
-    image={{ src: '~/assets/images/openclaw-logo.svg', alt: 'Openclaw Hero Image' }}
+    image={{ src: '~/assets/images/openclaw-logo.svg', alt: 'Openclaw AI Assistant Logo' }}
   >
     <Fragment slot="title">
       Unlock the Power of <span class="text-accent dark:text-white highlight">Openclaw</span>
@@ -46,6 +49,19 @@ const metadata = {
   <!-- Note Widget ******************* -->
 
   <Note title="Rebrand Notice:" description="Clawdbot → Moltbot → Openclaw. One mission, new name." />
+
+  <!-- Video Widget ****************** -->
+  <Video
+    id="video"
+    tagline="See it in action"
+    title="Openclaw Usage Demos"
+    subtitle="Watch how Openclaw transforms your workflow with local AI power."
+    items={[
+      { src: 'https://www.youtube.com/watch?v=SaWSPZoPX34', title: 'Openclaw Basic Setup' },
+      { src: 'https://www.youtube.com/watch?v=mMSKQvlmFuQ', title: 'Advanced Configuration' },
+      { src: 'https://www.youtube.com/watch?v=5kkIJNUGFho', title: 'Real-world Usage' },
+    ]}
+  />
 
   <!-- Features Widget *************** -->
 
@@ -108,8 +124,35 @@ const metadata = {
     ]}
     image={{
       src: 'https://images.unsplash.com/photo-1616469829941-c7200edec809?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-      alt: 'Steps image',
+      alt: 'Hardware Setup for Openclaw - Mac Mini',
     }}
+  />
+
+  <!-- Features2 Widget ************** -->
+
+  <Features2
+    title="Developer & Deployment"
+    subtitle="Built for developers, by developers. Streamline your workflow."
+    items={[
+      {
+        title: 'One-Click Installation',
+        description: 'Deploy Openclaw instantly using our automated installer. No complex configuration required.',
+        icon: 'tabler:download',
+        callToAction: { text: 'Install Now', href: '/install-openclaw/', variant: 'primary' },
+      },
+      {
+        title: 'Open Source Ecosystem',
+        description: 'Explore our GitHub repositories. Contribute to the core, build plugins, or check our roadmap.',
+        icon: 'tabler:brand-github',
+        callToAction: { text: 'View on GitHub', href: '/openclaw-github/' },
+      },
+      {
+        title: 'Docker Compose Generator',
+        description: 'Generate a custom docker-compose.yml file for your specific needs.',
+        icon: 'tabler:file-code',
+        callToAction: { text: 'Generate Config', href: '/tools/docker-compose-generator/' },
+      },
+    ]}
   />
 
   <!-- FAQs Widget ******************* -->

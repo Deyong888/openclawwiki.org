@@ -1,0 +1,157 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import Hero from '~/components/widgets/Hero.astro';
+import Features2 from '~/components/widgets/Features2.astro';
+import Steps from '~/components/widgets/Steps.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+
+const metadata = {
+  title: 'Install Openclaw - One-Click Deployment & Setup Guide',
+  description: 'Deploy Openclaw in seconds. The easiest way to install Openclaw on your Mac Mini, Linux server, or via Docker. Complete installation guide and requirements.',
+  keywords: 'install openclaw, deploy openclaw, openclaw installation, self-hosted AI setup, mac mini ai server',
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Openclaw",
+  "operatingSystem": "macOS, Linux, Docker",
+  "applicationCategory": "ProductivityApplication",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "A self-hosted AI assistant that runs locally on your hardware. Secure, private, and compatible with major LLM providers.",
+  "featureList": [
+    "One-click deployment",
+    "Local data privacy",
+    "Multi-LLM support (Claude, OpenAI, Local)",
+    "Plugin architecture"
+  ]
+};
+---
+
+<Layout metadata={metadata}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} slot="header" />
+
+  <Hero
+    tagline="Installation Center"
+    title="Install Openclaw"
+    subtitle="Deploy your private AI assistant in seconds. Choose the method that fits your workflow."
+  />
+
+  <!-- One-Click Installer Section -->
+  <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 mb-12">
+    <div class="mb-8 text-center">
+        <h2 class="text-3xl font-bold font-heading mb-4">Method 1: One-Click Installer (Recommended)</h2>
+        <p class="text-xl text-gray-600 dark:text-slate-400">The fastest way to get started via ClawdBody.</p>
+    </div>
+    <div class="relative w-full aspect-[16/9] md:aspect-[16/10] bg-gray-100 dark:bg-slate-900 rounded-xl overflow-hidden shadow-2xl border border-gray-200 dark:border-slate-800">
+      <iframe
+        src="https://clawdbody.com/"
+        class="absolute top-0 left-0 w-full h-full border-0"
+        title="Openclaw One-Click Installer"
+        loading="lazy"
+      ></iframe>
+    </div>
+  </div>
+
+  <Features2
+    title="Why use the One-Click Installer?"
+    items={[
+      {
+        title: 'Fast Deployment',
+        description: 'Get up and running in under 5 minutes without complex configuration files or dependency hell.',
+        icon: 'tabler:bolt',
+      },
+      {
+        title: 'Secure Defaults',
+        description: 'Automatically sets up secure defaults, ensuring your local AI instance is protected from the start.',
+        icon: 'tabler:shield-check',
+      },
+      {
+        title: 'Dependency Management',
+        description: 'Handles all necessary dependencies including Docker environment and Node.js runtimes automatically.',
+        icon: 'tabler:package',
+      },
+    ]}
+  />
+
+  <!-- Prerequisites Section -->
+  <Steps
+    title="System Requirements"
+    subtitle="Before you install Openclaw, ensure your hardware is ready."
+    items={[
+      {
+        title: 'Operating System',
+        description: 'macOS (Sonoma or later recommended) or Linux (Ubuntu 22.04+). Windows users should use WSL2.',
+        icon: 'tabler:brand-apple',
+      },
+      {
+        title: 'Hardware Resources',
+        description: 'Minimum: 8GB RAM, 4 CPU Cores. <br/>Recommended: Mac Mini M4 with 16GB+ RAM for local model inference.',
+        icon: 'tabler:cpu',
+      },
+      {
+        title: 'Software Dependencies',
+        description: 'Docker and Docker Compose must be installed and running if you are performing a manual installation.',
+        icon: 'tabler:box-model',
+      },
+    ]}
+  />
+
+  <!-- SEO Content Block -->
+  <section class="max-w-4xl mx-auto px-4 py-12 text-gray-700 dark:text-gray-300">
+    <h2 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Comprehensive Installation Guide</h2>
+    
+    <div class="prose dark:prose-invert max-w-none">
+        <p class="mb-4 text-lg">
+          Setting up a self-hosted AI agent shouldn't be complicated. Whether you choose our <strong>one-click installer</strong> or prefer a manual setup via terminal, Openclaw is designed for ease of use.
+        </p>
+
+        <h3 class="text-2xl font-semibold mt-8 mb-4">Method 2: Manual Installation via Terminal</h3>
+        <p class="mb-4">
+            For developers who prefer full control, you can <strong>install Openclaw</strong> directly from your command line. This method is ideal for headless servers or custom network configurations.
+        </p>
+        <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto mb-6"><code>curl -fsSL https://openclaw.ai/install.sh | bash</code></pre>
+        <p class="mb-4">
+            This script will check your environment, pull the latest Docker images, and generate the necessary configuration files to get your agent running.
+        </p>
+
+        <h3 class="text-2xl font-semibold mt-8 mb-4">Post-Installation Setup</h3>
+        <p class="mb-4">
+            Once you successfully <strong>deploy Openclaw</strong>, navigate to <code>http://localhost:3000</code> to access the dashboard. You will need to:
+        </p>
+        <ul class="list-disc pl-6 mb-6 space-y-2">
+            <li>Configure your LLM providers (Anthropic API Key or OpenAI API Key).</li>
+            <li>Set up your preferred vector database path (default is local).</li>
+            <li>Install any additional plugins for web browsing or file system access.</li>
+        </ul>
+    </div>
+  </section>
+
+  <!-- FAQs Section -->
+  <FAQs
+    title="Installation FAQ"
+    subtitle="Common questions about deploying Openclaw."
+    items={[
+      {
+        title: 'Does the installer work on Windows?',
+        description: 'The one-click installer is optimized for macOS and Linux. For Windows, we strongly recommend using WSL2 (Windows Subsystem for Linux) and running the manual install command inside the WSL terminal.',
+      },
+      {
+        title: 'How do I update Openclaw after installation?',
+        description: 'If you used the script, simply run it again—it detects existing installations and offers to update. For Docker users, run `docker-compose pull && docker-compose up -d`.',
+      },
+      {
+        title: 'Where is my data stored?',
+        description: 'All data is stored locally in the `./data` directory relative to your installation path. Openclaw does not upload your conversation history to any cloud server.',
+      },
+      {
+        title: 'Can I install offline?',
+        description: 'Initial installation requires internet access to pull Docker images. Once installed, Openclaw can run offline if you are using purely local models (like Llama 3 via Ollama).',
+      },
+    ]}
+  />
+</Layout>

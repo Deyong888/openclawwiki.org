@@ -4,7 +4,9 @@ import Layout from '~/layouts/PageLayout.astro';
 import Hero from '~/components/widgets/Hero.astro';
 import Note from '~/components/widgets/Note.astro';
 import Features from '~/components/widgets/Features.astro';
+import Features2 from '~/components/widgets/Features2.astro';
 import Steps from '~/components/widgets/Steps.astro';
+import Video from '~/components/widgets/Video.astro';
 import FAQs from '~/components/widgets/FAQs.astro';
 import CallToAction from '~/components/widgets/CallToAction.astro';
 import TrafficBanner from '~/components/custom/TrafficBanner.astro';
@@ -12,6 +14,7 @@ import { headerDataZH, footerDataZH } from '~/navigation';
 
 const metadata = {
   title: 'Openclaw Wiki — 终极自托管 AI 助手指南',
+  description: 'Openclaw 是一个在 Mac Mini M4 或 Linux 服务器上本地运行的自托管 AI 助手。安全、私密且功能强大。兼容 Anthropic Claude 和 OpenAI。',
   ignoreTitleTemplate: true,
 };
 ---
@@ -29,7 +32,7 @@ const metadata = {
       },
       { text: '迁移指南', href: '/zh/moltbot-to-openclaw/' },
     ]}
-    image={{ src: '~/assets/images/openclaw-logo.svg', alt: 'Openclaw Hero Image' }}
+    image={{ src: '~/assets/images/openclaw-logo.svg', alt: 'Openclaw AI 助手 Logo' }}
   >
     <Fragment slot="title">
       解锁 <span class="text-accent dark:text-white highlight">Openclaw</span> 的力量
@@ -47,6 +50,19 @@ const metadata = {
   <!-- Note Widget ******************* -->
 
   <Note title="品牌更名通知:" description="Clawdbot → Moltbot → Openclaw. 同一使命，全新名称。" />
+
+  <!-- Video Widget ****************** -->
+  <Video
+    id="video"
+    tagline="观看演示"
+    title="Openclaw 使用演示"
+    subtitle="了解 Openclaw 如何通过本地 AI 力量改变您的工作流程。"
+    items={[
+      { src: 'https://www.youtube.com/watch?v=SaWSPZoPX34', title: 'Openclaw 基础设置' },
+      { src: 'https://www.youtube.com/watch?v=mMSKQvlmFuQ', title: '高级配置指南' },
+      { src: 'https://www.youtube.com/watch?v=5kkIJNUGFho', title: '实际应用案例' },
+    ]}
+  />
 
   <!-- Features Widget *************** -->
 
@@ -109,8 +125,35 @@ const metadata = {
     ]}
     image={{
       src: 'https://images.unsplash.com/photo-1616469829941-c7200edec809?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-      alt: '步骤图片',
+      alt: 'Openclaw 硬件设置 - Mac Mini',
     }}
+  />
+
+  <!-- Features2 Widget ************** -->
+
+  <Features2
+    title="开发者与部署"
+    subtitle="为开发者打造，由开发者构建。简化您的工作流程。"
+    items={[
+      {
+        title: '一键安装',
+        description: '使用我们的自动化安装程序即刻部署 Openclaw。无需复杂配置。',
+        icon: 'tabler:download',
+        callToAction: { text: '立即安装', href: '/install-openclaw/', variant: 'primary' },
+      },
+      {
+        title: '开源生态系统',
+        description: '探索我们的 GitHub 仓库。为核心贡献代码，构建插件，或查看我们的路线图。',
+        icon: 'tabler:brand-github',
+        callToAction: { text: '查看 GitHub', href: '/openclaw-github/' },
+      },
+      {
+        title: 'Docker 配置生成器',
+        description: '为您生成定制化的 docker-compose.yml 配置文件。',
+        icon: 'tabler:file-code',
+        callToAction: { text: '生成配置', href: '/tools/docker-compose-generator/' },
+      },
+    ]}
   />
 
   <!-- FAQs Widget ******************* -->

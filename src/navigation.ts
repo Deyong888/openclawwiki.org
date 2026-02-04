@@ -30,6 +30,14 @@ export const headerData = {
           href: getPermalink('/tools'),
         },
         {
+          text: 'One-Click Install',
+          href: getPermalink('/install-openclaw'),
+        },
+        {
+          text: 'GitHub Repos',
+          href: getPermalink('/openclaw-github'),
+        },
+        {
           text: 'Docker Generator',
           href: getPermalink('/tools/docker-compose-generator'),
         },
@@ -117,6 +125,14 @@ export const headerDataZH = {
         {
           text: '工具概览',
           href: '/tools/',
+        },
+        {
+          text: '一键安装',
+          href: '/install-openclaw/',
+        },
+        {
+          text: 'GitHub 仓库',
+          href: '/openclaw-github/',
         },
         {
           text: 'Docker 生成器',

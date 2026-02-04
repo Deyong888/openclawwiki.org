@@ -1,0 +1,160 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import Hero from '~/components/widgets/Hero.astro';
+import Features2 from '~/components/widgets/Features2.astro';
+import Steps from '~/components/widgets/Steps.astro';
+import CallToAction from '~/components/widgets/CallToAction.astro';
+
+const metadata = {
+  title: 'Openclaw GitHub - Open Source AI Repositories & Contribution',
+  description: 'Explore the official Openclaw GitHub ecosystem. Access source code for the core server, plugins, and tools. Join our open source community.',
+  keywords: 'openclaw github, open source ai, openclaw source code, contribute to openclaw, ai assistant repository',
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Openclaw",
+  "codeRepository": "https://github.com/openclaw/openclaw",
+  "programmingLanguage": "TypeScript, Python, Rust",
+  "description": "The core Openclaw repository. Your private AI assistant server.",
+  "author": {
+    "@type": "Organization",
+    "name": "Openclaw Community",
+    "url": "https://openclawwiki.org"
+  }
+};
+
+const repos = [
+  {
+    title: 'openclaw/openclaw',
+    description: 'The core Openclaw repository. Your private AI assistant server.',
+    icon: 'tabler:brand-github',
+    callToAction: {
+        text: 'View Repo',
+        href: 'https://github.com/openclaw/openclaw',
+        target: '_blank',
+    }
+  },
+  {
+    title: 'openclaw/clawhub',
+    description: 'Official skills collection for Openclaw. Extend functionality with ease.',
+    icon: 'tabler:plug',
+    callToAction: {
+        text: 'View Repo',
+        href: 'https://github.com/openclaw/clawhub',
+        target: '_blank',
+    }
+  },
+  {
+    title: 'mengjian-github/openclaw101',
+    description: 'Collection of resources and guides for Openclaw. The ultimate knowledge base.',
+    icon: 'tabler:book',
+    callToAction: {
+        text: 'View Repo',
+        href: 'https://github.com/mengjian-github/openclaw101',
+        target: '_blank',
+    }
+  },
+  {
+    title: 'Prakshal-Jain/ClawdBody',
+    description: '1-Click ClawdBot Deployment tool. The engine behind our easy installer.',
+    icon: 'tabler:terminal-2',
+    callToAction: {
+        text: 'View Repo',
+        href: 'https://github.com/Prakshal-Jain/ClawdBody',
+        target: '_blank',
+    }
+  },
+  {
+    title: 'Moltbook',
+    description: 'A Social Network for AI Agents. Connect your Openclaw to the world.',
+    icon: 'tabler:social',
+    callToAction: {
+        text: 'View Repo',
+        href: 'https://www.moltbook.com/',
+        target: '_blank',
+    }
+  },
+  {
+    title: 'HKUDS/nanobot',
+    description: 'Ultra-Lightweight Personal AI Assistant. A minimal alternative.',
+    icon: 'tabler:robot',
+    callToAction: {
+        text: 'View Repo',
+        href: 'https://github.com/HKUDS/nanobot',
+        target: '_blank',
+    }
+  },
+];
+---
+
+<Layout metadata={metadata}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} slot="header" />
+
+  <Hero
+    tagline="Open Source"
+    title="Openclaw Ecosystem"
+    subtitle="Explore the code behind your private AI assistant. Star, fork, and contribute to the future of local AI."
+    actions={[{ variant: 'primary', text: 'Go to GitHub Profile', href: 'https://github.com/openclaw', icon: 'tabler:brand-github' }]}
+  />
+
+  <Features2
+    title="Popular Repositories"
+    subtitle="Check out our most active projects on GitHub."
+    items={repos}
+    columns={3}
+  />
+
+  <!-- Contribution Guide Section -->
+  <Steps
+    title="How to Contribute"
+    subtitle="We welcome contributions from the community! Here is how you can help."
+    items={[
+      {
+        title: 'Report Bugs',
+        description: 'Found an issue? Open a ticket on our GitHub repository with detailed reproduction steps.',
+        icon: 'tabler:bug',
+      },
+      {
+        title: 'Submit Pull Requests',
+        description: 'Fix bugs or add new features. Please read our `CONTRIBUTING.md` guide before submitting.',
+        icon: 'tabler:git-pull-request',
+      },
+      {
+        title: 'Create Plugins',
+        description: 'Build new skills and tools for Openclaw and publish them to the Clawhub.',
+        icon: 'tabler:plug',
+      },
+      {
+        title: 'Improve Documentation',
+        description: 'Help us make Openclaw easier to use by improving our wiki and guides.',
+        icon: 'tabler:file-text',
+      },
+    ]}
+  />
+
+  <CallToAction
+    actions={[
+      {
+        variant: 'primary',
+        text: 'Join Discord',
+        href: 'https://discord.gg/openclaw',
+        icon: 'tabler:brand-discord',
+      },
+      {
+        text: 'Star on GitHub',
+        href: 'https://github.com/openclaw/openclaw',
+        icon: 'tabler:star',
+      }
+    ]}
+  >
+    <Fragment slot="title">
+      Join the Community
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      Connect with other developers, get help, and showcase your Openclaw setup.
+    </Fragment>
+  </CallToAction>
+</Layout>
