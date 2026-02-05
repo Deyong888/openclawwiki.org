@@ -78,7 +78,7 @@ Linode provides high-performance SSD cloud servers with transparent pricing and 
 
 ### 4. Vultr ($2.50-220/month)
 
-Vultr offers competitive pricing and high-performance compute options, with hourly billing and no long-term commitments, perfect for testing OpenClaw configurations.
+[Vultr](https://www.vultr.com/?ref=9861424) offers competitive pricing and high-performance compute options, with hourly billing and no long-term commitments, perfect for testing OpenClaw configurations.
 
 **Pros:**
 - Low entry-level pricing
@@ -267,7 +267,7 @@ To ensure optimal OpenClaw performance on your VPS:
 
 ### Budget-Friendly Options
 - **DigitalOcean**: $5/month for basic setup
-- **Vultr**: $2.50/month minimum
+- **[Vultr](https://www.vultr.com/?ref=9861424)**: $2.50/month minimum
 - **Hetzner**: €3.29/month
 
 ### Production-Ready Options
