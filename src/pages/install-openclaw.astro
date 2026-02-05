@@ -7,8 +7,8 @@ import FAQs from '~/components/widgets/FAQs.astro';
 
 const metadata = {
   title: 'Install Openclaw - One-Click Deployment & Setup Guide',
-  description: 'Deploy Openclaw in seconds. The easiest way to install Openclaw on your Mac Mini, Linux server, or via Docker. Complete installation guide and requirements.',
-  keywords: 'install openclaw, deploy openclaw, openclaw installation, self-hosted AI setup, mac mini ai server',
+  description: 'Deploy Openclaw in seconds. The easiest way to install Openclaw on Cloud (DigitalOcean, Zeabur, Cloudflare), Mac Mini, Linux server, or via Docker.',
+  keywords: 'install openclaw, deploy openclaw, openclaw installation, digitalocean openclaw, zeabur openclaw, cloudflare workers ai',
 };
 
 const jsonLd = {
@@ -24,7 +24,8 @@ const jsonLd = {
   },
   "description": "A self-hosted AI assistant that runs locally on your hardware. Secure, private, and compatible with major LLM providers.",
   "featureList": [
-    "One-click deployment",
+    "One-click Cloud Deployment (DigitalOcean, Zeabur, Cloudflare)",
+    "Local One-click deployment",
     "Local data privacy",
     "Multi-LLM support (Claude, OpenAI, Local)",
     "Plugin architecture"
@@ -39,6 +40,48 @@ const jsonLd = {
     tagline="Installation Center"
     title="Install Openclaw"
     subtitle="Deploy your private AI assistant in seconds. Choose the method that fits your workflow."
+  />
+
+  <!-- Cloud Deployment Options -->
+  <Features2
+    title="Cloud & VPS Deployment"
+    subtitle="Launch Openclaw on your favorite cloud platform with one click."
+    columns={3}
+    items={[
+      {
+        title: 'Digital Ocean',
+        description: 'Launch a pre-configured Droplet via the Digital Ocean Marketplace.',
+        icon: 'tabler:server',
+        callToAction: {
+          text: 'Deploy on Digital Ocean',
+          href: 'https://marketplace.digitalocean.com/apps/openclaw?refcode=fb86ec65bc39',
+          target: '_blank',
+          variant: 'primary',
+        },
+      },
+      {
+        title: 'Zeabur',
+        description: 'Deploy a serverless instance instantly using Zeabur Templates.',
+        icon: 'tabler:cloud',
+        callToAction: {
+          text: 'Deploy on Zeabur',
+          href: 'https://zeabur.com/templates/VTZ4FX?referralCode=openclaw',
+          target: '_blank',
+          variant: 'primary',
+        },
+      },
+      {
+        title: 'Cloudflare',
+        description: 'Deploy to the edge with Cloudflare Workers (MoltWorker).',
+        icon: 'tabler:brand-cloudflare',
+        callToAction: {
+          text: 'Deploy on Cloudflare',
+          href: 'https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/moltworker',
+          target: '_blank',
+          variant: 'primary',
+        },
+      },
+    ]}
   />
 
   <!-- One-Click Installer Section -->

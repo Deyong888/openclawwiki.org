@@ -32,7 +32,7 @@ Based on performance benchmarks, reliability, and cost-effectiveness, we recomme
 
 ### 1. DigitalOcean ($5-40/month)
 
-DigitalOcean stands out as an excellent choice for OpenClaw deployment due to its developer-friendly interface and reliable infrastructure. Their $5 droplets provide sufficient resources for basic OpenClaw installations.
+[DigitalOcean](https://www.digitalocean.com/?refcode=fb86ec65bc39) stands out as an excellent choice for OpenClaw deployment due to its developer-friendly interface and reliable infrastructure. Their $5 droplets provide sufficient resources for basic OpenClaw installations.
 
 **Pros:**
 - Simple control panel

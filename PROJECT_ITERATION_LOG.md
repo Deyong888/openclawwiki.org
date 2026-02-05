@@ -48,7 +48,7 @@
 - [x] **检查徽章 (Badges)**: 确保 "New", "Latest" 等徽章文案也实现本地化。
 - [x] **验证 i18n 路由**: 确保 `/zh/` 路径下的侧边栏能正确显示中文（或回退英文）并高亮当前页面。
 
-## 迭代 11: 首页与营销功能优化 (进行中)
+## 迭代 11: 首页与营销功能优化 (已完成)
 
 ### 目标
 - [x] **SEO 审计与优化**:
@@ -59,6 +59,7 @@
    - 在首页添加了 OpenClaw 使用演示视频区块。
 - [x] **营销落地页建设**:
    - 新增 `/install-openclaw` 页面，嵌入一键安装工具，并针对 "Install Openclaw" 关键词进行了 SEO 内容强化。
+   - 在安装页面新增 **Cloud & VPS Deployment** 区块，提供 DigitalOcean, Zeabur, Cloudflare 的一键部署入口。
    - 新增 `/openclaw-github` 页面，以卡片形式展示 OpenClaw 核心仓库矩阵，提升开发者转化率。
 - [x] **导航系统更新**:
    - 在 Tools 菜单下增加了 "One-Click Install" (一键安装) 和 "GitHub Repos" (GitHub 仓库) 入口，并完成了中英文双语配置。

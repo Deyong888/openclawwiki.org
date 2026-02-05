@@ -46,7 +46,7 @@ You don't need to pay to get started. By using our partner link below, you can g
 
 ## 🧐 Why Vultr? (And What is OpenClaw?)
 
-First, let's clear up the confusion. **OpenClaw** is the community-maintained version of the project formerly known as **Clawdbot** and **Moltbot**. They are the same core software.
+First, let's clear up the confusion. **【、[OpenClaw](https://openclawwiki.org/)** is the community-maintained version of the project formerly known as **Clawdbot** and **Moltbot**. They are the same core software.
 
 We choose **Vultr** for this deployment because:
 1.  **Performance:** Their "High Frequency" servers are incredibly fast for AI tasks.
