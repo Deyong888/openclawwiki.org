@@ -9,6 +9,8 @@ tags: ["Ollama", "OpenClaw", "AI", "Integration", "Local AI"]
 
 The integration between Ollama v0.15.4 and OpenClaw represents a significant milestone in the evolution of personal AI assistants. Announced on February 1, 2026, this partnership introduces a streamlined method for running private AI agents entirely on your local devices. This combination enables powerful personal AI automation without sending conversations, files, or workflows to third-party servers, ensuring privacy and security while providing extensive functionality.
 
+![OpenClaw Interface](https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/OpenClaw_logo.png/220px-OpenClaw_logo.png)
+
 OpenClaw, previously known as Clawdbot and Moltbot, is an open-source personal AI assistant that transforms messaging apps into command centers for AI automation. It bridges your favorite messaging platforms to AI coding agents through a centralized gateway, allowing you to interact with AI models through platforms you already use daily. With Ollama's integration, users can now seamlessly connect their local Ollama models to OpenClaw, creating a powerful local AI ecosystem.
 
 ## Understanding OpenClaw
@@ -46,6 +48,31 @@ The gateway auto-reload feature means that OpenClaw detects configuration change
 OpenClaw's integration with Ollama maintains support for multiple messaging platforms, including WhatsApp, Telegram, Slack, Discord, and iMessage. The onboarding process guides users through platform selection and authentication, displaying QR codes or authentication URLs as needed for each platform.
 
 Once connected, messages sent to your OpenClaw contact trigger model execution on your local device. This means you can interact with your AI assistant using the messaging platforms you're already familiar with, without needing to learn new interfaces or applications.
+
+## Architecture Overview
+
+Understanding the OpenClaw architecture is essential to appreciate how the Ollama integration works. The system follows a gateway-centric design where a single long-running process manages all channel connections and provides a unified control plane.
+
+```
+WhatsApp / Telegram / Discord / iMessage (+ plugins)
+ │
+ ▼
+ ┌───────────────────────────┐
+ │ Gateway                   │ ws://127.0.0.1:18789 (loopback-only)
+ │ (single source)           │
+ │                           │ http://<gateway-host>:18793
+ │                           │ /__openclaw__/canvas/ (Canvas host)
+ └───────────┬───────────────┘
+             │
+ ├─ Pi agent (RPC)
+ ├─ CLI (openclaw …)
+ ├─ Chat UI (SwiftUI)
+ ├─ macOS app (OpenClaw.app)
+ ├─ iOS node via Gateway WS + pairing
+ └─ Android node via Gateway WS + pairing
+```
+
+This architecture ensures reliability, security, and simplicity by centralizing all communications through the gateway process.
 
 ## Recommended Models for Optimal Performance
 
@@ -112,6 +139,8 @@ ollama launch openclaw --config
 
 The command handles discovery of available models and establishes the gateway service. Changes reload automatically without interrupting the service, ensuring continuous operation.
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/egofv8c7oEk" frameborder="0" allowfullscreen></iframe>
+
 ## Privacy and Security Benefits
 
 The integration between Ollama and OpenClaw provides significant privacy and security benefits compared to cloud-based AI solutions. Since all processing occurs on your local device, your conversations and task data never leave your network. This local-first architecture means you maintain complete control over your hardware, network access, and data retention.
@@ -156,7 +185,7 @@ The open-source nature of both projects ensures that the community can contribut
 
 ## Conclusion
 
-The integration between Ollama v0.15.4 and OpenClaw represents a significant advancement in personal AI technology, offering users a powerful, private, and flexible AI assistant that operates entirely on their local devices. The simplified setup process, automatic model discovery, and extensive messaging platform support make this integration accessible to both technical and non-technical users.
+The integration between Ollama v0.15.4 and OpenClaw represents a significant advancement in personal AI technology, offering users a powerful, private, and flexible AI assistant that operates entirely on your local devices. The simplified setup process, automatic model discovery, and extensive messaging platform support make this integration accessible to both technical and non-technical users.
 
 By combining Ollama's local model capabilities with OpenClaw's messaging platform integration, users can create a personalized AI assistant that respects their privacy while providing extensive functionality. The system's modular design allows for customization and expansion, ensuring it can grow with users' changing needs.
 
