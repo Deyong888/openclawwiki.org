@@ -5,157 +5,335 @@ import Headline from '~/components/ui/Headline.astro';
 import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
 
 const metadata = {
-  title: 'Showcase - What People Are Building with OpenClaw',
+  title: 'Showcase - OpenClaw Use Cases',
   description: 'Discover real-world use cases and autonomous agents built by the OpenClaw community.',
 };
 
-const items = [
+const categories = [
   {
-    name: 'Peter Steinberger',
-    handle: '@steipete',
-    avatar: 'https://unavatar.io/twitter/steipete',
-    tweetUrl: 'https://twitter.com/steipete',
-    content: `What I'm currently doing with @openclaw:
-    • Check my incoming mail, and remove spam
-    • Order things for me
-    • Send my reminders to Tana
-    • Create issues on GitHub
-    • Sync my Google Places
-    • Reads my X bookmarks and discusses them with me
-    • Keep track of costs and split them after trips`,
-    date: 'Jan 30',
+    id: 'multi-agent',
+    name: 'Multi-Agent Collaboration',
+    nameCN: '多智能体协作',
+    icon: 'tabler:users-group',
+    description: 'Multiple agents working together as a coordinated team',
+    descriptionCN: '多个智能体协同工作，形成分工明确的团队',
+    usecases: [
+      {
+        title: 'Multi-Agent Specialized Team',
+        titleCN: '多智能体专业团队',
+        file: 'multi-agent-team.md',
+        summary: 'Set up multiple OpenClaw agents as a coordinated team, each specialized in a domain (strategy, business, marketing, dev), communicating through shared memory.',
+        summaryCN: '将多个 OpenClaw 智能体设置为协同团队，每个智能体专注于特定领域（战略、业务、营销、开发），通过共享内存进行沟通。',
+      },
+      {
+        title: 'Autonomous Project Management',
+        titleCN: '自主项目管理',
+        file: 'autonomous-project-management.md',
+        summary: 'Decentralized project management where subagents work autonomously on tasks, coordinating through shared STATE.yaml files.',
+        summaryCN: '去中心化的项目管理模式，子智能体通过共享的 STATE.yaml 文件自主完成工作。',
+      },
+      {
+        title: 'Dynamic Dashboard',
+        titleCN: '动态仪表盘',
+        file: 'dynamic-dashboard.md',
+        summary: 'Live dashboard that spawns sub-agents to fetch data from multiple sources in parallel and aggregates results.',
+        summaryCN: '实时仪表盘，通过生成子智能体并行从多个数据源获取数据并聚合结果。',
+      },
+      {
+        title: 'Content Factory',
+        titleCN: '内容工厂',
+        file: 'content-factory.md',
+        summary: 'Multi-agent content factory in Discord where research, writing, and visual agents handle the entire content pipeline.',
+        summaryCN: 'Discord 中的多智能体内容工厂，研究、写作和视觉智能体处理整个内容流程。',
+      },
+    ],
   },
   {
-    name: 'Dave Kiss',
-    handle: '@davekiss',
-    avatar: 'https://unavatar.io/twitter/davekiss',
-    tweetUrl: 'https://twitter.com/davekiss',
-    content: `Rebuilt my entire site via Telegram while watching Netflix in bed.
-    • Notion → Astro, 18 posts migrated
-    • DNS moved to Cloudflare
-    • Never opened my laptop`,
-    date: 'Jan 28',
+    id: 'business',
+    name: 'Business Services',
+    nameCN: '商业服务',
+    icon: 'tabler:building-store',
+    description: 'AI-powered solutions for business operations',
+    descriptionCN: '用于业务运营的 AI 驱动解决方案',
+    usecases: [
+      {
+        title: 'Multi-Channel Customer Service',
+        titleCN: '多渠道客服',
+        file: 'multi-channel-customer-service.md',
+        summary: 'Unified inbox for WhatsApp, Instagram, Gmail, and Google Reviews with AI auto-responses and human handoff.',
+        summaryCN: '整合 WhatsApp、Instagram、Gmail 和 Google Reviews 的统一收件箱，具备 AI 自动回复和人工接管功能。',
+      },
+      {
+        title: 'Multi-Channel Assistant',
+        titleCN: '多渠道助理',
+        file: 'multi-channel-assistant.md',
+        summary: 'AI assistant managing communications across multiple business channels.',
+        summaryCN: '跨多个业务渠道管理通信的 AI 助理。',
+      },
+      {
+        title: 'Market Research Product Factory',
+        titleCN: '市场研究产品工厂',
+        file: 'market-research-product-factory.md',
+        summary: 'Automated market research and product development pipeline.',
+        summaryCN: '自动化市场研究和产品开发流程。',
+      },
+    ],
   },
   {
-    name: 'OpenClaw Community',
-    handle: '@openclaw_ai',
-    avatar: 'https://unavatar.io/twitter/openclaw_ai',
-    tweetUrl: 'https://twitter.com/openclaw_ai',
-    content: `Things my @openclaw does for me:
-    • Timeblocks tasks in my calendar based on importance
-    • Scores tasks importance and urgency
-    • Leads me through a weekly review based on meeting transcriptions
-    • Gives a morning daily brief: weather, objectives, health stats
-    • Notifies my wife and I about our son's upcoming school tests`,
-    date: 'Jan 29',
+    id: 'productivity',
+    name: 'Personal Productivity',
+    nameCN: '个人生产力',
+    icon: 'tabler:brain',
+    description: 'AI-powered tools for personal organization and knowledge management',
+    descriptionCN: '用于个人组织和知识管理的 AI 工具',
+    usecases: [
+      {
+        title: 'Personal CRM',
+        titleCN: '个人 CRM',
+        file: 'personal-crm.md',
+        summary: 'Automatic contact discovery and relationship tracking with daily meeting prep briefings.',
+        summaryCN: '自动发现联系人并追踪关系，提供每日会议准备简报。',
+      },
+      {
+        title: 'Second Brain',
+        titleCN: '第二大脑',
+        file: 'second-brain.md',
+        summary: 'Memory capture system via text message with searchable dashboard for notes, conversations, and memories.',
+        summaryCN: '通过短信的记忆捕获系统，带有可搜索的仪表盘，用于笔记、对话和记忆。',
+      },
+      {
+        title: 'Knowledge Base (RAG)',
+        titleCN: '知识库 (RAG)',
+        file: 'knowledge-base-rag.md',
+        summary: 'Searchable knowledge base from saved articles, tweets, YouTube transcripts, and PDFs with semantic search.',
+        summaryCN: '从保存的文章、推文、YouTube 字幕和 PDF 构建的可搜索知识库，支持语义搜索。',
+      },
+      {
+        title: 'Todoist Task Manager',
+        titleCN: 'Todoist 任务管理',
+        file: 'todoist-task-manager.md',
+        summary: 'AI-powered task management with Todoist integration.',
+        summaryCN: '集成 Todoist 的 AI 驱动任务管理。',
+      },
+      {
+        title: 'Custom Morning Brief',
+        titleCN: '自定义早间简报',
+        file: 'custom-morning-brief.md',
+        summary: 'Personalized daily briefing with calendar, weather, tasks, and more.',
+        summaryCN: '包含日历、天气、任务等的个性化每日简报。',
+      },
+    ],
   },
   {
-    name: 'DevOps Engineer',
-    handle: '@devops_agent',
-    avatar: 'https://unavatar.io/twitter/github', // Fallback/Generic
-    tweetUrl: 'https://twitter.com/openclaw_ai',
-    content: `Put "BigC" (my OpenClaw) on a Hetzner server:
-    • Checked deployment of a new railway project
-    • Identified build failures and root causes (incorrect build commands)
-    • Updated configs, redeployed, and confirmed success
-    • Identified a design issue, fixed it, and submitted a PR`,
-    date: 'Jan 27',
+    id: 'life',
+    name: 'Life Assistant',
+    nameCN: '生活助手',
+    icon: 'tabler:home',
+    description: 'AI help for everyday life and household management',
+    descriptionCN: '日常生活和家庭管理的 AI 帮助',
+    usecases: [
+      {
+        title: 'Family Calendar & Household',
+        titleCN: '家庭日历与家务',
+        file: 'family-calendar-household-assistant.md',
+        summary: 'Calendar aggregation, ambient message monitoring for appointments, household inventory, and grocery coordination.',
+        summaryCN: '日历聚合、消息监控自动创建日历事件、家庭库存管理和杂货协调。',
+      },
+      {
+        title: 'Health Symptom Tracker',
+        titleCN: '健康症状追踪',
+        file: 'health-symptom-tracker.md',
+        summary: 'Track health symptoms and patterns over time.',
+        summaryCN: '追踪健康症状和长期模式。',
+      },
+      {
+        title: 'Event Guest Confirmation',
+        titleCN: '活动嘉宾确认',
+        file: 'event-guest-confirmation.md',
+        summary: 'Automated event RSVP tracking and follow-ups.',
+        summaryCN: '自动化的活动 RSVP 追踪和跟进。',
+      },
+      {
+        title: 'Inbox Declutter',
+        titleCN: '收件箱清理',
+        file: 'inbox-declutter.md',
+        summary: 'AI-powered email inbox organization and cleanup.',
+        summaryCN: 'AI 驱动的邮箱整理和清理。',
+      },
+      {
+        title: 'Phone-based Assistant',
+        titleCN: '电话助理',
+        file: 'phone-based-personal-assistant.md',
+        summary: 'Personal assistant accessible via phone calls.',
+        summaryCN: '可通过电话访问的个人助理。',
+      },
+    ],
   },
   {
-    name: 'Startup Founder',
-    handle: '@startup_io',
-    avatar: 'https://unavatar.io/twitter/stripe', // Generic tech avatar
-    tweetUrl: 'https://twitter.com/openclaw_ai',
-    content: `Less than 24 hours in:
-    • Cleaned up Linear issues
-    • Wrote email follow-ups
-    • Opened 3 PRs
-    • Prospected new signups
-    • Sent thousands of messages in a loop to test systems`,
-    date: 'Jan 26',
+    id: 'developer',
+    name: 'Developer & Tech',
+    nameCN: '开发者与技术',
+    icon: 'tabler:code',
+    description: 'AI assistance for development and infrastructure',
+    descriptionCN: '开发和基础设施的 AI 助手',
+    usecases: [
+      {
+        title: 'Self-Healing Home Server',
+        titleCN: '自愈家庭服务器',
+        file: 'self-healing-home-server.md',
+        summary: 'Infrastructure agent with SSH access, automated monitoring, self-healing, and morning briefings.',
+        summaryCN: '具备 SSH 访问权限的基础设施智能体，自动监控、自愈和早间简报。',
+      },
+      {
+        title: 'Project State Management',
+        titleCN: '项目状态管理',
+        file: 'project-state-management.md',
+        summary: 'State-based project tracking with YAML files.',
+        summaryCN: '基于 YAML 文件的项目状态追踪。',
+      },
+      {
+        title: 'n8n Workflow Orchestration',
+        titleCN: 'n8n 工作流编排',
+        file: 'n8n-workflow-orchestration.md',
+        summary: 'Automate n8n workflow creation and management.',
+        summaryCN: '自动化 n8n 工作流的创建和管理。',
+      },
+      {
+        title: 'Semantic Memory Search',
+        titleCN: '语义记忆搜索',
+        file: 'semantic-memory-search.md',
+        summary: 'Semantic search over agent memory and conversations.',
+        summaryCN: '智能体记忆和对话的语义搜索。',
+      },
+      {
+        title: 'Overnight Mini App Builder',
+        titleCN: '夜间迷你应用构建器',
+        file: 'overnight-mini-app-builder.md',
+        summary: 'Build and deploy mini apps overnight while you sleep.',
+        summaryCN: '在您睡觉时构建和部署迷你应用。',
+      },
+    ],
   },
   {
-    name: 'Smart Home User',
-    handle: '@home_automator',
-    avatar: 'https://unavatar.io/twitter/homeassistant',
-    tweetUrl: 'https://twitter.com/openclaw_ai',
-    content: `Built a full weekly meal planning system in Notion:
-    • Master meal plan template for all of 2026
-    • Shopping lists sorted by store and aisle
-    • Weather forecast auto-updating on the meal plan list
-    • Go-to recipes catalogued by chef`,
-    date: 'Jan 25',
+    id: 'content',
+    name: 'Content & Media',
+    nameCN: '内容与媒体',
+    icon: 'tabler:video',
+    description: 'AI-powered content curation and media digestion',
+    descriptionCN: 'AI 驱动的内容策划和媒体消化',
+    usecases: [
+      {
+        title: 'Daily YouTube Digest',
+        titleCN: '每日 YouTube 摘要',
+        file: 'daily-youtube-digest.md',
+        summary: 'Daily personalized summary of new videos from favorite channels with key insights.',
+        summaryCN: '每日个性化的喜爱频道新视频摘要，包含关键见解。',
+      },
+      {
+        title: 'Daily Reddit Digest',
+        titleCN: '每日 Reddit 摘要',
+        file: 'daily-reddit-digest.md',
+        summary: 'Daily Reddit feed summarization for followed subreddits.',
+        summaryCN: '关注子版块的每日 Reddit 信息流摘要。',
+      },
+      {
+        title: 'Multi-Source Tech News',
+        titleCN: '多源科技新闻',
+        file: 'multi-source-tech-news-digest.md',
+        summary: 'Aggregated tech news from multiple sources with AI summarization.',
+        summaryCN: '聚合多个来源的科技新闻，带有 AI 摘要。',
+      },
+      {
+        title: 'YouTube Content Pipeline',
+        titleCN: 'YouTube 内容流水线',
+        file: 'youtube-content-pipeline.md',
+        summary: 'End-to-end YouTube content creation pipeline.',
+        summaryCN: '端到端的 YouTube 内容创作流程。',
+      },
+      {
+        title: 'X Account Analysis',
+        titleCN: 'X 账户分析',
+        file: 'x-account-analysis.md',
+        summary: 'Analyze and track X (Twitter) account performance.',
+        summaryCN: '分析和追踪 X (Twitter) 账户表现。',
+      },
+    ],
+  },
+  {
+    id: 'finance',
+    name: 'Finance & Investment',
+    nameCN: '金融与投资',
+    icon: 'tabler:chart-line',
+    description: 'AI-powered financial tracking and market analysis',
+    descriptionCN: 'AI 驱动的财务追踪和市场分析',
+    usecases: [
+      {
+        title: 'Earnings Tracker',
+        titleCN: '财报追踪',
+        file: 'earnings-tracker.md',
+        summary: 'Automated earnings calendar tracking with previews and post-report summaries.',
+        summaryCN: '自动化的财报日历追踪，包含预览和报告后摘要。',
+      },
+      {
+        title: 'Polymarket Autopilot',
+        titleCN: 'Polymarket 自动交易',
+        file: 'polymarket-autopilot.md',
+        summary: 'Automated trading on Polymarket prediction markets.',
+        summaryCN: 'Polymarket 预测市场的自动化交易。',
+      },
+    ],
   },
 ];
 ---
 
 <Layout metadata={metadata}>
-  <!-- Hero Widget ******************* -->
-
   <Hero
     tagline="Showcase"
-    title="What People Are Building with OpenClaw"
-    subtitle="From autonomous coding to managing entire businesses—see how the community is redefining what AI agents can do."
+    title="OpenClaw Use Cases"
+    subtitle="Discover how the community is using OpenClaw to automate workflows, build businesses, and enhance productivity."
   />
 
-  <!-- Showcase Grid ****************** -->
-
   <WidgetWrapper containerClass="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <Headline
-      title="Community Stories"
-      subtitle="Real examples of OpenClaw in the wild."
-      classes={{ container: 'mb-12' }}
-    />
-
-    <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-      {items.map(({ name, handle, avatar, tweetUrl, content, date }) => (
-        <a 
-          href={tweetUrl} 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="block break-inside-avoid"
-        >
-          <div class="flex flex-col p-6 bg-white dark:bg-slate-900 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700 h-full">
-            
-            <!-- Header: Avatar + Name + Handle + Logo -->
-            <div class="flex items-start justify-between mb-4">
-              <div class="flex items-center">
-                <img 
-                  src={avatar} 
-                  alt={name} 
-                  class="w-10 h-10 rounded-full mr-3 border border-gray-100 dark:border-gray-600"
-                  onerror="this.src='https://unavatar.io/twitter/openclaw_ai'"
-                />
-                <div>
-                  <div class="font-bold text-gray-900 dark:text-white leading-tight hover:underline">
-                    {name}
-                  </div>
-                  <div class="text-gray-500 dark:text-gray-400 text-sm">
-                    {handle}
-                  </div>
-                </div>
-              </div>
-              <iconify-icon icon="tabler:brand-x" class="text-gray-400 text-xl"></iconify-icon>
+    <div class="grid gap-16">
+      {categories.map((category) => (
+        <section id={category.id} class="scroll-mt-20">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+              <iconify-icon icon={category.icon} class="text-xl text-blue-600 dark:text-blue-400"></iconify-icon>
             </div>
-
-            <!-- Content -->
-            <div class="text-gray-800 dark:text-gray-200 text-[15px] leading-relaxed whitespace-pre-line mb-4">
-              {content}
+            <div>
+              <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{category.name}</h2>
+              <p class="text-sm text-gray-500 dark:text-gray-400">{category.nameCN} · {category.description}</p>
             </div>
-
-            <!-- Footer: Date -->
-            <div class="mt-auto pt-2 text-gray-500 dark:text-gray-400 text-sm border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
-              <span>{date} · View on X</span>
-              <iconify-icon icon="tabler:external-link" class="text-gray-400"></iconify-icon>
-            </div>
-
           </div>
-        </a>
+          
+          <p class="text-gray-600 dark:text-gray-300 mb-6">{category.descriptionCN}</p>
+          
+          <div class="grid gap-6 md:grid-cols-2">
+            {category.usecases.map((usecase) => (
+              <a
+                href={`/docs/usecases/${usecase.file.replace('.md', '')}`}
+                class="block p-6 bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-200 dark:border-gray-700 group"
+              >
+                <div class="flex items-start justify-between">
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    {usecase.title}
+                  </h3>
+                  <iconify-icon icon="tabler:arrow-right" class="text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"></iconify-icon>
+                </div>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                  {usecase.summary}
+                </p>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                  {usecase.summaryCN}
+                </p>
+              </a>
+            ))}
+          </div>
+        </section>
       ))}
     </div>
   </WidgetWrapper>
-
-  <!-- CTA Widget ******************* -->
 
   <section class="py-12 bg-blue-50 dark:bg-slate-800 mt-12">
     <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
@@ -166,14 +344,13 @@ const items = [
         Share your OpenClaw agent with the community.
       </p>
       <a
-        href="https://twitter.com/openclaw_ai"
+        href="https://github.com/openclaw/awesome-openclaw-usecases"
         target="_blank"
         rel="noopener noreferrer"
         class="btn-primary"
       >
-        Share on Twitter
+        Add Your Use Case
       </a>
     </div>
   </section>
-
 </Layout>
