@@ -1,0 +1,83 @@
+---
+import { Icon } from 'astro-icon/components';
+
+/**
+ * ToolsGlass — surfaces the three interactive tools.
+ * These are strong long-tail landing pages; the old homepage
+ * only linked one of them and buried it.
+ */
+interface Tool {
+  title: string;
+  description: string;
+  href: string;
+  icon: string;
+}
+
+export interface Props {
+  id?: string;
+  tagline?: string;
+  title?: string;
+  subtitle?: string;
+  tools?: Tool[];
+}
+
+const {
+  id = 'tools',
+  tagline = 'Free tools',
+  title = 'Plan before you deploy',
+  subtitle = 'Three small utilities we built while running OpenClaw ourselves. No signup.',
+  tools = [
+    {
+      title: 'Docker Compose Generator',
+      description: 'Answer a few questions and get a compose file wired for your model provider and storage.',
+      href: '/tools/docker-compose-generator/',
+      icon: 'tabler:brand-docker',
+    },
+    {
+      title: 'Claude Cost Estimator',
+      description: 'Model what a month of real usage actually costs before you commit to a provider.',
+      href: '/tools/claude-cost-estimator/',
+      icon: 'tabler:calculator',
+    },
+    {
+      title: 'Security Policy Generator',
+      description: 'Generate a permission and secrets policy for an assistant that touches your files.',
+      href: '/tools/security-policy-generator/',
+      icon: 'tabler:shield-lock',
+    },
+  ],
+} = Astro.props;
+---
+
+<section class="relative mx-auto max-w-6xl px-5 py-24 sm:px-8 md:py-32" {...id ? { id } : {}}>
+  <div class="mx-auto max-w-3xl text-center">
+    <p class="dg-eyebrow reveal">{tagline}</p>
+    <h2 class="dg-h2 reveal mt-4 text-balance">{title}</h2>
+    <p class="dg-lede reveal mx-auto mt-5 max-w-2xl text-balance">{subtitle}</p>
+  </div>
+
+  <div class="mt-16 grid gap-5 md:grid-cols-3">
+    {
+      tools.map((tool) => (
+        <a href={tool.href} class="glass glass-card group reveal flex flex-col p-7">
+          <div class="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-gradient-to-br from-cyan-500/20 to-blue-500/20">
+            <Icon name={tool.icon} class="h-[1.375rem] w-[1.375rem] text-cyan-300" />
+          </div>
+          <h3 class="dg-h3">{tool.title}</h3>
+          <p class="dg-body mt-2.5 flex-1 text-[0.9375rem]">{tool.description}</p>
+          <span class="mt-6 inline-flex items-center gap-1.5 text-[0.875rem] font-semibold text-sky-300">
+            Open tool
+            <svg
+              class="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1"
+              viewBox="0 0 20 20"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path d="M4 10h11M11 5.5 15.5 10 11 14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </span>
+        </a>
+      ))
+    }
+  </div>
+</section>

@@ -1,0 +1,77 @@
+---
+/**
+ * HeroDeep — Apple-style typographic hero over deep-space aurora.
+ * No product shot: the type IS the visual.
+ */
+---
+
+<section class="relative overflow-hidden">
+  <!-- Aurora depth -->
+  <div
+    class="aurora aurora-blue"
+    style="width: 46rem; height: 34rem; top: -16rem; left: 50%; transform: translateX(-50%);"
+    aria-hidden="true"
+  >
+  </div>
+  <div
+    class="aurora aurora-violet"
+    style="width: 32rem; height: 30rem; top: -6rem; right: -12rem;"
+    aria-hidden="true"
+  >
+  </div>
+  <div
+    class="aurora aurora-cyan"
+    style="width: 28rem; height: 26rem; top: 4rem; left: -12rem;"
+    aria-hidden="true"
+  >
+  </div>
+
+  <!-- Fine grid texture, very subtle -->
+  <div
+    class="pointer-events-none absolute inset-0 opacity-[0.035]"
+    style="background-image: linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px); background-size: 64px 64px; mask-image: radial-gradient(ellipse 70% 55% at 50% 30%, #000 40%, transparent 100%); -webkit-mask-image: radial-gradient(ellipse 70% 55% at 50% 30%, #000 40%, transparent 100%);"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div class="relative z-10 mx-auto max-w-6xl px-5 sm:px-8">
+    <div class="flex min-h-[86vh] flex-col items-center justify-center py-24 text-center md:py-32">
+      <!-- Version pill -->
+      <div class="reveal glass-soft mb-9 inline-flex items-center gap-2.5 rounded-full px-4 py-2">
+        <span class="relative flex h-2 w-2" aria-hidden="true">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75"></span>
+          <span class="relative inline-flex h-2 w-2 rounded-full bg-cyan-400"></span>
+        </span>
+        <span class="text-[0.8125rem] font-medium tracking-wide text-[color:var(--dg-text-2)]">
+          OpenClaw 2.0 &middot; v2026.8.1 &mdash; just shipped
+        </span>
+      </div>
+
+      <h1 class="dg-display reveal text-balance">
+        Your AI assistant.<br />
+        <span class="dg-gradient-text">On your own hardware.</span>
+      </h1>
+
+      <p class="dg-lede reveal mx-auto mt-7 max-w-[42rem] text-balance">
+        OpenClaw is the open-source, self-hosted AI assistant trusted by 385,000+ developers.
+        Version 2.0 rebuilds onboarding, the browser app, sessions and permissions from the ground up.
+      </p>
+
+      <div class="reveal mt-11 flex w-full flex-col items-stretch gap-3.5 sm:w-auto sm:flex-row sm:items-center sm:justify-center">
+        <a href="/docs/getting-started/quick-start/" class="dg-btn dg-btn-primary">
+          Get started
+          <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M4 10h11M11 5.5 15.5 10 11 14.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </a>
+        <a href="/blog/openclaw-2-0-release-analysis/" class="dg-btn dg-btn-ghost">
+          What&rsquo;s new in 2.0
+        </a>
+      </div>
+
+      <p class="reveal mt-8 text-[0.8125rem] tracking-wide text-[color:var(--dg-text-3)]">
+        100% open source &middot; MIT licensed &middot; Runs on macOS, Linux, Docker &amp; WSL2
+      </p>
+    </div>
+  </div>
+</section>

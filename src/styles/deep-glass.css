@@ -1,0 +1,387 @@
+/* ============================================================
+   Deep Space Glass — design system for OpenClaw Wiki
+   Apple-inspired: generous space, tight display tracking,
+   frosted surfaces, aurora depth, restrained motion.
+   Scoped under `.deep-scope` so it never leaks into
+   Starlight docs or other marketing pages.
+   ============================================================ */
+
+.deep-scope {
+  /* ---- Surfaces (deep space) ---- */
+  --dg-bg: #070a14;
+  --dg-void: #05070e;
+  --dg-surface: rgba(255, 255, 255, 0.045);
+  --dg-surface-hi: rgba(255, 255, 255, 0.078);
+  --dg-hairline: rgba(255, 255, 255, 0.09);
+  --dg-hairline-hi: rgba(255, 255, 255, 0.17);
+
+  /* ---- Text (AA+ on --dg-bg) ---- */
+  --dg-text: #f2f5fa; /* ~16:1 */
+  --dg-text-2: #b3bed0; /* ~9.4:1 */
+  --dg-text-3: #8b98ad; /* ~6.6:1 */
+
+  /* ---- Accents ---- */
+  --dg-blue: #0a84ff;
+  --dg-violet: #8b5cf6;
+  --dg-cyan: #22d3ee;
+
+  /* ---- Radii ---- */
+  --dg-r-sm: 14px;
+  --dg-r: 22px;
+  --dg-r-lg: 30px;
+
+  /* ---- Elevation ---- */
+  --dg-shadow: 0 10px 34px rgba(0, 0, 0, 0.42);
+  --dg-shadow-hi: 0 26px 64px rgba(0, 0, 0, 0.56);
+  --dg-inner: inset 0 1px 0 rgba(255, 255, 255, 0.11);
+
+  /* ---- Motion ---- */
+  --dg-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dg-dur: 0.62s;
+
+  position: relative;
+  isolation: isolate;
+  background-color: var(--dg-bg);
+  color: var(--dg-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+    'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------- Typography ---------- */
+.deep-scope .dg-display {
+  font-size: clamp(2.85rem, 7vw, 5.6rem);
+  line-height: 1.03;
+  letter-spacing: -0.038em;
+  font-weight: 700;
+  color: var(--dg-text);
+}
+
+.deep-scope .dg-h2 {
+  font-size: clamp(1.95rem, 4.1vw, 3.3rem);
+  line-height: 1.11;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  color: var(--dg-text);
+}
+
+.deep-scope .dg-h3 {
+  font-size: 1.1875rem;
+  line-height: 1.35;
+  letter-spacing: -0.017em;
+  font-weight: 650;
+  color: var(--dg-text);
+}
+
+.deep-scope .dg-eyebrow {
+  font-size: 0.8125rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #7dd3fc;
+}
+
+.deep-scope .dg-lede {
+  font-size: clamp(1.0625rem, 1.55vw, 1.2813rem);
+  line-height: 1.62;
+  letter-spacing: -0.011em;
+  color: var(--dg-text-2);
+}
+
+.deep-scope .dg-body {
+  font-size: 1rem;
+  line-height: 1.66;
+  color: var(--dg-text-2);
+}
+
+.deep-scope .dg-gradient-text {
+  background: linear-gradient(103deg, #7dd3fc 0%, #a78bfa 40%, #22d3ee 74%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- Glass ---------- */
+.deep-scope .glass {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.028);
+  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.022));
+  -webkit-backdrop-filter: blur(22px) saturate(170%);
+  backdrop-filter: blur(22px) saturate(170%);
+  border: 1px solid var(--dg-hairline);
+  border-radius: var(--dg-r);
+  box-shadow: var(--dg-shadow), var(--dg-inner);
+}
+
+.deep-scope .glass-soft {
+  background-color: rgba(255, 255, 255, 0.022);
+  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.014));
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--dg-r-sm);
+}
+
+/* Top sheen — the detail that reads as "real glass" */
+.deep-scope .glass::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.28) 22%,
+    rgba(255, 255, 255, 0.28) 78%,
+    transparent
+  );
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.deep-scope .glass-card {
+  transition: transform 0.5s var(--dg-ease), border-color 0.5s var(--dg-ease),
+    box-shadow 0.5s var(--dg-ease);
+  will-change: transform;
+}
+
+.deep-scope .glass-card:hover,
+.deep-scope .glass-card:focus-within {
+  transform: translateY(-5px);
+  border-color: var(--dg-hairline-hi);
+  box-shadow: var(--dg-shadow-hi), inset 0 1px 0 rgba(255, 255, 255, 0.19);
+}
+
+/* ---------- Aurora ---------- */
+.deep-scope .aurora {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.deep-scope .aurora-blue {
+  background: radial-gradient(circle, rgba(10, 132, 255, 0.5), transparent 68%);
+}
+.deep-scope .aurora-violet {
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.42), transparent 68%);
+}
+.deep-scope .aurora-cyan {
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.32), transparent 68%);
+}
+
+/* ---------- Buttons ---------- */
+.deep-scope .dg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 1.0625rem;
+  letter-spacing: -0.012em;
+  padding: 0.9375rem 1.875rem;
+  transition: transform 0.35s var(--dg-ease), box-shadow 0.35s var(--dg-ease),
+    background-color 0.35s var(--dg-ease), border-color 0.35s var(--dg-ease);
+  will-change: transform;
+}
+
+.deep-scope .dg-btn-primary {
+  color: #fff;
+  background: linear-gradient(135deg, #0a84ff, #4f6bff);
+  box-shadow: 0 10px 30px rgba(10, 132, 255, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+.deep-scope .dg-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 44px rgba(10, 132, 255, 0.46), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.deep-scope .dg-btn-ghost {
+  color: var(--dg-text);
+  background-color: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--dg-hairline);
+}
+
+.deep-scope .dg-btn-ghost:hover {
+  transform: translateY(-2px);
+  background-color: rgba(255, 255, 255, 0.09);
+  border-color: var(--dg-hairline-hi);
+}
+
+/* ---------- Reveal ---------- */
+.deep-scope .reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity var(--dg-dur) var(--dg-ease), transform var(--dg-dur) var(--dg-ease);
+}
+
+.deep-scope .reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Accessibility ---------- */
+.deep-scope a:focus-visible,
+.deep-scope button:focus-visible,
+.deep-scope [tabindex]:focus-visible {
+  outline: 2px solid #7dd3fc;
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+
+.deep-scope ::selection {
+  background: rgba(10, 132, 255, 0.4);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deep-scope .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .deep-scope .glass-card:hover,
+  .deep-scope .glass-card:focus-within,
+  .deep-scope .dg-btn:hover {
+    transform: none !important;
+  }
+  .deep-scope .aurora {
+    animation: none !important;
+  }
+}
+
+/* Graceful fallback when backdrop-filter is unsupported */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .deep-scope .glass,
+  .deep-scope .glass-soft {
+    background-color: rgba(17, 22, 38, 0.9);
+  }
+  #header.dg-deep.scroll > div:first-child {
+    background-color: rgba(7, 10, 20, 0.97) !important;
+  }
+}
+
+/* ============================================================
+   Global frosted navigation (applies to every page)
+   ============================================================ */
+#header.dg-nav > div:first-child {
+  transition: background-color 0.45s var(--dg-ease), box-shadow 0.45s var(--dg-ease),
+    border-color 0.45s var(--dg-ease);
+  border-bottom: 1px solid transparent;
+}
+
+#header.dg-nav.scroll > div:first-child {
+  background-color: rgba(255, 255, 255, 0.74);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+  box-shadow: 0 10px 32px rgba(15, 23, 42, 0.08);
+}
+
+.dark #header.dg-nav.scroll > div:first-child {
+  background-color: rgba(7, 10, 20, 0.72);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45);
+}
+
+/* Deep variant — used on the homepage so nav text stays legible
+   over the dark hero even when the site is in light mode. */
+#header.dg-deep,
+#header.dg-deep .text-default,
+#header.dg-deep a:not(.dg-btn),
+#header.dg-deep button:not(.dg-btn) {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+#header.dg-deep a:not(.dg-btn):hover,
+#header.dg-deep button:not(.dg-btn):hover {
+  color: #fff;
+}
+
+#header.dg-deep .logo-text,
+#header.dg-deep [class*='logo'] {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+#header.dg-deep.scroll > div:first-child {
+  background-color: rgba(7, 10, 20, 0.74);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.46);
+}
+
+#header.dg-deep .dropdown-menu {
+  background-color: rgba(12, 16, 28, 0.92);
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  backdrop-filter: blur(20px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.55);
+  border-radius: var(--dg-r-sm, 14px);
+  overflow: hidden;
+}
+
+#header.dg-deep .dropdown-menu a {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+#header.dg-deep .dropdown-menu a:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+#header.dg-deep a:focus-visible,
+#header.dg-deep button:focus-visible {
+  outline: 2px solid #7dd3fc;
+  outline-offset: 3px;
+}
+
+/* Mobile menu open: AstroWind adds `bg-page` (light) — override so the
+   deep nav keeps a dark surface and white text stays legible. */
+#header.dg-deep.expanded,
+#header.dg-deep.bg-page {
+  background-color: rgba(5, 7, 14, 0.97) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(180%);
+  backdrop-filter: blur(26px) saturate(180%);
+}
+
+/* ============================================================
+   Deep footer
+   ============================================================ */
+.dg-footer-deep {
+  background-color: var(--dg-void, #05070e);
+  color: var(--dg-text-2, #b3bed0);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* Force the inner background layer too, so the deep footer stays dark
+   regardless of the site-wide light/dark theme. */
+.dg-footer-deep > div:first-child {
+  background-color: var(--dg-void, #05070e) !important;
+}
+
+.dg-footer-deep a {
+  color: var(--dg-text-2, #b3bed0);
+  transition: color 0.3s var(--dg-ease, ease);
+}
+
+.dg-footer-deep a:hover {
+  color: #fff;
+}
+
+.dg-footer-deep .text-muted,
+.dg-footer-deep .dark\:text-slate-400 {
+  color: var(--dg-text-3, #8b98ad) !important;
+}
+
+.dg-footer-deep a:focus-visible {
+  outline: 2px solid #7dd3fc;
+  outline-offset: 3px;
+  border-radius: 8px;
+}

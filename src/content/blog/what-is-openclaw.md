@@ -1,13 +1,12 @@
 ---
 title: 'What Is Openclaw? The Complete Guide to Clawdbot, Moltbot, and the Evolution of Self-Hosted AI (2026)'
-description: 'Discover Openclaw—the AI assistant formerly known as Clawdbot and Moltbot. Learn what changed, what stayed the same, and whether this thrice-rebranded self-hosted agent is worth your time. Based on hands-on testing and official source analysis.'
+image: ~/assets/images/blog/what-is-openclaw.png
 excerpt: 'Openclaw is the third evolution of the viral self-hosted AI assistant. We explain the journey from Clawdbot to Moltbot to Openclaw, what the software actually does, and whether the rebrandings signal instability or maturity.'
 publishDate: 2026-01-30
 lastmod: 2026-01-30
 author: 'Openclaw Wiki Editorial Team'
 tags: ['openclaw', 'clawdbot', 'moltbot', 'self-hosted-ai', 'claude-alternative', 'ai-agent']
 category: 'Technical Analysis'
-canonical: 'https://moltbotwiki.org/what-is-openclaw/'
 featured: true
 schema:
   type: 'TechArticle'

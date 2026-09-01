@@ -1,0 +1,51 @@
+---
+/**
+ * StatsBar — social proof from the OpenClaw 2.0 launch.
+ * The homepage previously showed zero proof; this is the
+ * highest-leverage trust block on the page.
+ */
+interface Stat {
+  value: string;
+  label: string;
+}
+
+export interface Props {
+  stats?: Stat[];
+  note?: string;
+}
+
+const {
+  stats = [
+    { value: '385K+', label: 'GitHub stars' },
+    { value: '3.22M', label: 'Weekly downloads' },
+    { value: '933', label: 'Contributors in 2.0' },
+    { value: '16K+', label: 'PRs merged in 2.0' },
+  ],
+  note = 'Measured at the OpenClaw 2.0 launch, 31 August 2026',
+} = Astro.props;
+---
+
+<section class="relative mx-auto max-w-6xl px-5 sm:px-8">
+  <div class="glass reveal p-7 md:p-9">
+    <dl class="grid grid-cols-2 gap-y-9 md:grid-cols-4 md:gap-y-0">
+      {
+        stats.map((stat, i) => (
+          <div
+            class:list={[
+              'px-1 text-center md:text-left',
+              'md:border-l md:border-white/10 md:pl-7 md:first:border-l-0 md:first:pl-0',
+            ]}
+          >
+            <dt class="dg-gradient-text text-[2rem] font-bold leading-none tracking-[-0.03em] md:text-[2.6rem]">
+              {stat.value}
+            </dt>
+            <dd class="mt-2 text-[0.8125rem] uppercase tracking-[0.1em] text-[color:var(--dg-text-3)]">
+              {stat.label}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+  <p class="mt-4 text-center text-[0.75rem] tracking-wide text-[color:var(--dg-text-3)]">{note}</p>
+</section>

@@ -1,70 +1,339 @@
 ---
 import Layout from '~/layouts/PageLayout.astro';
-import HeroText from '~/components/widgets/HeroText.astro';
+import Hero from '~/components/widgets/Hero.astro';
+import Features2 from '~/components/widgets/Features2.astro';
+import Steps from '~/components/widgets/Steps.astro';
+import FAQs from '~/components/widgets/FAQs.astro';
+import CallToAction from '~/components/widgets/CallToAction.astro';
 
 const metadata = {
-  title: 'OpenClaw Skills & Integrations - ClawHub Marketplace',
-  description: 'Explore the official OpenClaw Skills marketplace. Discover powerful plugins, integrations, and tools to extend the capabilities of your OpenClaw AI agent.',
+  title: 'OpenClaw Skills & ClawHub Marketplace',
+  description:
+    'Discover curated OpenClaw skills, learn how to install from ClawHub, map real use cases to capabilities, and stay safe with third-party skill security tips.',
   ignoreTitleTemplate: true,
+};
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'OpenClaw Skills Library',
+  description:
+    'Curated guide to OpenClaw skills, ClawHub marketplace installs, and real-world capability mapping.',
+  url: 'https://openclawwiki.org/skills',
+  isPartOf: {
+    '@type': 'WebSite',
+    name: 'OpenClaw Wiki',
+    url: 'https://openclawwiki.org',
+  },
 };
 ---
 
 <Layout metadata={metadata}>
-  <!-- HeroText Widget ******************* -->
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} slot="header" />
 
-  <HeroText
+  <Hero
     tagline="Marketplace"
     title="OpenClaw Skills Library"
-    subtitle="Discover and install powerful skills to expand your AI agent's capabilities."
+    subtitle="Modular extensions that teach your agent new tools. Browse ClawHub for thousands of community skills — or start with the curated picks below."
+    actions={[
+      {
+        variant: 'primary',
+        text: 'Browse ClawHub',
+        href: 'https://clawhub.ai',
+        target: '_blank',
+        icon: 'tabler:external-link',
+      },
+      {
+        text: 'Skills Docs',
+        href: '/docs/tools/skills/',
+        icon: 'tabler:book',
+      },
+    ]}
   />
 
-  <!-- Iframe Section ******************* -->
+  <Features2
+    title="Featured Skills to Start With"
+    subtitle="Community-proven skills from ClawdHub and showcase builds. Install with clawhub, then restart your agent session."
+    columns={3}
+    items={[
+      {
+        title: 'Home Assistant',
+        description:
+          'Control lights, sensors, and automations with natural language.<br/><code class="text-sm">clawhub install homeassistant</code>',
+        icon: 'tabler:home',
+        callToAction: {
+          text: 'View on ClawdHub',
+          href: 'https://clawdhub.com/skills/homeassistant',
+          target: '_blank',
+        },
+      },
+      {
+        title: 'CalDAV Calendar',
+        description:
+          'Self-hosted calendar integration via khal/vdirsyncer.<br/><code class="text-sm">clawhub install caldav-calendar</code>',
+        icon: 'tabler:calendar',
+        callToAction: {
+          text: 'View on ClawdHub',
+          href: 'https://clawdhub.com/skills/caldav-calendar',
+          target: '_blank',
+        },
+      },
+      {
+        title: 'R2 Upload',
+        description:
+          'Upload to Cloudflare R2/S3 and share secure presigned download links.<br/><code class="text-sm">clawhub install r2-upload</code>',
+        icon: 'tabler:cloud-upload',
+        callToAction: {
+          text: 'View on ClawdHub',
+          href: 'https://clawdhub.com/skills/r2-upload',
+          target: '_blank',
+        },
+      },
+      {
+        title: 'Bambu 3D Printer',
+        description:
+          'Status, jobs, camera, AMS, and calibration for BambuLab printers.<br/><code class="text-sm">clawhub install bambu-cli</code>',
+        icon: 'tabler:printer',
+        callToAction: {
+          text: 'View on ClawdHub',
+          href: 'https://clawdhub.com/tobiasbischoff/bambu-cli',
+          target: '_blank',
+        },
+      },
+      {
+        title: 'Vienna Transport',
+        description:
+          'Real-time departures, disruptions, and routing for Wiener Linien.<br/><code class="text-sm">clawhub install wienerlinien</code>',
+        icon: 'tabler:train',
+        callToAction: {
+          text: 'View on ClawdHub',
+          href: 'https://clawdhub.com/hjanuschka/wienerlinien',
+          target: '_blank',
+        },
+      },
+      {
+        title: 'OpenRouter Transcribe',
+        description:
+          'Multilingual audio transcription via OpenRouter (Gemini and more).<br/><code class="text-sm">clawhub install openrouter-transcribe</code>',
+        icon: 'tabler:microphone',
+        callToAction: {
+          text: 'View on ClawdHub',
+          href: 'https://clawdhub.com/obviyus/openrouter-transcribe',
+          target: '_blank',
+        },
+      },
+      {
+        title: 'CodexMonitor',
+        description:
+          'List, inspect, and watch local OpenAI Codex sessions from the CLI.<br/><code class="text-sm">clawhub install codexmonitor</code>',
+        icon: 'tabler:eye',
+        callToAction: {
+          text: 'View on ClawdHub',
+          href: 'https://clawdhub.com/odrobnik/codexmonitor',
+          target: '_blank',
+        },
+      },
+      {
+        title: 'GitHub (bundled)',
+        description:
+          'Official GitHub CLI integration for PRs, issues, and repo workflows. Ships with OpenClaw — enable it in config if needed.',
+        icon: 'tabler:brand-github',
+        callToAction: {
+          text: 'Skills config',
+          href: '/docs/tools/skills-config/',
+        },
+      },
+      {
+        title: 'Summarize (bundled)',
+        description:
+          'Summarize URLs, PDFs, documents, and audio. A core bundled skill maintained with the OpenClaw release.',
+        icon: 'tabler:file-text',
+        callToAction: {
+          text: 'Read Skills docs',
+          href: '/docs/tools/skills/',
+        },
+      },
+    ]}
+  />
 
-  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-    <div class="w-full aspect-[4/3] md:aspect-[16/9] lg:h-[800px] bg-white dark:bg-slate-900 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-      <iframe
-        src="https://www.clawhub.com/skills"
-        title="OpenClaw Skills Marketplace"
-        class="w-full h-full border-0"
-        loading="lazy"
-        allowfullscreen>
-      </iframe>
+  <Steps
+    title="How to Install Skills"
+    subtitle="ClawHub is the public registry. Skills land in your workspace and load on the next session."
+    items={[
+      {
+        title: 'Install the CLI',
+        description:
+          'Run <code>npm i -g clawhub</code> (or follow the latest install notes on <a class="underline" href="https://clawhub.ai" target="_blank" rel="noopener">clawhub.ai</a>).',
+        icon: 'tabler:terminal-2',
+      },
+      {
+        title: 'Search & install',
+        description:
+          'Browse the marketplace, then install into your workspace:<br/><code>clawhub search calendar</code><br/><code>clawhub install &lt;skill-slug&gt;</code>',
+        icon: 'tabler:download',
+      },
+      {
+        title: 'Update & manage',
+        description:
+          'Keep skills current with <code>clawhub update --all</code>. List installs with <code>clawhub list</code>. Prefer sandboxed runs for untrusted skills.',
+        icon: 'tabler:refresh',
+      },
+      {
+        title: 'Configure gating',
+        description:
+          'Skills can require binaries, env vars, or config flags. See <a class="underline" href="/docs/tools/skills/">Skills</a> and <a class="underline" href="/docs/tools/skills-config/">Skills config</a> for load-time filters and secrets.',
+        icon: 'tabler:settings',
+      },
+    ]}
+  />
+
+  <Features2
+    title="Map Real Use Cases to Skills"
+    subtitle="Skills are the building blocks. These community patterns show what to look for on ClawHub — not every use case needs a dedicated package."
+    columns={3}
+    isDark
+    items={[
+      {
+        title: 'Inbox & email',
+        description:
+          'Newsletter digests, triage, and CRM contact discovery. Look for Gmail/IMAP skills plus summarization.',
+        icon: 'tabler:mail',
+      },
+      {
+        title: 'Calendar & household',
+        description:
+          'Morning briefs, family calendars, and appointment tracking. Start with CalDAV or Google Calendar skills.',
+        icon: 'tabler:calendar-event',
+      },
+      {
+        title: 'Multi-channel assistant',
+        description:
+          'Route work across Telegram, Slack, WhatsApp, and email from one agent — often channel plugins plus task skills.',
+        icon: 'tabler:messages',
+      },
+      {
+        title: 'Knowledge & RAG',
+        description:
+          'Drop URLs and notes into chat, then search semantically. Pair memory/RAG skills with vector search tooling.',
+        icon: 'tabler:brain',
+      },
+      {
+        title: 'Content digests',
+        description:
+          'Daily Reddit/YouTube/tech-news summaries. Combine browser or API skills with scheduled prompts.',
+        icon: 'tabler:rss',
+      },
+      {
+        title: 'Home & infra',
+        description:
+          'Home Assistant control, self-healing servers, and n8n orchestration — hardware and webhook-friendly skills.',
+        icon: 'tabler:server',
+      },
+    ]}
+  />
+
+  <section class="py-12 bg-amber-50 dark:bg-slate-800/80 border-y border-amber-100 dark:border-slate-700">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl mb-4">
+        Skill Security Checklist
+      </h2>
+      <p class="text-lg text-gray-600 dark:text-slate-300 mb-6">
+        Treat third-party skills as <strong>trusted code</strong>. ClawHub hosts thousands of community bundles;
+        some have shipped vulnerabilities or malicious behavior. Review before you install.
+      </p>
+      <ul class="list-disc pl-6 space-y-3 text-gray-700 dark:text-slate-300">
+        <li>Read the skill’s <code>SKILL.md</code> and supporting scripts before enabling it.</li>
+        <li>Prefer sandboxed runs for untrusted inputs and risky tools.</li>
+        <li>Never paste API keys into chat; use skill env / config wiring instead.</li>
+        <li>Watch for skills that exfiltrate <code>.env</code> files, credentials, or private repos.</li>
+        <li>
+          See <a class="text-blue-600 dark:text-blue-400 hover:underline" href="/docs/tools/skills/">Skills security notes</a>
+          and the gateway <a class="text-blue-600 dark:text-blue-400 hover:underline" href="/docs/gateway/security">Security</a> guide.
+        </li>
+      </ul>
     </div>
   </section>
 
-  <!-- SEO Content Block ******************* -->
-
-  <section class="py-12 bg-blue-50 dark:bg-slate-800">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl mb-6">
+  <section class="py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 prose prose-lg dark:prose-invert text-gray-600 dark:text-slate-300">
+      <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl mb-6 !mt-0">
         What are OpenClaw Skills?
       </h2>
-      <div class="prose prose-lg dark:prose-invert max-w-none text-gray-600 dark:text-slate-300">
-        <p>
-          <strong>OpenClaw Skills</strong> are modular extensions that grant your AI agent new abilities. 
-          Formerly known as Moltbot or Clawdbot plugins, these skills allow your self-hosted AI to interact with external APIs, 
-          manage files, execute code, and perform complex automation tasks.
-        </p>
-        
-        <h3 class="text-2xl font-semibold mt-8 mb-4 text-gray-800 dark:text-gray-100">Why use ClawHub?</h3>
-        <p>
-          ClawHub is the premier repository for community-verified OpenClaw extensions. 
-          By browsing the <a href="https://www.clawhub.com/skills" class="text-blue-600 dark:text-blue-400 hover:underline">ClawHub Skills Marketplace</a>, 
-          you can find tools for:
-        </p>
-        <ul class="list-disc pl-6 space-y-2 mt-4">
-          <li><strong>Web Browsing:</strong> Enable your agent to search the internet and extract real-time data.</li>
-          <li><strong>Productivity:</strong> Connect with Google Workspace, Slack, Notion, and Linear.</li>
-          <li><strong>Development:</strong> Give your agent direct access to GitHub, Docker, and command-line interfaces.</li>
-          <li><strong>Data Analysis:</strong> Equip your agent with Python pandas, SQL capabilities, and visualization tools.</li>
-        </ul>
-
-        <h3 class="text-2xl font-semibold mt-8 mb-4 text-gray-800 dark:text-gray-100">How to Install Skills</h3>
-        <p>
-          Installing a skill is as simple as copying the skill definition or configuration from the marketplace and adding it to your OpenClaw configuration file. 
-          Always ensure you are using the latest version of OpenClaw for maximum compatibility with the newest skills in the ecosystem.
-        </p>
-      </div>
+      <p>
+        <strong>OpenClaw Skills</strong> are AgentSkills-compatible folders: each one is a directory with a
+        <code>SKILL.md</code> (YAML frontmatter + instructions) that teaches the agent how to use tools.
+        OpenClaw loads <strong>bundled</strong>, <strong>managed</strong> (<code>~/.openclaw/skills</code>), and
+        <strong>workspace</strong> (<code>&lt;workspace&gt;/skills</code>) skills — workspace wins on name conflicts.
+      </p>
+      <p>
+        <strong>ClawHub</strong> (browse at
+        <a href="https://clawhub.ai" target="_blank" rel="noopener">clawhub.ai</a>)
+        is the public registry for discovering, versioning, and installing community skills. For a live catalog with
+        extra filters, you can also open
+        <a href="https://www.skills.sh/" target="_blank" rel="noopener">skills.sh</a>
+        in a new tab (embedding is blocked by the site’s frame policy).
+      </p>
+      <p>
+        Want inspiration beyond package lists? Explore real deployments on our
+        <a href="/docs/start/showcase/">Showcase</a>
+        and community use-case collections that map life workflows to skill combinations.
+      </p>
     </div>
   </section>
+
+  <FAQs
+    title="Skills FAQ"
+    subtitle="Common questions about installing and using OpenClaw skills."
+    items={[
+      {
+        title: 'Skill vs plugin — what’s the difference?',
+        description:
+          'A skill is usually a SKILL.md bundle that teaches the agent procedures and tool usage. Plugins can ship code plus their own skills directories. Both participate in the same skill precedence rules when enabled.',
+      },
+      {
+        title: 'Where do installed skills live?',
+        description:
+          'By default clawhub installs into ./skills under your working directory (or the configured OpenClaw workspace). Precedence is workspace → ~/.openclaw/skills → bundled.',
+      },
+      {
+        title: 'How do I update skills?',
+        description:
+          'Run clawhub update --all to refresh installed skills. Pin important installs if you need frozen versions that force-reinstalls cannot overwrite.',
+      },
+      {
+        title: 'Can the agent create a skill itself?',
+        description:
+          'Yes — many showcase builds ask OpenClaw to generate a skill in chat (wine cellar, Todoist, Jira, camera shots). Review generated files before trusting them in production.',
+      },
+      {
+        title: 'How do I publish my own skill?',
+        description:
+          'Create a skill folder with SKILL.md, then use clawhub login and clawhub skill publish. Follow the ClawHub docs for versioning, tags, and moderation.',
+      },
+      {
+        title: 'Why can’t I embed ClawHub or skills.sh here?',
+        description:
+          'Those sites send X-Frame-Options / CSP frame-ancestors headers that block iframes. We link out instead and curate starter content on this page for SEO and safety.',
+      },
+    ]}
+  />
+
+  <CallToAction
+    title="Ready to extend your agent?"
+    subtitle="Browse the full registry on ClawHub, or dig into the Skills docs for gating, config, and security."
+    actions={[
+      {
+        variant: 'primary',
+        text: 'Open ClawHub',
+        href: 'https://clawhub.ai',
+        target: '_blank',
+        icon: 'tabler:external-link',
+      },
+      {
+        text: 'Skills documentation',
+        href: '/docs/tools/skills/',
+        icon: 'tabler:book',
+      },
+    ]}
+  />
 </Layout>

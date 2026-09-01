@@ -1,13 +1,12 @@
 ---
 title: 'The Easiest Way to Deploy Openclaw: One-Click Setup on Zeabur (No Coding Required)'
-description: 'Forget complex Docker commands. Learn how to deploy Openclaw (formerly Clawdbot/Moltbot) in 5 minutes using Zeabur''s one-click template. The fastest way to get your AI agent online 24/7.'
+image: ~/assets/images/blog/how-to-install-openclaw-clawdbot-on-zeabur.png
 excerpt: 'Struggling with Linux commands or VPS setup? We show you the "Cheat Code" to deploying Openclaw. Use our exclusive Zeabur template to get your AI agent running in the cloud instantly.'
 publishDate: 2026-02-01
 lastmod: 2026-02-01
 author: 'Openclaw Wiki Team'
 tags: ['zeabur deploy', 'openclaw zeabur', 'moltbot hosting', 'clawdbot cloud', 'no-code ai']
 category: 'Easy Deployment'
-canonical: 'https://openclawwiki.org/how-to-install-openclaw_clawdbot-on-zeabur/'
 schema:
   type: 'HowTo'
   name: 'How to Deploy Openclaw on Zeabur'

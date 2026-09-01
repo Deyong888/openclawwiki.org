@@ -1,0 +1,51 @@
+---
+/**
+ * CtaGlow — closing call to action, lit from behind by aurora.
+ */
+export interface Props {
+  title?: string;
+  subtitle?: string;
+}
+
+const {
+  title = 'Take your AI back to your own machine',
+  subtitle = 'One command, about five minutes, and your assistant runs where you can see it. 385,000+ developers already made the switch.',
+} = Astro.props;
+---
+
+<section class="relative overflow-hidden px-5 pb-28 pt-10 sm:px-8 md:pb-36">
+  <div
+    class="aurora aurora-blue"
+    style="width: 40rem; height: 26rem; bottom: -14rem; left: 50%; transform: translateX(-50%);"
+    aria-hidden="true"
+  >
+  </div>
+  <div
+    class="aurora aurora-violet"
+    style="width: 24rem; height: 20rem; bottom: -10rem; right: -6rem;"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div class="glass reveal relative z-10 mx-auto max-w-4xl px-6 py-14 text-center md:px-14 md:py-16">
+    <h2 class="dg-h2 text-balance">{title}</h2>
+    <p class="dg-lede mx-auto mt-5 max-w-xl text-balance">{subtitle}</p>
+
+    <div class="mt-10 flex w-full flex-col items-stretch gap-3.5 sm:w-auto sm:flex-row sm:items-center sm:justify-center">
+      <a href="/docs/getting-started/quick-start/" class="dg-btn dg-btn-primary">
+        Get started
+        <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M4 10h11M11 5.5 15.5 10 11 14.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </a>
+      <a
+        href="https://github.com/openclaw/openclaw"
+        class="dg-btn dg-btn-ghost"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        Star on GitHub
+      </a>
+    </div>
+  </div>
+</section>

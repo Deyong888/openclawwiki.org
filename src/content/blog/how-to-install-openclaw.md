@@ -1,13 +1,12 @@
 ---
 title: 'How to Install Openclaw (Formerly Clawdbot/Moltbot): The Ultimate Docker & VPS Setup Guide (2026)'
-description: 'Step-by-step guide to installing Openclaw (previously known as Clawdbot and Moltbot). Learn the safest way to deploy this AI agent using Docker, local host, or Cloud VPS. Includes troubleshooting for common errors.'
+image: ~/assets/images/blog/how-to-install-openclaw.png
 excerpt: 'Stop searching for broken Clawdbot links. This guide covers the correct installation method for Openclaw—the rebranded, official version of the viral AI agent. We provide copy-paste Docker Compose files for a secure setup.'
 publishDate: 2026-01-31
 lastmod: 2026-01-31
 author: 'Openclaw Wiki Editorial Team'
 tags: ['openclaw install', 'clawdbot install', 'moltbot install', 'docker tutorial', 'self-hosted ai']
 category: 'Tutorials'
-canonical: 'https://openclawwiki.org/how-to-install-openclaw/'
 featured: true
 schema:
   type: 'TechArticle'

@@ -17,6 +17,8 @@
     "check:astro": "astro check",
     "check:eslint": "eslint .",
     "check:prettier": "prettier --check .",
+    "validate": "node scripts/validate-frontmatter.cjs",
+    "covers": "node scripts/gen-covers.cjs",
     "fix": "npm run fix:eslint && npm run fix:prettier",
     "fix:eslint": "eslint --fix .",
     "fix:prettier": "prettier -w ."

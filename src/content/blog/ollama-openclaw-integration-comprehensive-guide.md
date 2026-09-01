@@ -1,7 +1,11 @@
 ---
 title: "Ollama v0.15.4 and OpenClaw Integration: A Comprehensive Guide"
-date: "2026-02-07"
-description: "An in-depth exploration of the integration between Ollama v0.15.4 and OpenClaw, highlighting features, benefits, and setup procedures."
+excerpt: "An in-depth exploration of the integration between Ollama v0.15.4 and OpenClaw, highlighting features, benefits, and setup procedures for running local models."
+publishDate: 2026-02-07
+updateDate: 2026-02-07
+author: "OpenClaw Wiki Editorial Team"
+image: ~/assets/images/blog/openclaw-ollama.png
+category: "Technical Deep Dive"
 tags: ["Ollama", "OpenClaw", "AI", "Integration", "Local AI"]
 ---
 

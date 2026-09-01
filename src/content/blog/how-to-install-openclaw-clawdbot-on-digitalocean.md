@@ -1,13 +1,12 @@
 ---
 title: 'How to Deploy OpenClaw on DigitalOcean: The 1-Click Marketplace Guide (2026)'
-description: 'Skip the complex Docker commands. Learn how to deploy OpenClaw (formerly Moltbot) using the official DigitalOcean Marketplace image. A complete step-by-step guide to getting your AI agent online in 3 minutes.'
+image: ~/assets/images/blog/how-to-install-openclaw-clawdbot-on-digitalocean.png
 excerpt: 'Installing self-hosted AI shouldn''t require a Computer Science degree. In this guide, we walk through the "Lazy Method" of deploying OpenClaw using DigitalOcean''s 1-Click App—including the critical initialization step most guides miss.'
 publishDate: 2026-02-02
 lastmod: 2026-02-02
 author: 'OpenClaw Wiki Editorial Team'
 tags: ['digitalocean', 'openclaw', 'moltbot', 'one-click-deploy', 'vps-hosting', 'server-setup']
 category: 'Tutorials'
-canonical: 'https://openclawwiki.org/how-to-deploy-openclaw-digitalocean/'
 featured: true
 schema:
   type: 'HowTo'

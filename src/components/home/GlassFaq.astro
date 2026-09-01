@@ -1,0 +1,115 @@
+---
+/**
+ * GlassFaq — native <details>/<summary> accordion.
+ * Zero JavaScript, keyboard accessible by default.
+ */
+interface Faq {
+  question: string;
+  answer: string;
+}
+
+export interface Props {
+  id?: string;
+  tagline?: string;
+  title?: string;
+  subtitle?: string;
+  items?: Faq[];
+}
+
+const {
+  id = 'faq',
+  tagline = 'FAQ',
+  title = 'Questions people actually ask',
+  subtitle = '',
+  items = [
+    {
+      question: 'What actually changed in OpenClaw 2.0?',
+      answer:
+        'It is the largest release in the project’s history — roughly half of all code ever merged shipped in this one version, from 933 contributors across 16,000+ pull requests. The installer and first-run flow were rebuilt, the browser app was rewritten (the Control UI now responds in about 575ms), sessions moved onto SQLite, and permissions, secrets, sharing and multi-agent work were all reworked.',
+    },
+    {
+      question: 'Is OpenClaw free?',
+      answer:
+        'Yes. The core is open source. You pay for your own hardware and, if you use one, for a hosted model API. There is no per-seat licence and no usage tax from us.',
+    },
+    {
+      question: 'Do I need a Mac Mini?',
+      answer:
+        'No. A Mac Mini is a popular always-on host because it is quiet and efficient, but 2.0 runs on macOS, Linux, Docker and WSL2. Pick whatever machine you already have.',
+    },
+    {
+      question: 'Can I reuse my existing ChatGPT or Claude subscription?',
+      answer:
+        'Yes. Guided setup in 2.0 detects an existing subscription, API keys you already have, or a local model such as Ollama, and wires it up without hand-editing config files.',
+    },
+    {
+      question: 'Where does my data go?',
+      answer:
+        'It stays on the machine you installed it on. That is the entire point of self-hosting — you choose which model provider, if any, sees a request. Nothing is proxied through us.',
+    },
+    {
+      question: 'I am still on Clawdbot or Moltbot. How do I migrate?',
+      answer:
+        'There is a dedicated migration guide. In practice it is mostly renaming configuration files and updating the image tag.',
+    },
+  ],
+} = Astro.props;
+---
+
+<section class="relative mx-auto max-w-4xl px-5 py-24 sm:px-8 md:py-32" {...id ? { id } : {}}>
+  <div class="text-center">
+    <p class="dg-eyebrow reveal">{tagline}</p>
+    <h2 class="dg-h2 reveal mt-4 text-balance">{title}</h2>
+    {subtitle && <p class="dg-lede reveal mx-auto mt-5 max-w-2xl text-balance">{subtitle}</p>}
+  </div>
+
+  <div class="mt-14 space-y-3.5">
+    {
+      items.map((item) => (
+        <details class="glass glass-card dg-faq reveal group overflow-hidden">
+          <summary class="dg-faq-summary flex cursor-pointer list-none items-center justify-between gap-5 px-6 py-5 md:px-7">
+            <h3 class="dg-h3 pr-2 text-[1.0625rem]">{item.question}</h3>
+            <svg
+              class="dg-chevron h-4 w-4 shrink-0 text-[color:var(--dg-text-3)] transition-transform duration-300"
+              viewBox="0 0 20 20"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </summary>
+          <div class="border-t border-white/[0.07] px-6 pb-6 pt-5 md:px-7">
+            <p class="dg-body">{item.answer}</p>
+          </div>
+        </details>
+      ))
+    }
+  </div>
+
+  <p class="mt-8 text-center text-[0.9375rem] text-[color:var(--dg-text-3)]">
+    Still stuck?
+    <a class="text-sky-300 underline-offset-4 hover:underline" href="/docs/getting-started/quick-start/">Read the docs</a>
+    &nbsp;or
+    <a class="text-sky-300 underline-offset-4 hover:underline" href="/moltbot-to-openclaw/">see the migration guide</a>.
+  </p>
+</section>
+
+<style>
+  .dg-faq-summary::-webkit-details-marker {
+    display: none;
+  }
+  .dg-faq-summary {
+    list-style: none;
+  }
+  .dg-faq[open] .dg-chevron {
+    transform: rotate(180deg);
+  }
+  .dg-faq[open] {
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dg-chevron {
+      transition: none;
+    }
+  }
+</style>

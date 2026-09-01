@@ -2,13 +2,11 @@
 title: 'Openclaw Analyzed: From Clawdbot to Moltbot to Openclaw—A Technical History of Brand Iteration'
 publishDate: 2026-01-30
 lastmod: 2026-01-30
-description: 'Third-party technical analysis of Openclaw (formerly Moltbot/Clawdbot). Installation testing, security audit of the January 2026 Shodan exposure incident, and objective assessment of whether this thrice-rebranded self-hosted AI assistant is worth your time.'
 excerpt: 'After three rebrandings (Clawdbot→Moltbot→Openclaw), is this self-hosted AI assistant technically sound? Evidence-based analysis from GitHub source review and hands-on installation testing.'
 image: ~/assets/images/openclaw-evolution-analysis.png
 tags: [openclaw, moltbot, clawdbot, self-hosted-ai, brand-analysis, security-audit]
 category: 'Technical Analysis'
 author: 'Moltbot Wiki Editorial Team'
-canonical: 'https://openclawwiki.org/blog/from-clawdbot-to-moltbot-to-openclaw/'
 relatedPosts:
   - '/docs/migration/from-moltbot/'
   - '/docs/install/mac-mini/'

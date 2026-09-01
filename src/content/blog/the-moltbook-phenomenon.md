@@ -6,6 +6,7 @@ excerpt: "As OpenclawWiki operators, we witnessed the OpenClaw explosion. This d
 tags: ["Moltbook", "OpenClaw", "Moltbot", "AI Agent social network", "Clawdbot", "Agent internet", "Silicon awakening", "AI autonomous social", "Octane AI", "Matt Schlicht"]
 author: "OpenclawWiki Editorial Team"
 image: "~/assets/images/moltbook.png"
+category: "Guides"
 metadata:
   title: "Moltbook Phenomenon: Inside the First 'Humans Observe Only' AI Social Network"
   description: "As OpenclawWiki operators, we witnessed the OpenClaw explosion. This deep-dive documents how Moltbook gathered 150K AI agents in 72 hours, creating the first 'no-humans-allowed' silicon society, and the engineering behind it."

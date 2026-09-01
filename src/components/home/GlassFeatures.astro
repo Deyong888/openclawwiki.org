@@ -1,0 +1,75 @@
+---
+import { Icon } from 'astro-icon/components';
+
+/**
+ * GlassFeatures — what actually changed in OpenClaw 2.0.
+ */
+interface Feature {
+  title: string;
+  description: string;
+  icon: string;
+}
+
+export interface Props {
+  id?: string;
+  tagline?: string;
+  title?: string;
+  subtitle?: string;
+  items?: Feature[];
+}
+
+const {
+  id = 'features',
+  tagline = 'OpenClaw 2.0',
+  title = 'Rebuilt from the installer up',
+  subtitle = 'The largest release in the project’s history — roughly half of all code ever merged shipped in this one version.',
+  items = [
+    {
+      title: 'Guided setup',
+      description:
+        '2.0 detects an existing ChatGPT or Claude subscription, your API keys, or a local model and wires it up for you. No config files to hand-edit.',
+      icon: 'tabler:wand',
+    },
+    {
+      title: 'A browser app, rebuilt',
+      description:
+        'The Control UI was rewritten from scratch. Interactions now land in about 575ms, with sessions, memory and tools in one place.',
+      icon: 'tabler:device-desktop',
+    },
+    {
+      title: 'Sessions that persist',
+      description:
+        'Conversations moved onto SQLite. History, memory and context survive restarts instead of living in fragile JSON files.',
+      icon: 'tabler:database',
+    },
+    {
+      title: 'Sharing and multiplayer',
+      description:
+        'Share an assistant with your team, run several agents side by side, and keep permissions and secrets under your control.',
+      icon: 'tabler:users',
+    },
+  ],
+} = Astro.props;
+---
+
+<section class="relative mx-auto max-w-6xl px-5 py-24 sm:px-8 md:py-32" {...id ? { id } : {}}>
+  <div class="mx-auto max-w-3xl text-center">
+    <p class="dg-eyebrow reveal">{tagline}</p>
+    <h2 class="dg-h2 reveal mt-4 text-balance">{title}</h2>
+    <p class="dg-lede reveal mx-auto mt-5 max-w-2xl text-balance">{subtitle}</p>
+  </div>
+
+  <div class="mt-16 grid gap-5 sm:grid-cols-2">
+    {
+      items.map((item) => (
+        <article class="glass glass-card reveal p-7 md:p-8">
+          <div class="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-gradient-to-br from-sky-500/20 to-violet-500/20">
+            <Icon name={item.icon} class="h-[1.375rem] w-[1.375rem] text-sky-300" />
+          </div>
+          <h3 class="dg-h3">{item.title}</h3>
+          <p class="dg-body mt-2.5">{item.description}</p>
+        </article>
+      ))
+    }
+  </div>
+</section>

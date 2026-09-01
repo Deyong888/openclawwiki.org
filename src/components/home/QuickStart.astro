@@ -1,0 +1,126 @@
+---
+/**
+ * QuickStart — three steps plus a copyable install command.
+ * Replaces the old YouTube video block (which cost ~3 embeds of LCP).
+ */
+interface Step {
+  title: string;
+  description: string;
+}
+
+export interface Props {
+  id?: string;
+  tagline?: string;
+  title?: string;
+  subtitle?: string;
+  command?: string;
+  steps?: Step[];
+}
+
+const {
+  id = 'quickstart',
+  tagline = 'Quick start',
+  title = 'Running in about five minutes',
+  subtitle = 'One command gets the whole stack on your machine. 2.0 then walks you through connecting a model.',
+  command = 'curl -fsSL https://openclaw.ai/install.sh | bash',
+  steps = [
+    {
+      title: 'Run the installer',
+      description: 'A single command sets up the runtime on macOS, Linux, Docker or WSL2. No manual dependency hunting.',
+    },
+    {
+      title: 'Pick a model',
+      description:
+        '2.0 detects an existing ChatGPT or Claude subscription, your API keys, or a local model such as Ollama — and configures it.',
+    },
+    {
+      title: 'Open the Control UI',
+      description: 'Start your first session in the rebuilt browser app. Sessions persist, so you can close the tab and come back.',
+    },
+  ],
+} = Astro.props;
+---
+
+<section class="relative mx-auto max-w-6xl px-5 py-24 sm:px-8 md:py-32" {...id ? { id } : {}}>
+  <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+    <div>
+      <p class="dg-eyebrow reveal">{tagline}</p>
+      <h2 class="dg-h2 reveal mt-4 text-balance">{title}</h2>
+      <p class="dg-lede reveal mt-5">{subtitle}</p>
+
+      <ol class="mt-10 space-y-4">
+        {
+          steps.map((step, i) => (
+            <li class="glass-soft reveal flex gap-4 p-5">
+              <span class="dg-gradient-text mt-0.5 shrink-0 text-[0.9375rem] font-bold tabular-nums">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <div>
+                <h3 class="dg-h3">{step.title}</h3>
+                <p class="dg-body mt-1.5 text-[0.9375rem]">{step.description}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <div class="reveal">
+      <div class="glass overflow-hidden p-5 md:p-6">
+        <div class="mb-3 flex items-center gap-1.5" aria-hidden="true">
+          <span class="h-2.5 w-2.5 rounded-full bg-[#ff5f57]"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-[#febc2e]"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-[#28c840]"></span>
+        </div>
+
+        <div class="rounded-xl border border-white/10 bg-black/45 p-4">
+          <pre class="overflow-x-auto font-mono text-[0.8125rem] leading-relaxed text-[color:var(--dg-text-2)]"><code
+              id="dg-install-cmd"
+            ><span class="text-emerald-300">$</span> {command}</code></pre>
+        </div>
+
+        <div class="mt-4 flex items-center justify-between gap-4">
+          <p class="text-[0.8125rem] text-[color:var(--dg-text-3)]">macOS &middot; Linux &middot; WSL2 &middot; Docker</p>
+          <button
+            type="button"
+            data-copy="dg-install-cmd"
+            class="dg-btn dg-btn-ghost !px-4 !py-2 !text-[0.8125rem]"
+          >
+            <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <rect x="7" y="7" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.6"></rect>
+              <path d="M13 5.5A1.5 1.5 0 0 0 11.5 4h-6A1.5 1.5 0 0 0 4 5.5v6A1.5 1.5 0 0 0 5.5 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+            </svg>
+            <span data-copy-label>Copy</span>
+          </button>
+        </div>
+      </div>
+
+      <p class="mt-4 px-1 text-[0.8125rem] text-[color:var(--dg-text-3)]">
+        Prefer to read first?
+        <a class="text-sky-300 underline-offset-4 hover:underline" href="/docs/install/mac-mini/">Installation guide</a>
+        &nbsp;or
+        <a class="text-sky-300 underline-offset-4 hover:underline" href="/docs/getting-started/quick-start/">quick start</a>.
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const target = document.getElementById(btn.dataset.copy || '');
+      if (!target) return;
+      const label = btn.querySelector('[data-copy-label]');
+      try {
+        await navigator.clipboard.writeText((target.textContent || '').replace(/^\$\s*/, '').trim());
+        if (label) {
+          const original = label.textContent;
+          label.textContent = 'Copied';
+          setTimeout(() => (label.textContent = original), 1600);
+        }
+      } catch {
+        /* Clipboard unavailable (insecure context) — fail silently. */
+      }
+    });
+  });
+</script>

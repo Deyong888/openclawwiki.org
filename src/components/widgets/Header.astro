@@ -30,6 +30,8 @@ export interface Props {
   showToggleTheme?: boolean;
   showRssFeed?: boolean;
   position?: string;
+  /** Force the deep-space glass variant (auto-enabled on the homepage). */
+  variant?: 'default' | 'deep';
 }
 
 const {
@@ -42,14 +44,16 @@ const {
   showToggleTheme = false,
   showRssFeed = false,
   position = 'center',
+  variant = 'default',
 } = Astro.props;
 
 const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
+const isDeep = variant === 'deep' || currentPath === '/';
 ---
 
 <header
   class:list={[
-    { sticky: isSticky, relative: !isSticky, dark: isDark },
+    { sticky: isSticky, relative: !isSticky, dark: isDark, 'dg-nav': true, 'dg-deep': isDeep },
     'top-0 z-40 flex-none mx-auto w-full border-b border-gray-50/0 transition-[opacity] ease-in-out',
   ]}
   {...isSticky ? { 'data-aw-sticky-header': true } : {}}

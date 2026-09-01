@@ -43,9 +43,48 @@ const metadata = merge(
   },
   { ...(post?.metadata ? { ...post.metadata, canonical: post.metadata?.canonical || url } : {}) }
 ) as MetaData;
+
+// Article / TechArticle structured data for Google rich results and E-E-A-T signals
+const imageUrl =
+  typeof image === 'string'
+    ? image
+    : image?.src
+      ? String(new URL(image.src, Astro.site))
+      : undefined;
+
+const isTechnical = ['Technical Deep Dive', 'Server Deployment', 'Technical Analysis'].includes(
+  post.category?.title ?? ''
+);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': isTechnical ? 'TechArticle' : 'Article',
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': url,
+  },
+  headline: post.title,
+  description: post.excerpt,
+  image: imageUrl ? [imageUrl] : undefined,
+  datePublished: post.publishDate?.toISOString?.(),
+  dateModified: post.updateDate?.toISOString?.() ?? post.publishDate?.toISOString?.(),
+  author: {
+    '@type': post.author?.includes('Team') ? 'Organization' : 'Person',
+    name: post.author || 'OpenClaw Wiki Editorial Team',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'OpenClaw Wiki',
+    url: String(Astro.site),
+  },
+  keywords: post.tags?.map((t) => t.title).join(', '),
+};
 ---
 
 <Layout metadata={metadata}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
   <SinglePost post={{ ...post, image: image }} url={url}>
     {post.Content ? <post.Content /> : <Fragment set:html={post.content || ''} />}
   </SinglePost>

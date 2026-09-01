@@ -106,6 +106,11 @@ export default defineConfig({
     // 迁移快捷入口
     '/migrate': '/docs/migration/from-moltbot/',
     '/migration': '/docs/migration/from-moltbot/',
+    // 博客 URL 规范化重定向（文件名重命名）
+    '/blog/0penclaw-latest-breakthroughs': '/blog/openclaw-latest-breakthroughs/',
+    '/blog/how-to-install-openclaw_clawdbot-on-digitalocean': '/blog/how-to-install-openclaw-clawdbot-on-digitalocean/',
+    '/blog/how-to-install-openclaw_clawdbot-on-zeabur': '/blog/how-to-install-openclaw-clawdbot-on-zeabur/',
+    '/blog/openclaw_clawdbot-usage-use-cases': '/blog/openclaw-clawdbot-usage-use-cases/',
   },
 
   image: {

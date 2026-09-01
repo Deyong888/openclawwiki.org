@@ -1,13 +1,12 @@
 ---
 title: 'How to Deploy OpenClaw (Moltbot) on Vultr VPS: The Ultimate Guide with $300 Free Credit'
-description: 'Step-by-step guide to installing OpenClaw (formerly Clawdbot/Moltbot) on a Vultr VPS. Get $300 free credit to run your AI agent 24/7 without touching your own computer.'
+image: ~/assets/images/blog/how-to-deploy-openclaw-moltbot-on-vultr-vps.png
 excerpt: 'Stop running AI agents on your laptop. Learn how to deploy OpenClaw on a high-performance Vultr cloud server for free (using our exclusive $300 credit link). Docker setup included.'
 publishDate: 2026-02-05
 lastmod: 2026-02-05
 author: 'OpenClaw Wiki Team'
 tags: ['deploy openclaw', 'install clawdbot', 'moltbot vps', 'vultr tutorial', 'ai agent hosting']
 category: 'Server Deployment'
-canonical: 'https://openclawwiki.org/deploy-openclaw-on-vultr/'
 schema:
   type: 'HowTo'
   name: 'How to Deploy OpenClaw on Vultr VPS'

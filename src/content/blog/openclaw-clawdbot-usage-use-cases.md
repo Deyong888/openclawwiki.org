@@ -1,13 +1,12 @@
 ---
 title: 'OpenClaw Explained: Usage, Use Cases, and the Evolution from Clawdbot & Moltbot (2026 Guide)'
-description: 'Discover how OpenClaw (formerly Clawdbot/Moltbot) is revolutionizing self-hosted AI. Explore real-world use cases—from automating emails to coding assistance—and learn why it is the top choice for secure, personal AI agents in 2026.'
+image: ~/assets/images/blog/openclaw-clawdbot-usage-use-cases.png
 excerpt: 'OpenClaw is more than just a chatbot—it is an autonomous agent that does things. In this deep dive, we explore its chaotic history, its powerful capabilities, and the most innovative ways the community is using it today.'
 publishDate: 2026-01-31
 lastmod: 2026-01-31
 author: 'OpenClaw Wiki Editorial Team'
 tags: ['openclaw', 'clawdbot', 'moltbot', 'ai-use-cases', 'self-hosted-ai', 'automation']
 category: 'Deep Dives'
-canonical: 'https://openclawwiki.org/openclaw_clawdbot-use-cases/'
 featured: true
 schema:
   type: 'TechArticle'
@@ -100,7 +99,7 @@ A: The software itself is open-source and free. However, you need to pay for the
 A: Yes, the best way is to use **Docker Desktop for Windows**. Avoid running it directly in PowerShell to prevent security risks.
 
 **Q: What happens if I close my computer?**
-A: If you run it locally, the bot goes offline. For 24/7 availability, we recommend deploying it on a [VPS](/blog/how-to-deploy-openclaw-moltbot-on-vultr-vps) or [Zeabur](/blog/how-to-install-openclaw_clawdbot-on-zeabur).
+A: If you run it locally, the bot goes offline. For 24/7 availability, we recommend deploying it on a [VPS](/blog/how-to-deploy-openclaw-moltbot-on-vultr-vps) or [Zeabur](/blog/how-to-install-openclaw-clawdbot-on-zeabur).
 
 ---
 
@@ -110,7 +109,7 @@ Ready to build your own AI agent? We have prepared detailed guides for every pla
 
 *   **[Installation Guide (Docker/Local)](/blog/how-to-install-openclaw)**: The standard way to install on Windows, Mac, or Linux.
 *   **[Deploy on Vultr VPS](/blog/how-to-deploy-openclaw-moltbot-on-vultr-vps)**: Run it 24/7 in the cloud with $300 free credit.
-*   **[One-Click Deploy on Zeabur](/blog/how-to-install-openclaw_clawdbot-on-zeabur)**: The easiest, no-code method.
+*   **[One-Click Deploy on Zeabur](/blog/how-to-install-openclaw-clawdbot-on-zeabur)**: The easiest, no-code method.
 
 ---
 

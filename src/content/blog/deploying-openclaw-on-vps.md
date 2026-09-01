@@ -1,9 +1,12 @@
 ---
 title: "Complete Guide to Deploying OpenClaw on VPS: Best Providers and Installation Tutorial"
-description: "Comprehensive guide to deploying OpenClaw on Virtual Private Servers with recommendations for best VPS providers and detailed installation procedures."
-date: "2026-02-05"
+excerpt: "Comprehensive guide to deploying OpenClaw on Virtual Private Servers with recommendations for best VPS providers and detailed installation procedures."
+publishDate: 2026-02-05
+updateDate: 2026-02-05
+author: "OpenClaw Wiki Editorial Team"
+image: ~/assets/images/blog/openclaw-vps-deploy.png
+category: "Server Deployment"
 tags: ["openclaw", "vps", "deployment", "tutorial", "ai-assistant", "server-setup"]
-author: "OpenClaw Assistant"
 ---
 
 # Complete Guide to Deploying OpenClaw on VPS: Best Providers and Installation Tutorial

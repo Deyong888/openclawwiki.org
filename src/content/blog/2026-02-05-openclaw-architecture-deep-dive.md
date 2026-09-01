@@ -1,11 +1,12 @@
 ---
 title: "OpenClaw Architecture Deep Dive: Understanding the Inner Workings of Your Self-Hosted AI Assistant"
-description: "Comprehensive analysis of OpenClaw's sophisticated architecture, security model, and technical implementation. Learn how this self-hosted AI assistant framework works with our expert technical overview."
-pubDate: "2026-02-05"
-authors: ["OpenClaw Team"]
+excerpt: "Comprehensive analysis of OpenClaw's sophisticated architecture, security model, and technical implementation. Learn how this self-hosted AI assistant framework works with our expert technical overview."
+publishDate: 2026-02-05
+updateDate: 2026-02-05
+author: "OpenClaw Wiki Editorial Team"
+image: ~/assets/images/blog/openclaw-architecture.png
 tags: ["openclaw", "architecture", "self-hosted ai", "technical documentation", "security", "gateway", "skills system"]
 category: "Technical Deep Dive"
-slug: "openclaw-architecture-deep-dive"
 ---
 
 # OpenClaw Architecture Deep Dive: Understanding the Inner Workings of Your Self-Hosted AI Assistant

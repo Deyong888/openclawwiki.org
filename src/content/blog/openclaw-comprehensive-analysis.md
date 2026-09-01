@@ -1,7 +1,11 @@
 ---
 title: "OpenClaw Comprehensive Analysis: The Agentic Shift in AI"
-date: "2026-02-07"
-description: "An in-depth analysis of OpenClaw, covering its features, benefits, and security implications."
+excerpt: "An in-depth analysis of OpenClaw, covering its features, benefits, and the security implications of running an autonomous agent on your own hardware."
+publishDate: 2026-02-07
+updateDate: 2026-02-07
+author: "OpenClaw Wiki Editorial Team"
+image: ~/assets/images/blog/openclaw-analysis.png
+category: "Technical Analysis"
 tags: ["OpenClaw", "AI", "Agentic AI", "Security"]
 ---
 
