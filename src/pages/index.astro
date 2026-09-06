@@ -9,6 +9,7 @@ import ToolsGlass from '~/components/home/ToolsGlass.astro';
 import GlassFaq from '~/components/home/GlassFaq.astro';
 import CtaGlow from '~/components/home/CtaGlow.astro';
 import TrafficBanner from '~/components/custom/TrafficBanner.astro';
+import RevealScript from '~/components/common/RevealScript.astro';
 
 const metadata = {
   title: 'OpenClaw Wiki — The Self-Hosted AI Assistant Guide',
@@ -35,39 +36,6 @@ const metadata = {
       <TrafficBanner variant="footer" site="all" />
     </div>
   </div>
+
+  <RevealScript />
 </Layout>
-
-<script>
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const items = document.querySelectorAll<HTMLElement>('.deep-scope .reveal');
-
-  if (reduce || !('IntersectionObserver' in window)) {
-    items.forEach((el) => el.classList.add('is-in'));
-  } else {
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-in');
-            io.unobserve(entry.target);
-          }
-        }
-      },
-      { rootMargin: '0px 0px -8% 0px', threshold: 0.06 }
-    );
-    items.forEach((el, i) => {
-      // Stagger siblings slightly so groups cascade instead of popping.
-      (el as HTMLElement).style.transitionDelay = `${Math.min(i % 6, 5) * 55}ms`;
-      io.observe(el);
-    });
-  }
-</script>
-
-<noscript>
-  <style>
-    .deep-scope .reveal {
-      opacity: 1 !important;
-      transform: none !important;
-    }
-  </style>
-</noscript>

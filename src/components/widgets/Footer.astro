@@ -29,7 +29,9 @@ export interface Props {
 const { socialLinks = [], secondaryLinks = [], links = [], footNote = '', theme = 'light', variant = 'default' } =
   Astro.props;
 
-const isDeep = variant === 'deep' || Astro.url.pathname === '/';
+// Pages built on the deep-space glass theme (must match Header.astro).
+const DEEP_PATHS = new Set(['/', '/gpt-6-astra-usecases/']);
+const isDeep = variant === 'deep' || DEEP_PATHS.has(Astro.url.pathname);
 ---
 
 <footer

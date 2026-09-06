@@ -48,7 +48,11 @@ const {
 } = Astro.props;
 
 const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
-const isDeep = variant === 'deep' || currentPath === '/';
+
+// Pages built on the deep-space glass theme. On these the nav text must stay
+// light even while the site-wide theme is in light mode.
+const DEEP_PATHS = new Set(['/', '/gpt-6-astra-usecases']);
+const isDeep = variant === 'deep' || DEEP_PATHS.has(currentPath);
 ---
 
 <header

@@ -1,0 +1,606 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import RevealScript from '~/components/common/RevealScript.astro';
+import { cases, categories, caseCount } from '~/data/gpt6-astra-cases';
+
+const title = `GPT-6 Astra Use Cases: ${caseCount} Real Examples (September 2026)`;
+const description = `${caseCount} GPT-6 Astra use cases gathered from public X posts and OpenAI launch materials, organised by task category, each with its source and an honest note on what was actually verified.`;
+
+const metadata = {
+  title,
+  description,
+  ignoreTitleTemplate: true,
+  openGraph: { type: 'article' },
+};
+
+const counts = categories.map((c) => ({
+  ...c,
+  n: cases.filter((k) => k.category === c.id).length,
+}));
+
+const typeLabel: Record<string, string> = {
+  demo: 'Demo',
+  benchmark: 'Benchmark',
+  integration: 'Integration',
+  review: 'Review',
+};
+
+// Benchmark table. Scores are vendor-reported unless noted.
+const benchmarks = [
+  { name: 'FrontierMath Tier 4 (v2)', astra: '97.6%', note: 'Research-level mathematics' },
+  { name: 'GPQA Diamond', astra: '96.0%', note: 'Graduate-level science reasoning' },
+  { name: 'BenchCAD', astra: '95.9%', note: '3D reconstruction from multiple views' },
+  { name: 'BrowseComp', astra: '91.5%', note: 'Browsing and retrieval' },
+  { name: 'SRE-Bench', astra: '99.2%', note: 'Site reliability tasks' },
+  { name: 'ExploitBench', astra: '100%', note: 'Cybersecurity, no production safeguards' },
+  { name: 'ARC-AGI-3', astra: '99.9%', note: 'Provider adapter; 62.7% on standard harness' },
+  { name: "Agent's Last Exam", astra: '59.3%', note: 'Complex professional software tasks' },
+  { name: 'Terminal-Bench Science 0.1', astra: '64.6%', note: 'Scientific research workflows' },
+  { name: 'Terminal-Bench 4.0', astra: '57.9%', note: 'Coding' },
+  { name: 'DeepSWE 1.1', astra: '74.1%', note: 'Long-horizon engineering tasks' },
+];
+
+const faqs = [
+  {
+    q: 'What is GPT-6 Astra?',
+    a: 'GPT-6 Astra is OpenAI frontier model announced on 3 September 2026. It is a reasoning model with a 1,050,000-token context window, 128,000 max output tokens, a knowledge cutoff of 30 April 2026, and built-in computer use, web search, code interpreter and MCP tool access. Input accepts text and images; output is text only.',
+  },
+  {
+    q: 'Is GPT-6 Astra free?',
+    a: 'No. There is no free tier. Rollout began with Daybreak enterprise customers, then ChatGPT Plus, Pro, Business and Enterprise, plus the OpenAI API, Microsoft Azure and AWS Bedrock. Enterprise administrators must enable it per workspace, and it is off by default.',
+  },
+  {
+    q: 'How much does GPT-6 Astra cost?',
+    a: 'API pricing is $10 per million input tokens and $50 per million output tokens, with cached input at $1 per million. A Fast mode doubles throughput at $20 input and $100 output. On the consumer side, the $200 Pro plan allows 200 calls per week, while the $100 tier drops to 50 per week, compared with roughly 170 calls per day for GPT-5.6 Sol at the same tier.',
+  },
+  {
+    q: 'Are these use cases verified?',
+    a: 'Most are creator-reported demos rather than independently audited results. This page labels each case with its type and includes the stated limitation, because a playable prototype is not a finished product and a vendor benchmark is not a production guarantee. Treat the collection as a map of what to try, not as a certificate of what works.',
+  },
+  {
+    q: 'Can I run these workflows on my own hardware?',
+    a: 'GPT-6 Astra itself is a hosted model, so the inference always runs on OpenAI infrastructure or a cloud partner. What you can control is the agent layer around it, including which files and tools it can reach and where the logs live. If keeping prompts and documents on your own machine matters, a self-hosted agent such as OpenClaw gives you that control over everything except the model call itself.',
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: title,
+  description,
+  url: 'https://openclawwiki.org/gpt-6-astra-usecases/',
+  datePublished: '2026-09-05',
+  dateModified: '2026-09-05',
+  publisher: { '@type': 'Organization', name: 'OpenClaw Wiki' },
+  mainEntity: {
+    '@type': 'ItemList',
+    numberOfItems: caseCount,
+    itemListElement: cases.slice(0, 30).map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: c.title,
+      url: c.url,
+    })),
+  },
+};
+---
+
+<Layout metadata={metadata}>
+  <Fragment slot="announcement" />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <div class="deep-scope">
+    <!-- ================= HERO ================= -->
+    <section class="relative overflow-hidden">
+      <div
+        class="aurora aurora-blue"
+        style="width: 44rem; height: 30rem; top: -15rem; left: 50%; transform: translateX(-50%);"
+        aria-hidden="true"
+      >
+      </div>
+      <div class="aurora aurora-violet" style="width: 30rem; height: 26rem; top: -6rem; right: -12rem;" aria-hidden="true">
+      </div>
+
+      <div class="relative z-10 mx-auto max-w-6xl px-5 sm:px-8">
+        <div class="py-20 text-center md:py-28">
+          <p class="dg-eyebrow reveal">Updated 5 September 2026</p>
+          <h1 class="dg-display reveal mt-5 text-balance">
+            GPT-6 Astra<br /><span class="dg-gradient-text">Use Cases</span>
+          </h1>
+          <p class="dg-lede reveal mx-auto mt-7 max-w-[44rem] text-balance">
+            {caseCount} things people actually built with OpenAI GPT-6 Astra in its first days, collected from public X
+            posts and launch materials. Every entry keeps its source and its limitation, so you can tell a working
+            prototype from a marketing claim.
+          </p>
+
+          <div class="reveal mx-auto mt-11 grid max-w-3xl grid-cols-2 gap-4 md:grid-cols-4">
+            <div class="glass-soft p-5">
+              <div class="dg-gradient-text text-[1.75rem] font-bold leading-none tracking-[-0.03em]">{caseCount}</div>
+              <div class="mt-1.5 text-[0.75rem] uppercase tracking-[0.1em] text-[color:var(--dg-text-3)]">
+                Cases collected
+              </div>
+            </div>
+            <div class="glass-soft p-5">
+              <div class="dg-gradient-text text-[1.75rem] font-bold leading-none tracking-[-0.03em]">8</div>
+              <div class="mt-1.5 text-[0.75rem] uppercase tracking-[0.1em] text-[color:var(--dg-text-3)]">
+                Task categories
+              </div>
+            </div>
+            <div class="glass-soft p-5">
+              <div class="dg-gradient-text text-[1.75rem] font-bold leading-none tracking-[-0.03em]">1.05M</div>
+              <div class="mt-1.5 text-[0.75rem] uppercase tracking-[0.1em] text-[color:var(--dg-text-3)]">
+                Token context
+              </div>
+            </div>
+            <div class="glass-soft p-5">
+              <div class="dg-gradient-text text-[1.75rem] font-bold leading-none tracking-[-0.03em]">$10/$50</div>
+              <div class="mt-1.5 text-[0.75rem] uppercase tracking-[0.1em] text-[color:var(--dg-text-3)]">
+                Per M in / out
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= WHAT IT IS ================= -->
+    <section class="relative mx-auto max-w-5xl px-5 pb-8 sm:px-8">
+      <div class="glass reveal p-7 md:p-9">
+        <h2 class="dg-h3">What GPT-6 Astra is</h2>
+        <p class="dg-body mt-3">
+          Announced 3 September 2026 and named from the Latin for "stars", Astra is OpenAI's most capable and most
+          heavily aligned model to date. The headline change is not raw reasoning but <strong class="text-white">computer
+          use</strong>: it drives existing desktop software rather than describing how to use it.
+        </p>
+
+        <dl class="mt-7 grid gap-x-8 gap-y-4 sm:grid-cols-2">
+          <div class="flex justify-between gap-4 border-b border-white/[0.07] pb-3">
+            <dt class="text-[0.9375rem] text-[color:var(--dg-text-3)]">Context window</dt>
+            <dd class="text-[0.9375rem] font-medium">1,050,000 tokens</dd>
+          </div>
+          <div class="flex justify-between gap-4 border-b border-white/[0.07] pb-3">
+            <dt class="text-[0.9375rem] text-[color:var(--dg-text-3)]">Max output</dt>
+            <dd class="text-[0.9375rem] font-medium">128,000 tokens</dd>
+          </div>
+          <div class="flex justify-between gap-4 border-b border-white/[0.07] pb-3">
+            <dt class="text-[0.9375rem] text-[color:var(--dg-text-3)]">Knowledge cutoff</dt>
+            <dd class="text-[0.9375rem] font-medium">30 April 2026</dd>
+          </div>
+          <div class="flex justify-between gap-4 border-b border-white/[0.07] pb-3">
+            <dt class="text-[0.9375rem] text-[color:var(--dg-text-3)]">Model ID</dt>
+            <dd class="font-mono text-[0.9375rem] font-medium">gpt-6-astra</dd>
+          </div>
+          <div class="flex justify-between gap-4 border-b border-white/[0.07] pb-3">
+            <dt class="text-[0.9375rem] text-[color:var(--dg-text-3)]">Input / output</dt>
+            <dd class="text-[0.9375rem] font-medium">Text + image / text</dd>
+          </div>
+          <div class="flex justify-between gap-4 border-b border-white/[0.07] pb-3">
+            <dt class="text-[0.9375rem] text-[color:var(--dg-text-3)]">Built-in tools</dt>
+            <dd class="text-[0.9375rem] font-medium">Search, code, computer use, MCP</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- ================= BENCHMARKS ================= -->
+    <section class="relative mx-auto max-w-5xl px-5 py-16 sm:px-8">
+      <div class="mx-auto max-w-3xl text-center">
+        <p class="dg-eyebrow reveal">The numbers</p>
+        <h2 class="dg-h2 reveal mt-4 text-balance">Benchmarks, with the asterisks attached</h2>
+        <p class="dg-lede reveal mx-auto mt-5 max-w-2xl text-balance">
+          Every score below was published by OpenAI at release. Several are saturated, which means they no longer
+          separate frontier models from each other.
+        </p>
+      </div>
+
+      <div class="glass reveal mt-12 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[34rem] text-left text-[0.9375rem]">
+            <thead>
+              <tr class="border-b border-white/[0.09] text-[0.75rem] uppercase tracking-[0.09em] text-[color:var(--dg-text-3)]">
+                <th class="px-6 py-4 font-semibold">Benchmark</th>
+                <th class="px-4 py-4 font-semibold">Astra</th>
+                <th class="px-6 py-4 font-semibold">What it measures</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                benchmarks.map((b) => (
+                  <tr class="border-b border-white/[0.05] last:border-0">
+                    <td class="px-6 py-3.5 font-medium">{b.name}</td>
+                    <td class="dg-gradient-text px-4 py-3.5 font-bold tabular-nums">{b.astra}</td>
+                    <td class="px-6 py-3.5 text-[0.875rem] text-[color:var(--dg-text-3)]">{b.note}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="glass-soft reveal mt-5 p-6">
+        <h3 class="dg-h3 text-[1.0625rem]">The ARC-AGI-3 result needs a footnote</h3>
+        <p class="dg-body mt-2.5 text-[0.9375rem]">
+          OpenAI reports 99.9% on ARC-AGI-3. ARC Prize, which owns the benchmark, measured 62.7% using its standard
+          harness and 99.9% only through a provider adapter that preserves OpenAI's opaque reasoning state between
+          requests. Both describe the same model under different scaffolding. ARC Prize also stated that saturating
+          the benchmark "would not represent proof of achieving AGI", and noted a genuinely interesting secondary
+          result: Astra used fewer actions than the median human tester on 96% of completed levels, across roughly 500
+          general-public participants.
+        </p>
+        <p class="dg-body mt-3 text-[0.9375rem]">
+          Separately, GDPval - OpenAI's own measure of performance on real occupational tasks - was absent from the
+          launch materials. For a release marketed on economic generality, that omission is worth watching.
+        </p>
+      </div>
+    </section>
+
+    <!-- ================= CASE BROWSER ================= -->
+    <section class="relative mx-auto max-w-6xl px-5 py-8 sm:px-8" id="cases">
+      <div class="mx-auto max-w-3xl text-center">
+        <p class="dg-eyebrow reveal">The collection</p>
+        <h2 class="dg-h2 reveal mt-4 text-balance">Browse {caseCount} GPT-6 Astra use cases</h2>
+        <p class="dg-lede reveal mx-auto mt-5 max-w-2xl text-balance">
+          Filter by category or search by tool, author or outcome. Each card ends with the limitation that came with
+          it, because most of these are demos, not audits.
+        </p>
+      </div>
+
+      <!-- Controls -->
+      <div class="reveal mt-12">
+        <div class="glass-soft flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between">
+          <div class="relative w-full md:max-w-xs">
+            <svg
+              class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[color:var(--dg-text-3)]"
+              viewBox="0 0 20 20"
+              fill="none"
+              aria-hidden="true"
+            >
+              <circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.6"></circle>
+              <path d="M13.5 13.5 17 17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+            </svg>
+            <input
+              id="astrasearch"
+              type="search"
+              placeholder="Search cases, tools, authors"
+              aria-label="Search use cases"
+              class="w-full rounded-full border border-white/[0.09] bg-white/[0.04] py-2.5 pl-10 pr-4 text-[0.9375rem] text-[color:var(--dg-text)] placeholder:text-[color:var(--dg-text-3)] focus:border-white/25 focus:outline-none focus:ring-2 focus:ring-sky-400/40"
+            />
+          </div>
+
+          <div class="flex flex-wrap gap-2" role="group" aria-label="Filter by category">
+            <button type="button" data-filter="all" class="dg-chip is-active">All {caseCount}</button>
+            {
+              counts.map((c) => (
+                <button type="button" data-filter={c.id} class="dg-chip">
+                  {c.label.split(' ')[0]} {c.n}
+                </button>
+              ))
+            }
+          </div>
+        </div>
+        <p id="astraempty" class="mt-6 hidden text-center text-[0.9375rem] text-[color:var(--dg-text-3)]">
+          No cases match that search. Try a different term or clear the filters.
+        </p>
+      </div>
+
+      <!-- Grid -->
+      <div id="astragrid" class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {
+          cases.map((c) => (
+            <article
+              class="glass glass-card reveal flex flex-col p-6"
+              data-category={c.category}
+              data-search={`${c.title} ${c.summary} ${c.author} ${c.handle} ${(c.tools || []).join(' ')} ${c.category} ${typeLabel[c.type]}`.toLowerCase()}
+            >
+              <div class="mb-4 flex items-center justify-between gap-3">
+                <span class="dg-pill">{categories.find((k) => k.id === c.category)?.label.split(' ')[0]}</span>
+                <span class:list={['dg-type', `dg-type-${c.type}`]}>{typeLabel[c.type]}</span>
+              </div>
+
+              <h3 class="dg-h3 text-[1.0625rem] leading-snug">{c.title}</h3>
+              <p class="dg-body mt-2.5 flex-1 text-[0.9375rem]">{c.summary}</p>
+
+              {c.metric && (
+                <p class="dg-gradient-text mt-4 text-[0.875rem] font-bold tracking-[-0.01em]">{c.metric}</p>
+              )}
+
+              {c.tools && c.tools.length > 0 && (
+                <div class="mt-4 flex flex-wrap gap-1.5">
+                  {c.tools.map((t) => (
+                    <span class="dg-tag">{t}</span>
+                  ))}
+                </div>
+              )}
+
+              {c.caveat && (
+                <p class="mt-4 border-t border-white/[0.07] pt-3.5 text-[0.8125rem] leading-relaxed text-[color:var(--dg-text-3)]">
+                  <span class="font-semibold text-amber-300/90">Caveat:</span> {c.caveat}
+                </p>
+              )}
+
+              <div class="mt-5 flex items-center justify-between gap-3 border-t border-white/[0.07] pt-4">
+                <span class="text-[0.8125rem] text-[color:var(--dg-text-3)]">{c.date}</span>
+                {c.url ? (
+                  <a
+                    href={c.url}
+                    class="text-[0.8125rem] font-semibold text-sky-300 underline-offset-4 hover:underline"
+                    rel="noopener noreferrer nofollow"
+                    target="_blank"
+                  >
+                    {c.author} &rarr;
+                  </a>
+                ) : (
+                  <span class="text-[0.8125rem] font-semibold text-sky-300">{c.author}</span>
+                )}
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- ================= VERIFIED VS CLAIMED ================= -->
+    <section class="relative mx-auto max-w-4xl px-5 py-20 sm:px-8">
+      <div class="glass reveal p-7 md:p-9">
+        <p class="dg-eyebrow">Read this before you copy anything</p>
+        <h2 class="dg-h2 mt-4 text-[1.75rem]">Demos, benchmarks and claims are three different things</h2>
+        <div class="mt-7 space-y-5">
+          <div>
+            <h3 class="dg-h3 text-[1.0625rem]">Demo</h3>
+            <p class="dg-body mt-1.5 text-[0.9375rem]">
+              Someone posted a result. Most of this page is demos. They show what is possible in one run, not what
+              holds up under repetition, load or audit.
+            </p>
+          </div>
+          <div>
+            <h3 class="dg-h3 text-[1.0625rem]">Benchmark</h3>
+            <p class="dg-body mt-1.5 text-[0.9375rem]">
+              A scored evaluation on a fixed task set. More reliable than a demo, but saturated benchmarks stop
+              discriminating between models, and vendor-reported scores should be treated as marketing until an
+              independent party reproduces them.
+            </p>
+          </div>
+          <div>
+            <h3 class="dg-h3 text-[1.0625rem]">Integration</h3>
+            <p class="dg-body mt-1.5 text-[0.9375rem]">
+              Astra is one component in a larger pipeline. Results depend on the other tools involved, so they cannot
+              be attributed to the model alone.
+            </p>
+          </div>
+          <div>
+            <h3 class="dg-h3 text-[1.0625rem]">Review</h3>
+            <p class="dg-body mt-1.5 text-[0.9375rem]">
+              Someone tested it against a defined standard, with enough detail that you could rerun it. The most
+              trustworthy category here, and the smallest.
+            </p>
+          </div>
+        </div>
+        <p class="dg-body mt-6 border-t border-white/[0.07] pt-6">
+          The pattern worth noticing is which tasks keep appearing. People are not showing off chat quality. They are
+          pointing at jobs they had already tried and failed to automate with previous frontier models. That
+          "previously impossible backlog" is a better test of this generation than any saturated benchmark.
+        </p>
+      </div>
+    </section>
+
+    <!-- ================= ACCESS ================= -->
+    <section class="relative mx-auto max-w-4xl px-5 pb-20 sm:px-8">
+      <div class="glass-soft reveal p-7 md:p-8">
+        <h2 class="dg-h3">The catch: access and quota</h2>
+        <p class="dg-body mt-2.5 text-[0.9375rem]">
+          Astra has no free tier, and quotas are tighter than the previous generation. On the $200 Pro plan you get
+          about 200 calls per week, where the same tier allowed roughly 170 GPT-5.6 Sol calls per day. The $100 tier
+          drops to about 50 per week. Enterprise administrators must enable the model per workspace, and it ships off
+          by default.
+        </p>
+        <p class="dg-body mt-3 text-[0.9375rem]">
+          The cost argument is more nuanced than the sticker price. OpenAI estimates that at the highest effort
+          setting, completing a DeepSWE task costs about 57% less than with Sol, because Astra needs fewer output
+          tokens and fewer retries. Latent Space reported an effective rate under $6 per hour of automated engineering
+          after more than 20 billion tokens, though that reflects their throughput and their assumptions.
+        </p>
+        <p class="dg-body mt-3 text-[0.9375rem]">
+          Model your own workload before committing. Our
+          <a class="text-sky-300 underline-offset-4 hover:underline" href="/tools/claude-cost-estimator/">cost estimator</a>
+          works through the arithmetic.
+        </p>
+      </div>
+    </section>
+
+    <!-- ================= FAQ ================= -->
+    <section class="relative mx-auto max-w-4xl px-5 pb-24 sm:px-8">
+      <div class="text-center">
+        <p class="dg-eyebrow reveal">FAQ</p>
+        <h2 class="dg-h2 reveal mt-4 text-balance">Common questions</h2>
+      </div>
+      <div class="mt-12 space-y-3.5">
+        {
+          faqs.map((f) => (
+            <details class="glass glass-card dg-faq reveal overflow-hidden">
+              <summary class="dg-faq-summary flex cursor-pointer list-none items-center justify-between gap-5 px-6 py-5 md:px-7">
+                <h3 class="dg-h3 pr-2 text-[1.0625rem]">{f.q}</h3>
+                <svg
+                  class="dg-chevron h-4 w-4 shrink-0 text-[color:var(--dg-text-3)] transition-transform duration-300"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </summary>
+              <div class="border-t border-white/[0.07] px-6 pb-6 pt-5 md:px-7">
+                <p class="dg-body">{f.a}</p>
+              </div>
+            </details>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- ================= CTA ================= -->
+    <section class="relative overflow-hidden px-5 pb-28 sm:px-8">
+      <div
+        class="aurora aurora-blue"
+        style="width: 34rem; height: 22rem; bottom: -12rem; left: 50%; transform: translateX(-50%);"
+        aria-hidden="true"
+      >
+      </div>
+      <div class="glass reveal relative z-10 mx-auto max-w-3xl px-6 py-12 text-center md:px-12">
+        <h2 class="dg-h2 text-[1.75rem] text-balance">Want the same control over a model you can inspect?</h2>
+        <p class="dg-lede mx-auto mt-4 max-w-xl text-balance">
+          Astra runs on someone else's hardware. If the interesting part for you is the agent layer rather than the
+          model, OpenClaw lets you keep prompts, files and logs on your own machine.
+        </p>
+        <div class="mt-9 flex flex-col items-stretch gap-3.5 sm:flex-row sm:items-center sm:justify-center">
+          <a href="/docs/getting-started/quick-start/" class="dg-btn dg-btn-primary">Get started with OpenClaw</a>
+          <a href="/blog/why-ai-agents-fail-in-production/" class="dg-btn dg-btn-ghost">
+            Why agents fail in production
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <RevealScript />
+  </div>
+</Layout>
+
+<script>
+  function initAstraFilter() {
+    const input = document.getElementById('astrasearch') as HTMLInputElement | null;
+    const grid = document.getElementById('astragrid');
+    const empty = document.getElementById('astraempty');
+    const chips = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-filter]'));
+
+    if (input && grid) {
+      const cards = Array.from(grid.querySelectorAll<HTMLElement>('[data-category]'));
+      let active = 'all';
+
+      const apply = () => {
+        const q = (input.value || '').trim().toLowerCase();
+        let shown = 0;
+
+        for (const card of cards) {
+          const matchesCat = active === 'all' || card.dataset.category === active;
+          const matchesQuery = !q || (card.dataset.search || '').includes(q);
+          const visible = matchesCat && matchesQuery;
+          card.hidden = !visible;
+          if (visible) shown++;
+        }
+
+        if (empty) empty.classList.toggle('hidden', shown !== 0);
+      };
+
+      input.addEventListener('input', apply);
+
+      for (const chip of chips) {
+        chip.addEventListener('click', () => {
+          active = chip.dataset.filter || 'all';
+          chips.forEach((c) => c.classList.toggle('is-active', c === chip));
+          apply();
+        });
+      }
+    }
+  }
+
+  // Re-run after every client-side navigation (Astro View Transitions), plus a
+  // readyState fallback for the no-ClientRouter case.
+  document.addEventListener('astro:page-load', initAstraFilter);
+  if (document.readyState !== 'loading') {
+    initAstraFilter();
+  } else {
+    document.addEventListener('DOMContentLoaded', initAstraFilter);
+  }
+</script>
+
+<style>
+  .dg-chip {
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    background-color: rgba(255, 255, 255, 0.04);
+    padding: 0.4rem 0.85rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--dg-text-2, #b3bed0);
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+  }
+  .dg-chip:hover {
+    background-color: rgba(255, 255, 255, 0.09);
+    color: #fff;
+  }
+  .dg-chip.is-active {
+    background-color: rgba(10, 132, 255, 0.22);
+    border-color: rgba(125, 211, 252, 0.45);
+    color: #fff;
+  }
+  .dg-chip:focus-visible {
+    outline: 2px solid #7dd3fc;
+    outline-offset: 2px;
+  }
+
+  .dg-pill {
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 0.2rem 0.6rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--dg-text-2, #b3bed0);
+  }
+
+  .dg-type {
+    border-radius: 999px;
+    padding: 0.2rem 0.55rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .dg-type-demo {
+    background-color: rgba(56, 189, 248, 0.16);
+    color: #7dd3fc;
+  }
+  .dg-type-benchmark {
+    background-color: rgba(52, 211, 153, 0.16);
+    color: #6ee7b7;
+  }
+  .dg-type-integration {
+    background-color: rgba(167, 139, 250, 0.18);
+    color: #c4b5fd;
+  }
+  .dg-type-review {
+    background-color: rgba(251, 191, 36, 0.16);
+    color: #fcd34d;
+  }
+
+  .dg-tag {
+    border-radius: 7px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background-color: rgba(255, 255, 255, 0.035);
+    padding: 0.15rem 0.45rem;
+    font-size: 0.6875rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: var(--dg-text-3, #8b98ad);
+  }
+
+  .dg-faq-summary::-webkit-details-marker {
+    display: none;
+  }
+  .dg-faq-summary {
+    list-style: none;
+  }
+  .dg-faq[open] .dg-chevron {
+    transform: rotate(180deg);
+  }
+  .dg-faq[open] {
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dg-chevron {
+      transition: none;
+    }
+  }
+</style>

@@ -1,0 +1,74 @@
+---
+/**
+ * RevealScript — scroll-in animation for any `.reveal` element inside
+ * `.deep-scope`. Shared by every deep-space page so the behaviour stays
+ * consistent and the observer is only ever defined once.
+ *
+ * Fails safe: without JS, or with reduced motion, everything is visible.
+ *
+ * IMPORTANT (Astro View Transitions): the site uses <ClientRouter />, so
+ * client-side navigations do NOT re-run a page's module scripts. We therefore
+ * bind the initialiser to `astro:page-load`, which Astro fires after EVERY
+ * navigation (initial load included). A readyState fallback keeps things
+ * working even if view transitions are later disabled.
+ */
+---
+
+<script>
+  let revealObserver: IntersectionObserver | null = null;
+
+  function initDeepReveal() {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const items = document.querySelectorAll<HTMLElement>('.deep-scope .reveal');
+
+    // Reset any previous observer so re-navigations don't stack observers.
+    if (revealObserver) {
+      revealObserver.disconnect();
+      revealObserver = null;
+    }
+
+    if (reduce || !('IntersectionObserver' in window)) {
+      items.forEach((el) => el.classList.add('is-in'));
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-in');
+            io.unobserve(entry.target);
+          }
+        }
+      },
+      { rootMargin: '0px 0px -8% 0px', threshold: 0.06 }
+    );
+
+    items.forEach((el, i) => {
+      // Stagger siblings slightly so groups cascade instead of popping.
+      (el as HTMLElement).style.transitionDelay = `${Math.min(i % 6, 5) * 55}ms`;
+      io.observe(el);
+    });
+
+    revealObserver = io;
+  }
+
+  // Re-run after every client-side navigation (and the initial load).
+  document.addEventListener('astro:page-load', initDeepReveal);
+
+  // Fallback for the no-ClientRouter case (or if astro:page-load already fired).
+  if (document.readyState !== 'loading') {
+    initDeepReveal();
+  } else {
+    document.addEventListener('DOMContentLoaded', initDeepReveal);
+  }
+</script>
+
+<noscript>
+  <style>
+    .deep-scope .reveal {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  </style>
+</noscript>

@@ -20,7 +20,16 @@ export const headerData = {
     },
     {
       text: 'Showcase',
-      href: getPermalink('/showcase'),
+      links: [
+        {
+          text: 'Showcase Overview',
+          href: getPermalink('/showcase'),
+        },
+        {
+          text: 'GPT-6 Astra Use Cases',
+          href: '/gpt-6-astra-usecases/',
+        },
+      ],
     },
     {
       text: 'Tools',
@@ -71,6 +80,7 @@ export const footerData = {
         { text: 'Documentation', href: '/docs/getting-started/quick-start/' },
         { text: 'Blog', href: getBlogPermalink() },
         { text: 'Migration Guide', href: '/moltbot-to-openclaw/' },
+        { text: 'GPT-6 Astra Use Cases', href: '/gpt-6-astra-usecases/' },
         { text: 'FAQ', href: getPermalink('/resources/faq') },
       ],
     },
@@ -117,7 +127,16 @@ export const headerDataZH = {
     },
     {
       text: '案例',
-      href: '/showcase/',
+      links: [
+        {
+          text: '案例概览',
+          href: '/showcase/',
+        },
+        {
+          text: 'GPT-6 Astra 使用案例',
+          href: '/gpt-6-astra-usecases/',
+        },
+      ],
     },
     {
       text: '工具',
@@ -168,6 +187,7 @@ export const footerDataZH = {
         { text: '文档', href: '/zh/docs/getting-started/quick-start/' },
         { text: '博客', href: '/blog/' },
         { text: '迁移指南', href: '/zh/moltbot-to-openclaw/' },
+        { text: 'GPT-6 Astra 使用案例', href: '/gpt-6-astra-usecases/' },
         { text: 'FAQ', href: '/zh/docs/migration/faq/' },
       ],
     },
